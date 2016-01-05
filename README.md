@@ -1,10 +1,15 @@
 - build this package
 - mbzirc is a meta-package, the hierarchical style is like
--- mbzirc folder
---- mbzirc package(meta)
----- launch folder, CMakeLists
---- gazebo_model,task1,task2,task3,README,setup,etc..
----- packages.
+
+###  mbzirc folder
+
+- mbzirc package(meta)
+
+-- launch folder, CMakeLists
+
+- gazebo_model,task1,task2,task3,README,setup,etc..
+
+-- packages.
 
 
 e.g. $ catkin build mbzirc
