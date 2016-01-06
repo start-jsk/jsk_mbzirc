@@ -1,6 +1,6 @@
 <package>
   <name>mbzirc</name>
-  <version>0.3.4</version>
+  <version>1.0.0</version>
   <description>
       Software of JSK lab in mbzirc challenge.
   </description>
@@ -22,7 +22,18 @@
 
   <!--   ugv task2 -->
   <run_depend>jsk_mbzirc_ugv_sim</run_depend>
-
+  	<!--   husky related -->
+  	<run_depend>husky_desktop</run_depend>
+  	<run_depend>husky_robot</run_depend>
+  	<run_depend>husky_simulator</run_depend>
+  	<run_depend>husky_customization</run_depend>
+  	<run_depend>husky_description</run_depend>
+	<run_depend>husky_control</run_depend>
+	<run_depend>husky_msgs</run_depend>
+	<run_depend>husky_navigation</run_depend>
+	<run_depend>husky_ur5_moveit_config</run_depend>
+	<!--   ur5 related -->
+	<run_depend>universal_robot</run_depend>
   <!--   uav task3 -->
 
 

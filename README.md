@@ -38,3 +38,7 @@ initial pose is very necessary
 
 # for husky, please install as follow:
 sudo apt-get install ros-indigo-husky-simulator
+
+# Before push do 
+`find . -type f -name '*~' -delete`
+
