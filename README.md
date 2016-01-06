@@ -36,8 +36,5 @@ $ roslaunch jsk_mbzirc_common mbzirc_arena.launch
 
 initial pose is very necessary 
 
-
-- for developer
-
-models are the sdf files, put those files into :~/.gazebo/models/
-or you can create new world
+# for husky, please install as follow:
+sudo apt-get install ros-indigo-husky-simulator
