@@ -32,12 +32,17 @@ $ roslaunch jsk_mbzirc_common mbzirc_arena.launch
 
 - run simulation of husky + ur5 
 
-`ROBOT_INITIAL_POSE="-y 65 -x 25" roslaunch jsk_mbzirc_ugv_sim husky_mbzirc.launch`
+`ROBOT_INITIAL_POSE="-y 65 -x 25 -Y -1.57" roslaunch jsk_mbzirc_ugv_sim husky_mbzirc.launch`
 
 initial pose is very necessary 
 
 # for husky, please install as follow:
-sudo apt-get install ros-indigo-husky-simulator
+do `./install.sh` 
+There maybe some ros packages that needed, like 
+ros-indigo-moveit-simple-controller-manager 
+ros-indigo-pr2-controller-manager 
+and etc. Plz follow the error message and do apt install.
+
 
 # Before push do 
 `find . -type f -name '*~' -delete`
