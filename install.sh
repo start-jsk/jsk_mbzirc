@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e 
 cd `pwd`/../
 ###husky repo 
 git clone https://github.com/husky/husky
