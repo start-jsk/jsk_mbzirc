@@ -7,7 +7,7 @@
 
 -- launch folder, CMakeLists
 
-- gazebo_model,task1,task2,task3,README,setup,etc..
+- jsk_mbzirc_common,task1,task2,task3,README,setup,etc..
 
 -- packages.
 
@@ -23,6 +23,8 @@ $ source ~/.bashrc
 
 
 - run mbzirc_arena wolrd in gazebo:
+
+model files can be found in jsk_mbzirc_common package
 
 $ gazebo mbzirc_arena.world
 
