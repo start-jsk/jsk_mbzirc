@@ -14,7 +14,9 @@ cd husky_simulator && git checkout gripper-and-roscontrol-fix && cd ..
 cd husky && git checkout gripper-addition && cp ../mbzirc/husky.patch ./
 git apply husky.patch && cd ..
 ###catkin make 
-cd .. && catkin_make install mbzirc
+#cd .. && catkin_make install mbzirc
 
-
+###catkin build 
+cp -r ./mbzirc/jsk_mbzirc_common/gazebo_model/models/* ~/.gazebo/models/
+catkin build mbzirc && cd ..
 

@@ -7,7 +7,7 @@
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   <arg name="verbose" default="false"/>
-  <arg name="world_name" default="$(find jsk_mbzirc_common)/../gazebo_model/world/mbzirc_arena.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESO\
+  <arg name="world_name" default="$(find jsk_mbzirc_common)/gazebo_model/world/mbzirc_arena.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESO\
 URCE_PATH environmental variable -->
 
   <!-- set use_sim_time flag -->
