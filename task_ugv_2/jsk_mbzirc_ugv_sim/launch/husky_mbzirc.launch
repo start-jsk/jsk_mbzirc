@@ -25,6 +25,8 @@
     <arg name="limited" value="$(arg limited)"/>
     <arg name="debug" value="$(arg debug)"/>
   </include>
+  <include file="$(find interactive_marker_twist_server)/launch/interactive_markers.launch">
+  </include>
 
 <!--rviz-->
   <arg name="debug_rviz" default="false" />
