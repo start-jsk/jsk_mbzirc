@@ -17,6 +17,6 @@ git apply husky.patch && cd ..
 #cd .. && catkin_make install mbzirc
 
 ###catkin build 
-
+cp -r ./mbzirc/jsk_mbzirc_common/gazebo_model/models/* ~/.gazebo/models/
 catkin build mbzirc && cd ..
 
