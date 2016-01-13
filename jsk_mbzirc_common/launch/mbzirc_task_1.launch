@@ -1,0 +1,8 @@
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>
+  <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena.launch" >
+    <arg name="paused" default="$(arg paused)"/>
+    <arg name="debug" default="$(arg debug)"/>
+  </include>
+</launch>
