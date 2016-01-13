@@ -36,6 +36,34 @@
       <uri>model://arena</uri>
     </include>
 
+    <include>
+      <pose>0 0 1.0 0 -0 0</pose>
+      <uri>model://truck</uri>
+    </include>
+
+    <model name="box">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <plugin name="mbzirc_gazebo_truck_plugin" filename="libmbzirc_gazebo_truck_plugin.so"/>
+    </model>        
+
 
     <state world_name='default'>
       <sim_time>164 424000000</sim_time>
