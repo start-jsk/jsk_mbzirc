@@ -15,6 +15,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>std_msgs</build_depend>
+
   <run_depend>husky_gazebo</run_depend>  
   <run_depend>husky_ur5_moveit_config</run_depend> 
   <run_depend>husky_control</run_depend> 
