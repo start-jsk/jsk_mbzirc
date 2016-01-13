@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.5'>
-  <model name='arena'>
-    <link name='link_arena'>
+  <model name='arenaold'>
+    <link name='link_arenaold'>
       <pose>0 0 0 0 -0 0</pose>
       <gravity>1</gravity>
       <self_collide>0</self_collide>
