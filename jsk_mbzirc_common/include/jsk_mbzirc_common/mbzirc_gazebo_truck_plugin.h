@@ -35,7 +35,7 @@ private:
 
   physics::WorldPtr world_;
   physics::LinkPtr link_;
-physics::ModelPtr model_;
+  physics::ModelPtr model_;
 
   std::string link_name_;
   std::string namespace_;
@@ -46,10 +46,10 @@ physics::ModelPtr model_;
 
   event::ConnectionPtr update_connection_;
 
-float x_;
-float y_;
-float direction_;
-bool cicle_;
+  float x_;
+  float y_;
+  float direction_;
+  bool cicle_;
 
 };
 
