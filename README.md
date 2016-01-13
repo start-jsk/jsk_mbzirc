@@ -34,7 +34,7 @@ $ roslaunch jsk_mbzirc_common mbzirc_arena.launch
 
 - run simulation of husky + ur5 
 
-`ROBOT_INITIAL_POSE="-y 65 -x 25 -Y -1.57" roslaunch jsk_mbzirc_ugv_sim husky_mbzirc.launch`
+`ROBOT_INITIAL_POSE="-y 65 -x 25 -z 0.03 -Y -1.57" roslaunch jsk_mbzirc_ugv_sim husky_mbzirc.launch`
 
 initial pose is very necessary 
 
