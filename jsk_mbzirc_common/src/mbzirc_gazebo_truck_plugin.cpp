@@ -26,10 +26,9 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   link_name_ = link_->GetName();
   namespace_.clear();
 
-  x_ = 0;
-  y_ = 0;
-  direction_ = 1;
-  circle_ = false;
+  traversed_ = 0;
+  last_time_ = world_->GetSimTime();
+  terminated_ = false;
 
   // load parameters from sdf
   if (_sdf->HasElement("robotNamespace")) namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -55,6 +54,7 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   node_handle_ = new ros::NodeHandle(namespace_);
+  pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true); // set latch true
   ros::NodeHandle param_handle(*node_handle_, "controller");
 
 
@@ -68,38 +68,79 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 // Update the controller
 void GazeboTruck::Update()
 {
-
-  if(x_ >= DISTANCE_THRE)
-  {
-    if(circle_ = false)
-    {
-      circle_ = true;
-      direction_ *= -1;
-    }
-
+  if ( terminated_ ) {
+    return;
   }
-  else if(x_ <= -DISTANCE_THRE)
-  {
-    if(circle_ = false)
-    {
-      circle_ = true;
-      direction_ *= -1;
-    }
+  //std::cerr << link_->GetWorldPose() << std::endl;
+  common::Time current_time = world_->GetSimTime();
+  double delta_time = (current_time-last_time_).Double();
+  double theta = acos(CIRCLE_RADIUS/(CIRCLE_DISTANCE/2));
+  double x, y, yaw;
+  double l1 = CIRCLE_DISTANCE*sin(theta);
+  double l2 = 2*CIRCLE_RADIUS*(M_PI-theta);
+  double all_l = l1 + l2 + l1 + l2;
+
+  //static const float VELOCITY = 4.16667;  //  4.16667 m/sec = 15 km/h, 2.77778 m/sec = 10 km/h, 1.38889 = 5 km/h
+  if ( current_time.Double() < 6*60 ) {
+    traversed_ += 4.16667 * delta_time;
+  } else if ( current_time.Double() < 12*60 ) {
+    traversed_ += 2.77778 * delta_time;
+  } else if ( current_time.Double() < 20*60 ) {
+    traversed_ += 1.38889 * delta_time;
+  } else {
+    ROS_FATAL("Time's up, Your challenge was over");
+    terminated_ = true;
   }
-  else
-  {
-    circle_ = false;
+  double l = fmod(traversed_, all_l);
+  ROS_DEBUG_STREAM("time: " << current_time.Double() << ", traversed: " << traversed_);
 
-    if(direction_ = 1)
-      model_->SetLinearVel(math::Vector3(VELOCITY/sqrt(2), VELOCITY/sqrt(2), 0));
-
-
-
+  if ( l < l1  ) {
+    x =  (l - l1/2)*sin(theta);
+    y = -(l - l1/2)*cos(theta);
+    yaw = theta-M_PI/2;
+  } else if ( l < l1 + l2 ) {
+    l = l - l1;
+    x = -CIRCLE_RADIUS * cos(l/l2*(2*M_PI-theta*2)+theta) + CIRCLE_DISTANCE/2;
+    y = -CIRCLE_RADIUS * sin(l/l2*(2*M_PI-theta*2)+theta);
+    yaw = (l/l2*(2*M_PI-theta*2)+theta)-M_PI/2;
+  } else if ( l < l1 + l2 + l1 ) {
+    l = l - (l1 + l2);
+    x = -(l - l1/2)*sin(theta);
+    y = -(l - l1/2)*cos(theta);
+    yaw =-M_PI/2-theta;
+  } else {
+    l = l - (l1 + l2 + l1);
+    x =  CIRCLE_RADIUS * cos(l/l2*(2*M_PI-theta*2)+theta) - CIRCLE_DISTANCE/2;
+    y = -CIRCLE_RADIUS * sin(l/l2*(2*M_PI-theta*2)+theta);
+    yaw = -(l/l2*(2*M_PI-theta*2)+theta)-M_PI/2;
   }
+  model_->SetLinkWorldPose(math::Pose(x, y, 0, 0, 0, yaw), link_);
+  last_time_ = world_->GetSimTime();
 
+  // check score
+  // void Entity::GetNearestEntityBelow(double &_distBelow,  std::string &_entityName)
 
+  gazebo::physics::RayShapePtr rayShape = boost::dynamic_pointer_cast<gazebo::physics::RayShape>(world_->GetPhysicsEngine()->CreateShape("ray", gazebo::physics::CollisionPtr()));
 
+  double distAbove;
+  std::string entityName;
+  math::Box box = link_->GetCollisionBoundingBox();
+  math::Vector3 start = link_->GetWorldPose().pos;
+  math::Vector3 end = start;
+  start.z = box.max.z + 0.00001;
+  end.z += 1000;
+  rayShape->SetPoints(start, end);
+  rayShape->GetIntersection(distAbove, entityName);
+  distAbove -= 0.00001;
 
+  //
+  if ( entityName != "" && distAbove < 1.0 ) {
+    std_msgs::String msg;
+    msg.data = "Mission Completed";
+    ROS_INFO(msg.data.c_str());
+    pub_score_.publish(msg);
+    terminated_ = true;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
