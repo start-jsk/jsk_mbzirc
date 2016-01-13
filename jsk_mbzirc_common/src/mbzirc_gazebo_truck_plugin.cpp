@@ -29,7 +29,7 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   x_ = 0;
   y_ = 0;
   direction_ = 1;
-  cicle_ = false;
+  circle_ = false;
 
   // load parameters from sdf
   if (_sdf->HasElement("robotNamespace")) namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();

@@ -49,7 +49,7 @@ private:
   float x_;
   float y_;
   float direction_;
-  bool cicle_;
+  bool circle_;
 
 };
 
