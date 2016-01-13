@@ -7,12 +7,12 @@
         <mass>0.5</mass>
         <inertia>
           <!-- http://answers.gazebosim.org/question/4372/the-inertia-matrix-explained/ -->
-          <ixx>0.044612</ixx>    <!-- for a box: ixx = 0.083 * mass * (3*r*r + h*h) -->
+          <ixx>0.005914</ixx>    <!-- for a box: ixx = 0.083 * mass * (3*r*r + h*h) -->
           <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
           <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
-          <iyy>0.044612</iyy>    <!-- for a box: iyy = 0.083 * mass * (3*r*r + h*h) -->
+          <iyy>0.005914</iyy>    <!-- for a box: iyy = 0.083 * mass * (3*r*r + h*h) -->
           <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
-          <izz>0.025937</izz>    <!-- for a box: izz = 0.083 * mass * (r*r + h*h) -->
+          <izz>0.010000</izz>    <!-- for a box: izz = 0.5 * mass * (r*r) -->
         </inertia>
       </inertial>
       <collision name="collision">
