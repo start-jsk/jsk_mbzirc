@@ -1,0 +1,4 @@
+- git:
+    local-name: universal_robot
+    uri: https://github.com/k-okada/universal_robot.git
+    version: e586420c2d85b907351c4d9faf68af531dbdbd91
