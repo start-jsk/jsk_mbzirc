@@ -20,16 +20,16 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   gzwarn << "The GazeboTruck plugin is DEPRECATED in ROS hydro." << std::endl;
 
-model_ = _model;
+  model_ = _model;
   world_ = _model->GetWorld();
   link_ = _model->GetLink();
   link_name_ = link_->GetName();
   namespace_.clear();
 
-x_ = 0;
-y_ = 0;
-direction_ = 1;
-cicle_ = false;
+  x_ = 0;
+  y_ = 0;
+  direction_ = 1;
+  cicle_ = false;
 
   // load parameters from sdf
   if (_sdf->HasElement("robotNamespace")) namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -50,7 +50,7 @@ cicle_ = false;
   if (!ros::isInitialized())
   {
     ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
-      << "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
+                     << "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
     return;
   }
 
@@ -60,7 +60,7 @@ cicle_ = false;
 
 
   update_connection_ = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&GazeboTruck::Update, this));
+                                                              boost::bind(&GazeboTruck::Update, this));
 }
 
 
@@ -69,33 +69,33 @@ cicle_ = false;
 void GazeboTruck::Update()
 {
 
-if(x_ >= DISTANCE_THRE)
+  if(x_ >= DISTANCE_THRE)
   {
-if(circle_ = false)
+    if(circle_ = false)
+    {
+      circle_ = true;
+      direction_ *= -1;
+    }
+
+  }
+  else if(x_ <= -DISTANCE_THRE)
   {
-circle_ = true;
-direction_ *= -1;
-}
-
-}
- else if(x_ <= -DISTANCE_THRE)
-   {
-if(circle_ = false)
+    if(circle_ = false)
+    {
+      circle_ = true;
+      direction_ *= -1;
+    }
+  }
+  else
   {
-circle_ = true;
-direction_ *= -1;
-}
-}
- else
-   {
-circle_ = false;
+    circle_ = false;
 
-if(direction_ = 1)
-  model_->SetLinearVel(math::Vector3(VELOCITY/sqrt(2), VELOCITY/sqrt(2), 0));
+    if(direction_ = 1)
+      model_->SetLinearVel(math::Vector3(VELOCITY/sqrt(2), VELOCITY/sqrt(2), 0));
 
 
 
-}
+  }
 
 
 
