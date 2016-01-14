@@ -4,7 +4,7 @@ project(jsk_mbzirc_common)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS gazebo_ros std_msgs)
+find_package(catkin REQUIRED COMPONENTS gazebo_ros std_msgs geometry_msgs)
 
 
 # Depend on system install of Gazebo and SDFormat
@@ -26,6 +26,11 @@ target_link_libraries(mbzirc_gazebo_truck_plugin ${GAZEBO_LIBRARIES} ${catkin_LI
 
 add_library(mbzirc_gazebo_treasure_plugin src/mbzirc_gazebo_treasure_plugin.cpp)
 target_link_libraries(mbzirc_gazebo_treasure_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp) 
+target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES} )
+
+
 
 #############
 ## Install ##
