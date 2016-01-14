@@ -31,7 +31,7 @@
     </include>
 
     <include>
-<!--      <pose>0 0 0 1.57 -0 0</pose> -->
+      <pose>0 0 0 1.57 -0 0</pose>
       <uri>model://arena</uri>
     </include>
 
@@ -233,7 +233,9 @@
       <include>
         <uri>model://large_object</uri>
       </include>
-      <plugin name="mbzirc_gazebo_treasure_plugin_large_1" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+      <plugin name="mbzirc_gazebo_treasure_plugin_large_1" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
     </model>
 
     <model name="large_object_2" >
@@ -241,7 +243,9 @@
       <include>
         <uri>model://large_object</uri>
       </include>
-      <plugin name="mbzirc_gazebo_treasure_plugin_large_2" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+      <plugin name="mbzirc_gazebo_treasure_plugin_large_2" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
     </model>
 
     <model name="large_object_3" >
@@ -249,8 +253,11 @@
       <include>
         <uri>model://large_object</uri>
       </include>
-      <plugin name="mbzirc_gazebo_treasure_plugin_large_3" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+      <plugin name="mbzirc_gazebo_treasure_plugin_large_3" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
     </model>
+
 
     <gui fullscreen='0'>
       <camera name='user_camera'>
