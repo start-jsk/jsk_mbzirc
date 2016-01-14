@@ -19,21 +19,27 @@
   <run_depend>jsk_mbzirc_common</run_depend>
 
   <!--   uav task1 -->
+  <run_depend>hector_quadrotor</run_depend>
+  <run_depend>hector_localization</run_depend>
+  <run_depend>hector_models</run_depend>
+  <run_depend>hector_gazebo</run_depend>
+  <run_depend>hector_slam</run_depend>
+  <run_depend>hector_quadrotor_demo</run_depend>
 
   <!--   ugv task2 -->
   <run_depend>jsk_mbzirc_ugv_sim</run_depend>
-  	<!--   husky related -->
-  	<run_depend>husky_desktop</run_depend>
-  	<run_depend>husky_robot</run_depend>
-  	<run_depend>husky_simulator</run_depend>
-  	<run_depend>husky_customization</run_depend>
-  	<run_depend>husky_description</run_depend>
-	<run_depend>husky_control</run_depend>
-	<run_depend>husky_msgs</run_depend>
-	<run_depend>husky_navigation</run_depend>
-	<run_depend>husky_ur5_moveit_config</run_depend>
-	<!--   ur5 related -->
-	<run_depend>universal_robot</run_depend>
+  <!--   husky related -->
+  <run_depend>husky_desktop</run_depend>
+  <run_depend>husky_robot</run_depend>
+  <run_depend>husky_simulator</run_depend>
+  <run_depend>husky_customization</run_depend>
+  <run_depend>husky_description</run_depend>
+  <run_depend>husky_control</run_depend>
+  <run_depend>husky_msgs</run_depend>
+  <run_depend>husky_navigation</run_depend>
+  <run_depend>husky_ur5_moveit_config</run_depend>
+  <!--   ur5 related -->
+  <run_depend>universal_robot</run_depend>
   <!--   uav task3 -->
 
 
