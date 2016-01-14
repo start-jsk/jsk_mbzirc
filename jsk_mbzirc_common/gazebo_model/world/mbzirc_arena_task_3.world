@@ -1,0 +1,262 @@
+<?xml version="1.0" ?>
+<sdf version='1.4'>
+  <world name='default'>
+
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <gravity>0 0 -9.8</gravity>
+    </physics>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- A global light source -->
+   <scene>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+   </scene>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <pose>0 0 0 1.57 -0 0</pose>
+      <uri>model://arena</uri>
+    </include>
+
+    <!-- this is for gazebo 1.5 -->
+    <!-- <population name="small_cylinder" > -->
+    <!--   <model name="small_cylinder1" > -->
+    <!--     <include> -->
+    <!--       <uri>model://small_cylinder</uri> -->
+    <!--     </include> -->
+    <!--   </model> -->
+    <!--   <model_count>10</model> -->
+    <!--   <distribution> -->
+    <!--     <type>random</type> -->
+    <!--   </distribution> -->
+    <!-- </population> -->
+
+    <model name="small_cylinder_1" >
+      <pose>1 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_1" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_cylinder_2" >
+      <pose>2 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_2" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_cylinder_3" >
+      <pose>3 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_3" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_cylinder_4" >
+      <pose>4 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_4" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_cylinder_5" >
+      <pose>5 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_5" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_cylinder_6" >
+      <pose>6 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_6" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_cylinder_7" >
+      <pose>7 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_7" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_cylinder_8" >
+      <pose>8 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_8" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_cylinder_9" >
+      <pose>9 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_9" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_cylinder_10" >
+      <pose>10 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_cylinder</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_cylinder_10" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_rectangle_1" >
+      <pose>-1 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_1" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_rectangle_2" >
+      <pose>-2 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_2" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_rectangle_3" >
+      <pose>-3 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_3" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_rectangle_4" >
+      <pose>-4 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_4" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_rectangle_5" >
+      <pose>-5 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_5" filename="libmbzirc_gazebo_treasure_plugin.so">
+        <staticObject>true</staticObject>
+      </plugin>
+    </model>
+
+    <model name="small_rectangle_6" >
+      <pose>-6 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_6" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_rectangle_7" >
+      <pose>-7 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_7" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_rectangle_8" >
+      <pose>-8 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_8" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_rectangle_9" >
+      <pose>-9 0 0.2 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_9" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="small_rectangle_10" >
+      <pose>-10 0.2 0 0 0 0</pose>
+      <include>
+        <uri>model://small_rectangle</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_rectangle_10" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="large_object_1" >
+      <pose>0 1 0 0 0 0</pose>
+      <include>
+        <uri>model://large_object</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_large_1" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="large_object_2" >
+      <pose>0 2 0 0 0 0</pose>
+      <include>
+        <uri>model://large_object</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_large_2" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <model name="large_object_3" >
+      <pose>0 3 0 0 0 0</pose>
+      <include>
+        <uri>model://large_object</uri>
+      </include>
+      <plugin name="mbzirc_gazebo_treasure_plugin_large_3" filename="libmbzirc_gazebo_treasure_plugin.so"/>
+    </model>
+
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>159.908 -1.39949 83.4967 0 0.559643 -3.11099</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>

@@ -11,16 +11,18 @@
 
 -- packages.
 
+## how to compile
 
-e.g. $ catkin build mbzirc
+```
+cd <catkin_ws>
+wstool init -t src
+wstool merge -t src https://raw.githubusercontent.com/tongtybj/mbzirc/indigo-devel/mbzirc.rosinstall
+wstool update -t src
+rosdep install -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+catkin build
+```
 
-
-- add the mbzirc.sh to ~/.bashrc
-
-$ echo "source `rospack find mbzirc`/../setup.sh" >> ~/.bashrc
-
-$ source ~/.bashrc
-
+## how to run program
 
 - run mbzirc_arena wolrd in gazebo:
 
@@ -38,14 +40,5 @@ $ roslaunch jsk_mbzirc_common mbzirc_arena.launch
 
 initial pose is very necessary 
 
-# for husky, please install as follow:
-do `./install.sh` 
-There maybe some ros packages that needed, like 
-ros-indigo-moveit-simple-controller-manager 
-ros-indigo-pr2-controller-manager 
-and etc. Plz follow the error message and do apt install.
 
-
-# Before push do 
-`find . -type f -name '*~' -delete`
 

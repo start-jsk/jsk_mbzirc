@@ -4,8 +4,12 @@ project(jsk_mbzirc_common)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED COMPONENTS gazebo_ros std_msgs)
 
+
+# Depend on system install of Gazebo and SDFormat
+find_package(gazebo REQUIRED)
+find_package(Boost REQUIRED COMPONENTS thread random)
 
 ###################################
 ## catkin specific configuration ##
@@ -13,6 +17,15 @@ find_package(catkin REQUIRED COMPONENTS)
 catkin_package(
     CATKIN_DEPENDS
 )
+
+# build plugins
+include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+
+add_library(mbzirc_gazebo_truck_plugin src/mbzirc_gazebo_truck_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_truck_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_library(mbzirc_gazebo_treasure_plugin src/mbzirc_gazebo_treasure_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_treasure_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #############
 ## Install ##
