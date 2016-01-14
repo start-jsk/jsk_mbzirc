@@ -31,13 +31,45 @@
     </include>
 
     <include>
-<!--      <pose>0 0 0 1.57 -0 0</pose> -->
       <uri>model://arena</uri>
     </include>
 
     <include>
-      <pose>0.0 0.0 0.0  0 0 0</pose>
+      <pose>0.0 0.0 0.05  0 0 0</pose>
       <uri>model://panel</uri>
+    </include>
+    <!-- Wrench tools: last number indicate the size, like wrench12 means 12mm. 
+there are six wrenches, just change the last number, do not change the pose, 
+when the panel pose is changed, change the wrenches x and y too.-->
+
+    <include>
+      <pose>0.165 0.20 0.6725  0 0 0</pose>
+      <uri>model://wrench12</uri>
+    </include>
+
+    <include>
+      <pose>0.165 0.25 0.6725  0 0 0</pose>
+      <uri>model://wrench15</uri>
+    </include>
+
+    <include>
+      <pose>0.165 0.30 0.6725  0 0 0</pose>
+      <uri>model://wrench13</uri>
+    </include>
+
+    <include>
+      <pose>0.165 0.35 0.6725  0 0 0</pose>
+      <uri>model://wrench18</uri>
+    </include>
+
+    <include>
+      <pose>0.165 0.40 0.6725  0 0 0</pose>
+      <uri>model://wrench19</uri>
+    </include>
+
+    <include>
+      <pose>0.165 0.45 0.6725  0 0 0</pose>
+      <uri>model://wrench14</uri>
     </include>
 
     <gui fullscreen='0'>
