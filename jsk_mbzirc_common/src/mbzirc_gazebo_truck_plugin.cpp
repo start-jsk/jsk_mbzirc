@@ -114,7 +114,7 @@ void GazeboTruck::Update()
     y = -CIRCLE_RADIUS * sin(l/l2*(2*M_PI-theta*2)+theta);
     yaw = -(l/l2*(2*M_PI-theta*2)+theta)-M_PI/2;
   }
-  model_->SetLinkWorldPose(math::Pose(x, y, 0, 0, 0, yaw), link_);
+  model_->SetLinkWorldPose(math::Pose(x, y, 0.595, 0, 0, yaw), link_);
   last_time_ = world_->GetSimTime();
 
   // check score

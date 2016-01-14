@@ -3,8 +3,8 @@
   <model name='truck'>
       <static>1</static>
       <link name='link_truck'>
+        <pose>0 0 0.595 0 -0 0</pose>
         <collision name='collision'>
-          <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
               <uri>model://truck/meshes/truck.dae</uri>
@@ -56,6 +56,104 @@
             </mesh>
           </geometry>
         </visual>
+
+        <visual name='visual_front_left_tire'>
+          <pose>0.8 0.625 -0.3 1.5707 0 0</pose>
+          <cast_shadows>1</cast_shadows>
+          <transparency>0</transparency>
+          <geometry>
+            <!--
+                <mesh>
+                <uri>model://truck/meshes/tire.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+                </mesh>
+            -->
+            <cylinder>
+              <radius>.295</radius>
+              <length>.23</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+
+
+        <visual name='visual_front_right_tire'>
+          <pose>0.8 -0.625 -0.3 1.5707 0 0</pose>
+          <cast_shadows>1</cast_shadows>
+          <transparency>0</transparency>
+          <geometry>
+            <!--
+                <mesh>
+                <uri>model://truck/meshes/tire.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+                </mesh>
+            -->
+            <cylinder>
+              <radius>.295</radius>
+              <length>.23</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+
+        <visual name='visual_rear_left_tire'>
+          <pose>-0.8 0.625 -0.3 1.5707 0 0</pose>
+          <cast_shadows>1</cast_shadows>
+          <transparency>0</transparency>
+          <geometry>
+            <!--
+                <mesh>
+                <uri>model://truck/meshes/tire.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+                </mesh>
+            -->
+            <cylinder>
+              <radius>.295</radius>
+              <length>.23</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+
+        <visual name='visual_rear_right_tire'>
+          <pose>-0.8 -0.625 -0.3 1.5707 0 0</pose>
+          <cast_shadows>1</cast_shadows>
+          <transparency>0</transparency>
+          <geometry>
+            <!--
+                <mesh>
+                <uri>model://truck/meshes/tire.dae</uri>
+                <scale>0.001 0.001 0.001</scale>
+                </mesh>
+            -->
+            <cylinder>
+              <radius>.295</radius>
+              <length>.23</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Black</name>
+            </script>
+          </material>
+        </visual>
+
         <velocity_decay>
           <linear>0</linear>
           <angular>0</angular>
@@ -64,5 +162,58 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
+
+      <link name="heliport">
+        <pose>-0.5 0 0.995 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>model://truck/meshes/heliport.dae</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+          </surface>
+          <max_contacts>10</max_contacts>
+          <laser_retro>0</laser_retro>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://truck/meshes/heliport.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+
   </model>
 </sdf>
