@@ -1,4 +1,21 @@
 - git:
     local-name: universal_robot
-    uri: https://github.com/k-okada/universal_robot.git
-    version: e586420c2d85b907351c4d9faf68af531dbdbd91
+    uri: https://github.com/ros-industrial/universal_robot.git
+    version: indigo-devel
+- git:
+    local-name: husky
+    uri: https://github.com/husky/husky.git
+    version: gripper-addition
+- git:
+    local-name: husky_robot
+    uri: https://github.com/husky/husky_robot.git
+    version: indigo-devel
+- git:
+    local-name: husky_simulator
+    uri: https://github.com/husky/husky_simulator.git
+    version: gripper-and-roscontrol-fix
+- git:
+    local-name: husky_desktop
+    uri: https://github.com/husky/husky_desktop.git
+    version: indigo-devel
+
