@@ -68,9 +68,9 @@
     </link>
     
     <link name='link_stem'>
-      <pose>0.02 -0.155 0.4 0 0 0</pose>
+      <pose>0.0225 -0.155 0.4 0 0 0</pose>
       <gravity>1</gravity>
-      <self_collide>0</self_collide>
+      <self_collide>1</self_collide>
       <kinematic>0</kinematic>
       <inertial>
         <mass>1</mass>
