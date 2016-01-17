@@ -4,7 +4,7 @@ project(jsk_mbzirc_ugv_sim)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs gazebo_ros)
 
 
 ###################################
@@ -14,11 +14,16 @@ catkin_package(
     CATKIN_DEPENDS
 )
 
-install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+add_executable(ugv_teleop_keyboard src/ugv_teleop_keyboard.cpp) 
+target_link_libraries(ugv_teleop_keyboard ${catkin_LIBRARIES})
+
+
 #############
 ## Install ##
 #############
-
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 #############
 ## Testing ##
