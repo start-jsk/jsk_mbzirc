@@ -55,6 +55,7 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   node_handle_ = new ros::NodeHandle(namespace_);
   pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true); // set latch true
+  pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
   ros::NodeHandle param_handle(*node_handle_, "controller");
 
 
@@ -134,11 +135,16 @@ void GazeboTruck::Update()
   distAbove -= 0.00001;
 
   //
+  std::stringstream ss;
+  std_msgs::String msg_time;
+  ss << 20*60 - current_time.Double();
+  msg_time.data = ss.str();
+  pub_time_.publish(msg_time);
   if ( entityName != "" && distAbove < 1.0 ) {
-    std_msgs::String msg;
-    msg.data = "Mission Completed";
-    ROS_INFO(msg.data.c_str());
-    pub_score_.publish(msg);
+    std_msgs::String msg_score, msg_time;
+    msg_score.data = "Mission Completed";
+    ROS_INFO_STREAM("Remaining time is " << msg_time.data << "[sec], Score is " << msg_score.data);
+    pub_score_.publish(msg_score);
     terminated_ = true;
   }
 }
