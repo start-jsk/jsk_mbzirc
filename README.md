@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/tongtybj/mbzirc.svg?branch=master)](https://travis-ci.org/tongtybj/mbzirc)
 - build this package
 - mbzirc is a meta-package, the hierarchical style is like
 
