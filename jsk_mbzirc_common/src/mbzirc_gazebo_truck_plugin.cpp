@@ -127,8 +127,8 @@ void GazeboTruck::Update()
 
   double distAbove;
   std::string entityName;
-  math::Box box = link_->GetCollisionBoundingBox();
-  math::Vector3 start = link_->GetWorldPose().pos;
+  math::Box box = model_->GetLink("heliport")->GetCollisionBoundingBox();
+  math::Vector3 start = model_->GetLink("heliport")->GetWorldPose().pos;
   math::Vector3 end = start;
   start.z = box.max.z + 0.00001;
   end.z += 1000;
