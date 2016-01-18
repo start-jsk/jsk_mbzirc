@@ -21,7 +21,6 @@ wstool update -t src
 rosdep install -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 catkin build
 ```
-Please cp the husky.patch to catkin_ws/src/husky/ and apply the patch.
 
 ## how to run program
 
