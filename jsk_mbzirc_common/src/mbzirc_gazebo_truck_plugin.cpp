@@ -69,6 +69,8 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 // Update the controller
 void GazeboTruck::Update()
 {
+  boost::mutex::scoped_lock scoped_lock(lock);
+
   if ( terminated_ ) {
     return;
   }
