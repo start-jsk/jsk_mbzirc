@@ -47,6 +47,8 @@ private:
   ros::Publisher pub_score_, pub_time_;
   ros::Time state_stamp_;
 
+  boost::mutex lock;
+
   event::ConnectionPtr update_connection_;
 
   double traversed_;
