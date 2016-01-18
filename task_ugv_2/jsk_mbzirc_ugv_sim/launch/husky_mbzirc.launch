@@ -27,7 +27,7 @@
   </include>
   <include file="$(find interactive_marker_twist_server)/launch/interactive_markers.launch">
   </include>
-
+  <rosparam command="load" file="$(find jsk_mbzirc_ugv_sim)/config/control_ur5.yaml" />
 <!--rviz-->
   <arg name="debug_rviz" default="false" />
   <arg name="config" default="true" />
