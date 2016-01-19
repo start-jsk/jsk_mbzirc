@@ -1,6 +1,6 @@
 <launch>
   <arg name="paused" default="false"/>
-  <arg name="debug" default="false"/>e
+  <arg name="debug" default="false"/>
   <arg name="gui" default="false" />
   <arg name="headless" default="false"/>
 
