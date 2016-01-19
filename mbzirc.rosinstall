@@ -7,10 +7,10 @@
 - git:
     local-name: husky
     uri: https://github.com/k-okada/husky.git
-    version: f585a3238be9b8439e5ede83e4c5c869c6937596
+    version: cb19573649fd56906372a384e37338bf17d26e8a
 # https://github.com/husky/husky_simulator/pull/24
 - git:
     local-name: husky_simulator
     uri: https://github.com/k-okada/husky_simulator.git
-    version: 4ec90b35b9debc8b25d6db63308205bd6a8b0b69
+    version: cd309a2dada1d106c671ef13b96e2feb8d98e0d8
 
