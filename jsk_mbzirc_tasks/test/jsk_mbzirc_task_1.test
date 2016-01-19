@@ -2,6 +2,7 @@
   <include file="$(find jsk_mbzirc_tasks)/launch/jsk_mbzirc_task_1.launch" >
     <arg name="paused" default="false"/>
     <arg name="gui" default="false" />
+    <arg name="headless" default="true" />
     <arg name="cheat" default="true" />
   </include>
 
