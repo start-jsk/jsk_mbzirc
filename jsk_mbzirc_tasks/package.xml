@@ -19,6 +19,8 @@
   <run_depend>jsk_mbzirc_common</run_depend>
   <run_depend>jsk_rviz_plugins</run_depend>
   <run_depend>teleop_twist_keyboard</run_depend>
+  <run_depend>hector_quadrotor_gazebo</run_depend>
+  <run_depend>rviz</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
