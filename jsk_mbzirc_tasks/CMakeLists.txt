@@ -25,3 +25,9 @@ install(DIRECTORY launch urdf config
 #############
 ## Testing ##
 #############
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  roslaunch_add_file_check(launch/jsk_mbzirc_task_1.launch)
+  roslaunch_add_file_check(launch/jsk_mbzirc_task_2.launch)
+  add_rostest(test/jsk_mbzirc_task_1.test)
+endif()

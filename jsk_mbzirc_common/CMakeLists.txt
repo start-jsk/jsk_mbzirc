@@ -35,6 +35,12 @@ target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES} )
 #############
 ## Install ##
 #############
+install(TARGETS
+  mbzirc_gazebo_truck_plugin mbzirc_gazebo_treasure_plugin uav_teleop_keyboard
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  )
+
 install(DIRECTORY launch gazebo_model
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
@@ -43,3 +49,10 @@ install(DIRECTORY launch gazebo_model
 #############
 ## Testing ##
 #############
+if(CATKIN_ENABLE_TESTING)
+  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  roslaunch_add_file_check(launch/mbzirc_arena.launch)
+  roslaunch_add_file_check(launch/mbzirc_arena_1.launch)
+  roslaunch_add_file_check(launch/mbzirc_arena_2.launch)
+  roslaunch_add_file_check(launch/mbzirc_arena_3.launch)
+endif()
