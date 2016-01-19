@@ -35,6 +35,9 @@ target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES} )
 #############
 ## Install ##
 #############
+install(DIRECTORY launch gazebo_model
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS)
 
 
 #############

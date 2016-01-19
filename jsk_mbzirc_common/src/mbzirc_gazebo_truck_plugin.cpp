@@ -55,6 +55,7 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   node_handle_ = new ros::NodeHandle(namespace_);
   pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true); // set latch true
+  pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
   ros::NodeHandle param_handle(*node_handle_, "controller");
 
 
@@ -68,6 +69,8 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 // Update the controller
 void GazeboTruck::Update()
 {
+  boost::mutex::scoped_lock scoped_lock(lock);
+
   if ( terminated_ ) {
     return;
   }
@@ -124,8 +127,8 @@ void GazeboTruck::Update()
 
   double distAbove;
   std::string entityName;
-  math::Box box = link_->GetCollisionBoundingBox();
-  math::Vector3 start = link_->GetWorldPose().pos;
+  math::Box box = model_->GetLink("heliport")->GetCollisionBoundingBox();
+  math::Vector3 start = model_->GetLink("heliport")->GetWorldPose().pos;
   math::Vector3 end = start;
   start.z = box.max.z + 0.00001;
   end.z += 1000;
@@ -134,11 +137,16 @@ void GazeboTruck::Update()
   distAbove -= 0.00001;
 
   //
+  std::stringstream ss;
+  std_msgs::String msg_time;
+  ss << 20*60 - current_time.Double();
+  msg_time.data = ss.str();
+  pub_time_.publish(msg_time);
   if ( entityName != "" && distAbove < 1.0 ) {
-    std_msgs::String msg;
-    msg.data = "Mission Completed";
-    ROS_INFO(msg.data.c_str());
-    pub_score_.publish(msg);
+    std_msgs::String msg_score, msg_time;
+    msg_score.data = "Mission Completed";
+    ROS_INFO_STREAM("Remaining time is " << msg_time.data << "[sec], Score is " << msg_score.data);
+    pub_score_.publish(msg_score);
     terminated_ = true;
   }
 }

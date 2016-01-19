@@ -1,0 +1,32 @@
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>e
+  <arg name="gui" default="false" />
+  <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_2.launch" >
+    <arg name="paused" default="$(arg paused)"/>
+    <arg name="debug" default="$(arg debug)"/>
+    <arg name="gui" value="$(arg gui)" />
+  </include>
+
+  <!-- Spawn simulated ugv -->
+  <env name="ROBOT_INITIAL_POSE" value="-x 65 -y 25 -z 0.3" />
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+    <arg name="laser_enabled" value="false"/>
+    <arg name="ur5_enabled" value="true"/>
+    <arg name="kinect_enabled" value="false"/>
+    <arg name="gripper_enabled" value="true"/>
+    <arg name="robot_initial_pose" value="-x 65 -y -25 "/>
+    <arg name="huskey_gazebo_description" value="$(find jsk_mbzirc_tasks)/urdf/husky_with_camera.urdf.xacro"/>
+  </include>
+
+  <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
+  <node pkg="jsk_mbzirc_tasks" name="remain_time_text_to_overlay" type="relay_field_728"
+        args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
+              'text: m.data' --wait-for-start" />
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task2.rviz"/>
+
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard"
+        launch-prefix="xterm -e" />
+
+</launch>

@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /LaserScan1
-        - /Camera1
       Splitter Ratio: 0.5
     Tree Height: 428
   - Class: rviz/Selection
@@ -28,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LaserScan
+    SyncSource: Camera
 Visualization Manager:
   Class: ""
   Displays:
@@ -60,25 +58,169 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        downward_cam_link:
+        camera_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        downward_cam_optical_frame:
+        camera_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        laser0_frame:
+        front_bumper_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        sonar_link:
+        front_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        inertial_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        r_gripper_l_finger_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        r_gripper_l_finger_tip_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        r_gripper_l_finger_tip_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        r_gripper_led_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        r_gripper_motor_accelerometer_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        r_gripper_motor_screw_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        r_gripper_motor_slider_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        r_gripper_palm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        r_gripper_r_finger_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        r_gripper_r_finger_tip_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        r_gripper_tool_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rear_bumper_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_chassis_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_plate_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ur5_arm_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_ee_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ur5_arm_forearm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_shoulder_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_tool0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        ur5_arm_upper_arm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_wrist_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_wrist_2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur5_arm_wrist_3_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        user_rail_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -121,7 +263,7 @@ Visualization Manager:
     - Class: rviz/Camera
       Enabled: true
       Image Rendering: background and overlay
-      Image Topic: /downward_cam/camera/image
+      Image Topic: /camera/image
       Name: Camera
       Overlay Alpha: 0.5
       Queue Size: 2
@@ -130,9 +272,28 @@ Visualization Manager:
       Visibility:
         Grid: true
         LaserScan: true
+        OverlayText: true
         RobotModel: true
         Value: true
       Zoom Factor: 1
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 0; 170; 127
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /remaining_time_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 100
+      left: 10
+      line width: 2
+      text size: 64
+      top: 10
+      width: 370
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -157,22 +318,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 7.45053
+      Distance: 4.94518
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 1.87918
+        Y: 0.711822
+        Z: 1.2416
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.200398
+      Pitch: 0.270398
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.6904
+      Yaw: 2.6804
     Saved: ~
 Window Geometry:
   Camera:

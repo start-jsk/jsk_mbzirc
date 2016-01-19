@@ -1,17 +1,3 @@
-[![Build Status](https://travis-ci.org/tongtybj/mbzirc.svg?branch=master)](https://travis-ci.org/tongtybj/mbzirc)
-- build this package
-- mbzirc is a meta-package, the hierarchical style is like
-
-###  mbzirc folder
-
-- mbzirc package(meta)
-
--- launch folder, CMakeLists
-
-- jsk_mbzirc_common,task1,task2,task3,README,setup,etc..
-
--- packages.
-
 ## how to compile
 
 ```
@@ -27,27 +13,17 @@ catkin build
 
 - run mbzirc_arena wolrd in gazebo:
 
-model files can be found in jsk_mbzirc_common package
-
-$ gazebo mbzirc_arena.world
-
-or 
-
 $ roslaunch jsk_mbzirc_common mbzirc_arena.launch
 
-- run simulation of task1 with uav
-task1 statege: 
-$ roslaunch jsk_mbzirc_common mbzirc_task_1.launch
+- run simulation of task1 with uav in task1 stage
+```
+$ roslaunch jsk_mbzirc_tasks mbzirc_task_1.launch
+```
 
-keyboard teleop:
-$ rosrun jsk_mbzirc_common uav_teleop_keyboard 
-
-
-- run simulation of husky + ur5 
-
-`ROBOT_INITIAL_POSE="-x 65 -y -25 -z 0.05 -Y -3.1415" roslaunch jsk_mbzirc_ugv_sim husky_mbzirc.launch`
-
-initial pose is very necessary 
-
+- run simulation of husky + ur5 in task2 stage
+```
+$ roslaunch jsk_mbzirc_tasks mbzirc_task_2.launch
+$ rostopic pub -r 10 r_gripper_controller/command std_msgs/Float64 "data: 0.2" # to move gripper
+```
 
 

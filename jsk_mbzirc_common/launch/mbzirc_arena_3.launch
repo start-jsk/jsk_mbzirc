@@ -1,0 +1,11 @@
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"  />
+  <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena.launch" >
+    <arg name="paused" default="$(arg paused)"/>
+    <arg name="debug" default="$(arg debug)"/>
+    <arg name="gui" default="$(arg gui)"  />
+    <arg name="world_name" default="$(find jsk_mbzirc_common)/gazebo_model/world/mbzirc_arena_task_3.world"/>
+  </include>
+</launch>
