@@ -1,17 +1,16 @@
 <?xml version="1.0"?>
 
-<robot
-  name="quadrotor"
-  xmlns:xacro="http://ros.org/wiki/xacro"
->
-   
-    <xacro:property name="M_PI" value="3.1415926535897931" />
-    
+<robot name="quadrotor" xmlns:xacro="http://ros.org/wiki/xacro">
+
     <!-- Included URDF Files -->
     <xacro:include filename="$(find hector_quadrotor_description)/urdf/quadrotor_base.urdf.xacro" />
-    
+    <xacro:include filename="$(find hector_quadrotor_gazebo)/urdf/quadrotor_plugins.gazebo.xacro" />
+
     <!-- Instantiate quadrotor_base_macro once (has no parameters atm) -->
     <xacro:quadrotor_base_macro />
+
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <!-- Custom sensors settings -->
     
     <!-- Hokuyo UTM-30LX mounted upside down below the quadrotor body -->
     <xacro:include filename="$(find hector_sensors_description)/urdf/hokuyo_utm30lx.urdf.xacro" />
@@ -25,6 +24,5 @@
       <origin xyz="0.4 0.0 -0.0" rpy="0 ${M_PI/2} 0"/>
     </xacro:generic_camera>
 
-
 </robot>
-  
+

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>jsk_mbzirc_common</name>
+  <name>jsk_mbzirc_tasks</name>
   <version>0.0.0</version>
-  <description>The jsk_mbzirc_common package</description>
+  <description>The jsk_mbzirc_tasks package</description>
 
   <maintainer email="xychen@jsk.imi.i.u-tokyo.ac.jp">xychen at jsk</maintainer>
   <maintainer email="bakui@jsk.imi.i.u-tokyo.ac.jp">zhao  at jsk</maintainer>
@@ -15,15 +15,19 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>gazebo_ros</build_depend>
+  <build_depend>jsk_mbzirc_common</build_depend>
 
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>gazebo_plugins</run_depend>
-  <run_depend>gazebo_ros</run_depend>
+  <run_depend>jsk_mbzirc_common</run_depend>
+  <run_depend>jsk_rviz_plugins</run_depend>
+  <run_depend>teleop_twist_keyboard</run_depend>
+
+  <run_depend>hector_quadrotor_gazebo</run_depend>
+  <run_depend>husky_gazebo</run_depend>
+  <run_depend>husky_ur5_moveit_config</run_depend>
+
+  <run_depend>rviz</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <gazebo_ros gazebo_model_path="${prefix}/gazebo_model/models" />
   </export>
 </package>

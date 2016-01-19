@@ -6,8 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /LaserScan1
-        - /Camera1
+        - /OverlayText1
       Splitter Ratio: 0.5
     Tree Height: 428
   - Class: rviz/Selection
@@ -130,9 +129,28 @@ Visualization Manager:
       Visibility:
         Grid: true
         LaserScan: true
+        OverlayText: true
         RobotModel: true
         Value: true
       Zoom Factor: 1
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 0; 170; 127
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /remaining_time_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 100
+      left: 10
+      line width: 2
+      text size: 64
+      top: 10
+      width: 370
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
