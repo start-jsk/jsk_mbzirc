@@ -8,16 +8,27 @@
     <arg name="gui" value="$(arg gui)" />
   </include>
 
+  <arg name="cheat" default="false" />
+
   <!-- Spawn simulated ugv -->
-  <env name="ROBOT_INITIAL_POSE" value="-x 65 -y 25 -z 0.3" />
+  <arg unless="$(arg cheat)" name="robot_initial_pose" value="-x 65  -y -25 -z 0.3" />
+  <arg     if="$(arg cheat)" name="robot_initial_pose" value="-x 1.5 -y   0 -z 0.3 -Y 3.14" />
   <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
     <arg name="laser_enabled" value="false"/>
     <arg name="ur5_enabled" value="true"/>
     <arg name="kinect_enabled" value="false"/>
     <arg name="gripper_enabled" value="true"/>
-    <arg name="robot_initial_pose" value="-x 65 -y -25 "/>
+    <arg name="robot_initial_pose" value="$(arg robot_initial_pose)"/>
     <arg name="huskey_gazebo_description" value="$(find jsk_mbzirc_tasks)/urdf/husky_with_camera.urdf.xacro"/>
   </include>
+
+  <!-- moveit -->
+  <include file="$(find husky_ur5_moveit_config)/launch/husky_ur5_planning_execution.launch">
+    <arg name="sim" value="true"/>
+    <arg name="limited" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
 
   <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
   <node pkg="jsk_mbzirc_tasks" name="remain_time_text_to_overlay" type="relay_field_728"
