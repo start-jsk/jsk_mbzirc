@@ -1,0 +1,26 @@
+<robot name="husky_robot_gazebo" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="laser_enabled" default="true" />
+  <xacro:arg name="ur5_enabled" default="false" />
+  <xacro:arg name="kinect_enabled" default="false" />
+  <xacro:arg name="gripper_enabled" default="false" />
+
+  <xacro:include filename="$(find husky_description)/urdf/husky.urdf.xacro" />
+  <xacro:include filename="$(find husky_gazebo)/urdf/husky.gazebo.xacro" />
+
+  <!-- Gazebo plugin for ROS Control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <xacro:husky_robot />
+
+  <xacro:husky_robot_gazebo />
+
+  <!-- Forward facing camera -->
+  <xacro:include filename="$(find hector_sensors_description)/urdf/generic_camera.urdf.xacro" />
+  <xacro:generic_camera name="camera" parent="base_link" ros_topic="image" cam_info_topic="camera_info" update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="100">
+    <origin xyz="-0.3 0.0 0.6" rpy="0 0 0"/>
+  </xacro:generic_camera>
+</robot>
