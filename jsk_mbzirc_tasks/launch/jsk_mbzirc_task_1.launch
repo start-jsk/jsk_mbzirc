@@ -2,10 +2,13 @@
   <arg name="paused" default="false"/>
   <arg name="debug" default="false"/>e
   <arg name="gui" default="false" />
+  <arg name="headless" default="false"/>
+
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
     <arg name="debug" default="$(arg debug)"/>
     <arg name="gui" value="$(arg gui)" />
+    <arg name="headless" default="$(arg headless)"/>
   </include>
 
   <arg name="cheat" default="false" />
