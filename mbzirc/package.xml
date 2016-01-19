@@ -17,13 +17,9 @@
   <buildtool_depend>catkin</buildtool_depend>
   <!--   jsk_mbzirc_common-->
   <run_depend>jsk_mbzirc_common</run_depend>
+  <run_depend>jsk_mbzirc_tasks</run_depend>
 
   <!--   uav task1 -->
-  <run_depend>hector_quadrotor</run_depend>
-  <run_depend>hector_localization</run_depend>
-  <run_depend>hector_models</run_depend>
-  <run_depend>hector_gazebo</run_depend>
-  <run_depend>hector_slam</run_depend>
   <run_depend>hector_quadrotor_demo</run_depend>
 
   <!--   ugv task2 -->
