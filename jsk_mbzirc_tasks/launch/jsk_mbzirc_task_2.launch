@@ -3,6 +3,7 @@
   <arg name="debug" default="false"/>
   <arg name="gui" default="false" />
   <arg name="headless" default="false"/>
+  <arg name="teleopUGV" default="true"/>
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_2.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -14,8 +15,8 @@
   <arg name="cheat" default="false" />
 
   <!-- Spawn simulated ugv -->
-  <arg unless="$(arg cheat)" name="robot_initial_pose" value="-x 65  -y -25 -z 0.3" />
-  <arg     if="$(arg cheat)" name="robot_initial_pose" value="-x 1.5 -y   0 -z 0.3 -Y 3.14" />
+  <arg unless="$(arg cheat)" name="robot_initial_pose" value="-x 65  -y -25 -z 0.1" />
+  <arg     if="$(arg cheat)" name="robot_initial_pose" value="-x 1.5 -y   0 -z 0.1 -Y 3.14" />
   <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
     <arg name="laser_enabled" value="false"/>
     <arg name="ur5_enabled" value="true"/>
@@ -39,8 +40,11 @@
               'text: m.data' --wait-for-start" />
 
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task2.rviz"/>
-
-  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard"
-        launch-prefix="xterm -e" />
+  <rosparam param="/husky_velocity_controller/linear/x/max_velocity">4.0</rosparam>
+    <node pkg="jsk_mbzirc_common" type="uav_teleop_keyboard" name="ugv_teleop_keyboard"
+          launch-prefix="xterm -e">
+  	<param name="teleopUGV" value="$(arg teleopUGV)"/>
+	<remap from="teleopUGV" to="ugv_teleop_keyboard/teleopUGV"/>
+    </node>
 
 </launch>
