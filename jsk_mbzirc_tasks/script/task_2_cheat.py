@@ -72,9 +72,12 @@ if __name__ == '__main__':
         for r in numpy.arange(start_angle, start_angle-3.14*2, -1.0):
             rospy.loginfo(angles)
             angles[5] = r
-            arm.set_joint_value_target(angles)
             rospy.loginfo("rotate (%f)"%(r))
-            arm.plan() and arm.go()
+            msg.trajectory.header.stamp = rospy.Time.now() + rospy.Duration(0.2)
+            msg.trajectory.points = [JointTrajectoryPoint(positions=angles, time_from_start = rospy.Duration(1))]
+            client.send_goal(msg)
+            client.wait_for_result()
+
         # open
         rospy.loginfo("open")
         open_hand()
