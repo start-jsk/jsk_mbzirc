@@ -25,6 +25,8 @@
   <run_depend>husky_gazebo</run_depend>
   <run_depend>husky_ur5_moveit_config</run_depend>
 
+  <run_depend>moveit_commander</run_depend>
+
   <run_depend>rviz</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
