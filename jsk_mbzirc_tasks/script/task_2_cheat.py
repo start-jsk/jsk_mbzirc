@@ -62,7 +62,7 @@ if __name__ == '__main__':
     arm.set_pose_target([1.13, 0.16, 0.233, 0, 0, 0])
     arm.plan() and arm.go()
     # rotate
-    for i in range(2):
+    for i in range(4):
         # close
         rospy.loginfo("close")
         close_hand()
