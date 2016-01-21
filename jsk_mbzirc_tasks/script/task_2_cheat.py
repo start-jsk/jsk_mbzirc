@@ -4,6 +4,9 @@
 from __future__ import print_function
 import sys
 import rospy
+import actionlib
+from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+from trajectory_msgs.msg import JointTrajectoryPoint
 import math
 from moveit_commander import MoveGroupCommander, conversions
 from std_msgs.msg import Float64
@@ -27,14 +30,23 @@ def close_hand():
 
 if __name__ == '__main__':
     rospy.init_node('task_2_cheat', anonymous=True)
-    pub = rospy.Publisher("/r_gripper_controller/command", Float64, queue_size=1)
 
     # for for 5 sec
     rospy.sleep(5)
     rospy.loginfo("start program %f"%rospy.get_time())
+    rospy.loginfo("init pose")
+    client = actionlib.SimpleActionClient('arm_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+    client.wait_for_server()
+    msg = FollowJointTrajectoryGoal()
+    msg.trajectory.header.stamp = rospy.Time.now() + rospy.Duration(0.2)
+    msg.trajectory.joint_names = ['ur5_arm_shoulder_pan_joint', 'ur5_arm_shoulder_lift_joint', 'ur5_arm_elbow_joint', 'ur5_arm_wrist_1_joint', 'ur5_arm_wrist_2_joint', 'ur5_arm_wrist_3_joint']
+    msg.trajectory.points.append(JointTrajectoryPoint(positions=[-1.57,-0.1745,-2.79,-1.57,0,0], time_from_start = rospy.Duration(2)))
+    client.send_goal(msg)
+    client.wait_for_result()
 
     arm = MoveGroupCommander("ur5_arm")
     arm.set_planner_id('RRTConnectkConfigDefault')
+    pub = rospy.Publisher("/r_gripper_controller/command", Float64, queue_size=1)
 
     # open
     open_hand()
