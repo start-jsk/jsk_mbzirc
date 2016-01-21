@@ -24,6 +24,9 @@ include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${GAZEB
 add_library(mbzirc_gazebo_truck_plugin src/mbzirc_gazebo_truck_plugin.cpp)
 target_link_libraries(mbzirc_gazebo_truck_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_library(mbzirc_gazebo_panel_plugin src/mbzirc_gazebo_panel_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_panel_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 add_library(mbzirc_gazebo_treasure_plugin src/mbzirc_gazebo_treasure_plugin.cpp)
 target_link_libraries(mbzirc_gazebo_treasure_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
@@ -36,7 +39,7 @@ target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES} )
 ## Install ##
 #############
 install(TARGETS
-  mbzirc_gazebo_truck_plugin mbzirc_gazebo_treasure_plugin uav_teleop_keyboard
+  mbzirc_gazebo_truck_plugin mbzirc_gazebo_panel_plugin mbzirc_gazebo_treasure_plugin uav_teleop_keyboard
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   )
