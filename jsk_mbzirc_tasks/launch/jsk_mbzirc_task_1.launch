@@ -1,8 +1,9 @@
 <launch>
   <arg name="paused" default="false"/>
-  <arg name="debug" default="false"/>e
+  <arg name="debug" default="false"/>
   <arg name="gui" default="false" />
   <arg name="headless" default="false"/>
+  <arg name="teleopUGV" default="false"/>
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -40,7 +41,11 @@
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
 
     <node pkg="jsk_mbzirc_common" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
-          launch-prefix="xterm -e" />
+          launch-prefix="xterm -e">
+  	<param name="teleopUGV" value="$(arg teleopUGV)"/>
+	<remap from="teleopUGV" to="uav_teleop_keyboard/teleopUGV"/>
+    </node>
+
   </group>
 
 </launch>
