@@ -24,6 +24,7 @@
     <arg name="ur5_enabled" value="true"/>
     <arg name="kinect_enabled" value="false"/>
     <arg name="gripper_enabled" value="true"/>
+    <arg name="ur5_control_yaml_file" value="$(find jsk_mbzirc_tasks)/config/control_ur5.yaml"/>
     <arg name="robot_initial_pose" value="$(arg robot_initial_pose)"/>
     <arg name="huskey_gazebo_description" value="$(find jsk_mbzirc_tasks)/urdf/husky_with_camera.urdf.xacro"/>
   </include>

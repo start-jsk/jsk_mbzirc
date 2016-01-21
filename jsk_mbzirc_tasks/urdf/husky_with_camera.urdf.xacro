@@ -7,6 +7,10 @@
   <xacro:include filename="$(find husky_description)/urdf/husky.urdf.xacro" />
   <xacro:include filename="$(find husky_gazebo)/urdf/husky.gazebo.xacro" />
 
+  <!-- use effor controller -->
+  <xacro:arg name="use_position_interface" default="false" />
+  <xacro:arg name="use_effort_interface" default="true" />
+
   <!-- Gazebo plugin for ROS Control -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
