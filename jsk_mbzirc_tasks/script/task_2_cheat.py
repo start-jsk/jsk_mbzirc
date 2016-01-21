@@ -29,9 +29,8 @@ if __name__ == '__main__':
     rospy.init_node('task_2_cheat', anonymous=True)
     pub = rospy.Publisher("/r_gripper_controller/command", Float64, queue_size=1)
 
-    # for for 1 sec
-    while rospy.get_time() < 5 :
-        rospy.sleep(0.01)
+    # for for 5 sec
+    rospy.sleep(5)
     rospy.loginfo("start program %f"%rospy.get_time())
 
     arm = MoveGroupCommander("ur5_arm")
