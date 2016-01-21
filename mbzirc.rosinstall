@@ -8,7 +8,7 @@
 - git:
     local-name: husky
     uri: https://github.com/k-okada/husky.git
-    version: fe25e6f
+    version: 962a814
 # https://github.com/husky/husky_simulator/pull/24
 # https://github.com/husky/husky_simulator/pull/25
 # https://github.com/husky/husky_simulator/pull/26

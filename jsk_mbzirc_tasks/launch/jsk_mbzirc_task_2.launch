@@ -52,6 +52,8 @@
     <arg name="sim" value="true"/>
     <arg name="limited" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
+    <arg name="allow_sensor_manager" default="true" unless="$(arg headless)"/> <!-- nominal -->
+    <arg name="allow_sensor_manager" default="false"    if="$(arg headless)"/> <!-- on travis -->
   </include>
 
 
