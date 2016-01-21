@@ -14,7 +14,7 @@
 
   <arg name="cheat" default="false" />
   <group if="$(arg cheat)" >
-    <node pkg="jsk_mbzirc_tasks" type="task_2_cheat.py" name="task_1_cheat" />
+    <node pkg="jsk_mbzirc_tasks" type="task_2_cheat.py" name="task_2_cheat" />
   </group>
 
   <!-- Spawn simulated ugv -->
