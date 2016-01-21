@@ -33,10 +33,15 @@ if __name__ == '__main__':
 
     # for for 5 sec
     rospy.sleep(5)
+
     rospy.loginfo("start program %f"%rospy.get_time())
-    rospy.loginfo("init pose")
+    arm = MoveGroupCommander("ur5_arm")
+    arm.set_planner_id('RRTConnectkConfigDefault')
+    pub = rospy.Publisher("/r_gripper_controller/command", Float64, queue_size=1)
     client = actionlib.SimpleActionClient('arm_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
     client.wait_for_server()
+
+    rospy.loginfo("init pose")
     msg = FollowJointTrajectoryGoal()
     msg.trajectory.header.stamp = rospy.Time.now() + rospy.Duration(0.2)
     msg.trajectory.joint_names = ['ur5_arm_shoulder_pan_joint', 'ur5_arm_shoulder_lift_joint', 'ur5_arm_elbow_joint', 'ur5_arm_wrist_1_joint', 'ur5_arm_wrist_2_joint', 'ur5_arm_wrist_3_joint']
@@ -44,9 +49,6 @@ if __name__ == '__main__':
     client.send_goal(msg)
     client.wait_for_result()
 
-    arm = MoveGroupCommander("ur5_arm")
-    arm.set_planner_id('RRTConnectkConfigDefault')
-    pub = rospy.Publisher("/r_gripper_controller/command", Float64, queue_size=1)
 
     # open
     open_hand()
