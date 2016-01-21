@@ -34,4 +34,5 @@ if(CATKIN_ENABLE_TESTING)
   #
   roslaunch_add_file_check(launch/jsk_mbzirc_task_2.launch)
   add_rostest(test/jsk_mbzirc_task_1.test)
+  add_rostest(test/jsk_mbzirc_task_2.test)
 endif()

@@ -12,6 +12,9 @@
   </include>
 
   <arg name="cheat" default="false" />
+  <group if="$(arg cheat)" >
+    <node pkg="jsk_mbzirc_tasks" type="task_2_cheat.py" name="task_1_cheat" />
+  </group>
 
   <!-- Spawn simulated ugv -->
   <arg unless="$(arg cheat)" name="robot_initial_pose" value="-x 65  -y -25 -z 0.3" />
