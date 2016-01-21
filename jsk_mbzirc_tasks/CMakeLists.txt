@@ -30,9 +30,9 @@ if(CATKIN_ENABLE_TESTING)
   # https://github.com/ros/ros_comm/pull/730
   set(roslaunch_check_script ${PROJECT_SOURCE_DIR}/script/roslaunch-check)
   roslaunch_add_file_check(launch/jsk_mbzirc_task_1.launch)
+  roslaunch_add_file_check(launch/jsk_mbzirc_task_2.launch)
   set(roslaunch_check_script ${roslaunch_DIR}/../scripts/roslaunch-check)
   #
-  roslaunch_add_file_check(launch/jsk_mbzirc_task_2.launch)
   add_rostest(test/jsk_mbzirc_task_1.test)
   add_rostest(test/jsk_mbzirc_task_2.test)
 endif()
