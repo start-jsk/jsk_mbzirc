@@ -132,6 +132,21 @@
         </surface>
       </collision>
     </link>
+    <joint name="stem_joint" type="revolute" >
+      <parent>link_panel</parent>
+      <child>link_stem</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-3.14</lower>
+          <upper>3.14</upper>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+          <friction>0.1</friction>
+        </dynamics>
+      </axis>
+    </joint>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>

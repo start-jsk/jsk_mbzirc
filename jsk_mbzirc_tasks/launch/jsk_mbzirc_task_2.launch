@@ -13,24 +13,47 @@
   </include>
 
   <arg name="cheat" default="false" />
+  <group if="$(arg cheat)" >
+    <node pkg="jsk_mbzirc_tasks" type="task_2_cheat.py" name="task_2_cheat" />
+  </group>
 
   <!-- Spawn simulated ugv -->
   <arg unless="$(arg cheat)" name="robot_initial_pose" value="-x 65  -y -25 -z 0.1" />
   <arg     if="$(arg cheat)" name="robot_initial_pose" value="-x 1.5 -y   0 -z 0.1 -Y 3.14" />
   <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
     <arg name="laser_enabled" value="false"/>
-    <arg name="ur5_enabled" value="true"/>
     <arg name="kinect_enabled" value="false"/>
-    <arg name="gripper_enabled" value="true"/>
+    <arg name="ur5_enabled" value="false"/> <!-- set to false because  we wan to use ur5 for effort controller -->
+    <arg name="gripper_enabled" value="false"/>
     <arg name="robot_initial_pose" value="$(arg robot_initial_pose)"/>
-    <arg name="huskey_gazebo_description" value="$(find jsk_mbzirc_tasks)/urdf/husky_with_camera.urdf.xacro"/>
+    <arg name="husky_gazebo_description" value="$(find jsk_mbzirc_tasks)/urdf/husky_with_camera.urdf.xacro"/>
   </include>
+  <!-- Load UR5 controllers -->
+  <rosparam command="load" file="$(find jsk_mbzirc_tasks)/config/control_ur5.yaml" />
+  <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" args="arm_controller --shutdown-timeout 3"/>
+
+  <!-- Fake Calibration -->
+  <node pkg="rostopic" type="rostopic" name="fake_joint_calibration" args="pub calibrated std_msgs/Bool true" />
+
+  <!-- Stow the arm -->
+  <node pkg="husky_control" type="stow_ur5" name="stow_ur5"/>
+
+  <!-- Start the pr2 gripper controller and action server -->
+  <rosparam command="load" file="$(find husky_control)/config/control_gripper.yaml" />
+  <node name="r_gripper_controller_spawner" pkg="controller_manager" type="spawner" args="r_gripper_controller"/>
+  <!-- https://github.com/ros-controls/ros_controllers/pull/181 -->
+  <node name="r_gripper_state_publisher" pkg="rostopic" type="rostopic"
+        args="pub -r 1 /joint_states sensor_msgs/JointState
+              '{name: [r_gripper_l_finger_tip_joint, r_gripper_motor_slider_joint, r_gripper_motor_screw_joint, r_gripper_r_finger_joint, r_gripper_r_finger_tip_joint,  r_gripper_joint],
+              position: [0,0,0,0,0,0]}'" />
 
   <!-- moveit -->
   <include file="$(find husky_ur5_moveit_config)/launch/husky_ur5_planning_execution.launch">
     <arg name="sim" value="true"/>
     <arg name="limited" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
+    <arg name="allow_sensor_manager" default="true" unless="$(arg headless)"/> <!-- nominal -->
+    <arg name="allow_sensor_manager" default="false"    if="$(arg headless)"/> <!-- on travis -->
   </include>
 
 
@@ -39,12 +62,14 @@
         args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
               'text: m.data' --wait-for-start" />
 
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task2.rviz"/>
-  <rosparam param="/husky_velocity_controller/linear/x/max_velocity">4.0</rosparam>
+  <group unless="$(arg headless)" >
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task2.rviz"/>
+    <rosparam param="/husky_velocity_controller/linear/x/max_velocity">4.0</rosparam>
     <node pkg="jsk_mbzirc_common" type="uav_teleop_keyboard" name="ugv_teleop_keyboard"
           launch-prefix="xterm -e">
-  	<param name="teleopUGV" value="$(arg teleopUGV)"/>
-	<remap from="teleopUGV" to="ugv_teleop_keyboard/teleopUGV"/>
+      <param name="teleopUGV" value="$(arg teleopUGV)"/>
+      <remap from="teleopUGV" to="ugv_teleop_keyboard/teleopUGV"/>
     </node>
+  </group>
 
 </launch>

@@ -1,0 +1,18 @@
+<launch>
+  <include file="$(find jsk_mbzirc_tasks)/launch/jsk_mbzirc_task_2.launch" >
+    <arg name="paused" default="false"/>
+    <arg name="gui" default="false" />
+    <arg name="headless" default="true" />
+    <arg name="cheat" default="true" />
+  </include>
+
+  <!-- check heart beat -->
+  <param name="remaining_time_test/topic" value="/remaining_time_overlay" />
+  <param name="remaining_time_test/hz" value="1000.0" />
+  <param name="remaining_time_test/hzerror" value="200" />
+  <param name="remaining_time_test/test_duration" value="5.0" />
+  <test test-name="remaining_time_test" pkg="rostest" type="hztest"  name="remaining_time_test" retry="2" />
+
+  <test test-name="completed_test" pkg="jsk_mbzirc_tasks" type="check_mission.py"  name="completed_test" retry="2" time-limit="120" />
+
+</launch>

@@ -1,16 +1,19 @@
 # https://github.com/ros-industrial/universal_robot/pull/226
+# https://github.com/ros-industrial/universal_robot/pull/227
 - git:
     local-name: universal_robot
     uri: https://github.com/k-okada/universal_robot.git
-    version: 3f17854640a0cd49ca1e09318a1a10cd47a6bc05
+    version: bd3df16
 # https://github.com/husky/husky/pull/22
 - git:
     local-name: husky
     uri: https://github.com/k-okada/husky.git
-    version: 6c2c00144b8e57d385ae96f13498af4bec9af768
+    version: 137294a
 # https://github.com/husky/husky_simulator/pull/24
+# https://github.com/husky/husky_simulator/pull/25
+# https://github.com/husky/husky_simulator/pull/26
 - git:
     local-name: husky_simulator
     uri: https://github.com/k-okada/husky_simulator.git
-    version: cd309a2dada1d106c671ef13b96e2feb8d98e0d8
+    version: f8a670d1578254ef6d5c7627ea6f7ac6b8d99a15
 
