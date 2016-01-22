@@ -1,17 +1,15 @@
 <?xml version="1.0"?>
 <package>
   <name>jsk_mbzirc_common</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>The jsk_mbzirc_common package</description>
 
-  <maintainer email="xychen@jsk.imi.i.u-tokyo.ac.jp">xychen at jsk</maintainer>
-  <maintainer email="bakui@jsk.imi.i.u-tokyo.ac.jp">zhao  at jsk</maintainer>
+  <maintainer email="xychen@jsk.imi.i.u-tokyo.ac.jp">Moju Zhao</maintainer>
+  <maintainer email="bakui@jsk.imi.i.u-tokyo.ac.jp">Xiangyu Chen</maintainer>
 
   <license>BSD</license>
 
   <url type="website">http://www.jsk.t.u-tokyo.ac.jp/</url>
-  <!--   temporary, will appear to jsk package later on -->
-  <url type="repository">https://github.com/tongtybj/mbzirc</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
