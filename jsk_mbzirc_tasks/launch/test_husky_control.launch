@@ -1,0 +1,78 @@
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true" />
+  <arg name="headless" default="false"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" default="$(arg paused)"/>
+    <arg name="debug" default="$(arg debug)"/>
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="headless" default="$(arg headless)"/>
+  </include>
+
+  <!-- Spawn simulated ugv -->
+  <arg name="robot_initial_pose" value="" />
+  <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+    <arg name="laser_enabled" value="false"/>
+    <arg name="kinect_enabled" value="false"/>
+    <arg name="ur5_enabled" value="false"/> <!-- set to false because  we wan to use ur5 for effort controller -->
+    <arg name="gripper_enabled" value="false"/>
+    <arg name="robot_initial_pose" value="$(arg robot_initial_pose)"/>
+    <arg name="husky_gazebo_description" value="$(find jsk_mbzirc_tasks)/urdf/husky_with_camera.urdf.xacro"/>
+  </include>
+  <!-- Load UR5 controllers -->
+  <rosparam>
+# Position Controllers ---------------------------------------
+ur5_arm_shoulder_pan_joint_controller:
+  type: effort_controllers/JointPositionController
+  joint: ur5_arm_shoulder_pan_joint
+  pid: {p: 4000.0, i: 1000.0, d: 100.0, i_clamp_max: 10.0, i_clamp_min: -10.0}
+ur5_arm_shoulder_lift_joint_controller:
+  type: effort_controllers/JointPositionController
+  joint: ur5_arm_shoulder_lift_joint
+  pid: {p: 2000.0, i: 500.0, d: 100.0, i_clamp_max: 100.0, i_clamp_min: -100.0}
+ur5_arm_elbow_joint_controller:
+  type: effort_controllers/JointPositionController
+  joint: ur5_arm_elbow_joint
+  pid: {p: 1500.0, i: 500.0, d: 50.0, i_clamp_max: 10.0, i_clamp_min: -10.0}
+ur5_arm_wrist_1_joint_controller:
+  type: effort_controllers/JointPositionController
+  joint: ur5_arm_wrist_1_joint
+  pid: {p: 700.0, i: 200.0, d: 10.0, i_clamp: 0.0}
+ur5_arm_wrist_2_joint_controller:
+  type: effort_controllers/JointPositionController
+  joint: ur5_arm_wrist_2_joint
+  pid: {p: 700.0, i: 200.0, d: 10.0, i_clamp: 0.0}
+ur5_arm_wrist_3_joint_controller:
+  type: effort_controllers/JointPositionController
+  joint: ur5_arm_wrist_3_joint
+  pid: {p: 700.0, i: 200.0, d: 10.0, i_clamp: 0.0}
+  </rosparam>
+
+  <node name="arm_controller_spawner" pkg="controller_manager"
+        type="spawner" args="ur5_arm_shoulder_pan_joint_controller
+                             ur5_arm_shoulder_lift_joint_controller
+                             ur5_arm_elbow_joint_controller
+                             ur5_arm_wrist_1_joint_controller
+                             ur5_arm_wrist_2_joint_controller
+                             ur5_arm_wrist_3_joint_controller
+                             --shutdown-timeout 3"/>
+
+  <!-- Fake Calibration -->
+  <node pkg="rostopic" type="rostopic" name="fake_joint_calibration" args="pub calibrated std_msgs/Bool true" />
+
+  <!-- Stow the arm -->
+  <node pkg="husky_control" type="stow_ur5" name="stow_ur5"/>
+
+  <!-- Start the pr2 gripper controller and action server -->
+  <rosparam command="load" file="$(find husky_control)/config/control_gripper.yaml" />
+  <node name="r_gripper_controller_spawner" pkg="controller_manager" type="spawner" args="r_gripper_controller"/>
+  <!-- https://github.com/ros-controls/ros_controllers/pull/181 -->
+  <node name="r_gripper_state_publisher" pkg="rostopic" type="rostopic"
+        args="pub -r 1 /joint_states sensor_msgs/JointState
+              '{name: [r_gripper_l_finger_tip_joint, r_gripper_motor_slider_joint, r_gripper_motor_screw_joint, r_gripper_r_finger_joint, r_gripper_r_finger_tip_joint,  r_gripper_joint],
+              position: [0,0,0,0,0,0]}'" />
+  <node name="rqt" pkg="rqt_gui" type="rqt_gui"
+        args="--perspective-file $(find jsk_mbzirc_tasks)/launch/test_husky_control.perspective" />
+</launch>
