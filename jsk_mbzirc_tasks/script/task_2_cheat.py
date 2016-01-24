@@ -81,12 +81,12 @@ if __name__ == '__main__':
     open_hand()
     # reach
     rospy.loginfo("reach")
-    arm.set_pose_target([0.90, 0.16, 0.233, 0, 0, 0])
+    arm.set_pose_target([0.90, 0.16, 0.255, 0, 0, 0])
     arm.plan() and arm.go()
     arm.plan() and arm.go()
     # approach
     rospy.loginfo("approach")
-    arm.set_pose_target([1.13, 0.16, 0.233, 0, 0, 0])
+    arm.set_pose_target([1.13, 0.16, 0.255, 0, 0, 0])
     arm.plan() and arm.go()
     # rotate
     for i in range(4):
