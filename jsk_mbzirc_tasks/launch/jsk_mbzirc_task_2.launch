@@ -65,7 +65,7 @@
   <group unless="$(arg headless)" >
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task2.rviz"/>
     <rosparam param="/husky_velocity_controller/linear/x/max_velocity">4.0</rosparam>
-    <node pkg="jsk_mbzirc_common" type="uav_teleop_keyboard" name="ugv_teleop_keyboard"
+    <node pkg="jsk_mbzirc_tasks" type="uav_teleop_keyboard" name="ugv_teleop_keyboard"
           launch-prefix="xterm -e">
       <param name="teleopUGV" value="$(arg teleopUGV)"/>
       <remap from="teleopUGV" to="ugv_teleop_keyboard/teleopUGV"/>

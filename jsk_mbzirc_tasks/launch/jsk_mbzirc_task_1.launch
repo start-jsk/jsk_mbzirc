@@ -40,7 +40,7 @@
   <group unless="$(arg headless)" >
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
 
-    <node pkg="jsk_mbzirc_common" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
+    <node pkg="jsk_mbzirc_tasks" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
           launch-prefix="xterm -e">
   	<param name="teleopUGV" value="$(arg teleopUGV)"/>
 	<remap from="teleopUGV" to="uav_teleop_keyboard/teleopUGV"/>
