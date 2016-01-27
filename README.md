@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/tongtybj/mbzirc.svg?branch=master)](https://travis-ci.org/tongtybj/mbzirc)
+[![Build Status](https://travis-ci.org/start-jsk/jsk_mbzirc.svg?branch=master)](https://travis-ci.org/tongtybj/mbzirc)
 
 ## how to compile
 
 ```
 cd <catkin_ws>
 wstool init src
-wstool merge -t src https://raw.githubusercontent.com/tongtybj/mbzirc/master/mbzirc.rosinstall
+wstool merge -t src https://raw.githubusercontent.com/start-jsk/jsk_mbzirc/master/mbzirc.rosinstall
 wstool update -t src
 rosdep install -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 catkin build
