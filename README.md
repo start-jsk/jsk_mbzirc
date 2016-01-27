@@ -5,6 +5,7 @@
 ```
 cd <catkin_ws>
 wstool init src
+wstool set -t src jsk_mbzirc http://github.com/start-jsk/jsk_mbzirc --git
 wstool merge -t src https://raw.githubusercontent.com/start-jsk/jsk_mbzirc/master/mbzirc.rosinstall
 wstool update -t src
 rosdep install -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
