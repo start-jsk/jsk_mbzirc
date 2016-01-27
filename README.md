@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/start-jsk/jsk_mbzirc.svg?branch=master)](https://travis-ci.org/tongtybj/mbzirc)
+[![Build Status](https://travis-ci.org/start-jsk/jsk_mbzirc.svg?branch=master)](https://travis-ci.org/start-jsk/jsk_mbzirc)
 
 ## how to compile
 
