@@ -2,8 +2,8 @@
 Changelog for package jsk_mbzirc_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2016-01-29)
+------------------
 * move uav_teleop_keyboard to  jsk_mbzirc_tasks, no launch file in jsK_mbzirc_common use them
 * add BSD copyright
 * use full name for model author

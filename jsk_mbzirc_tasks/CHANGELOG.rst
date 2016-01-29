@@ -2,8 +2,8 @@
 Changelog for package jsk_mbzirc_tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2016-01-29)
+------------------
 * add tools to tune effort controllers pid param
 * fix the height of the target
 * update effort controller parameters
