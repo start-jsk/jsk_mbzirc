@@ -1,0 +1,82 @@
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="false" />
+  <arg name="headless" default="false"/>
+  <arg name="teleopUGV" default="false"/>
+  <arg name="uav1_name" default="UAV1" />
+  <arg name="uav2_name" default="UAV2" />
+  <arg name="uav3_name" default="UAV3" />
+
+  <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_3.launch" >
+    <arg name="paused" default="$(arg paused)"/>
+    <arg name="debug" default="$(arg debug)"/>
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="headless" default="$(arg headless)"/>
+  </include>
+
+  <!-- Spawn simulated quadrotor UAVs -->
+  <group ns="$(arg uav1_name)">
+    <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
+      <arg name="model" value="$(find jsk_mbzirc_tasks)/urdf/quadrotor_with_hokyo30lx_and_downward_cam.urdf.xacro"/>
+      <arg name="name" value="$(arg uav1_name)" />
+      <arg name="tf_prefix" value="$(arg uav1_name)" />
+      <arg name="x" value="68"/>
+      <arg name="y" value="-25"/>
+      <arg name="z" value="0.3"/>
+    </include>
+  </group>
+  <group ns="$(arg uav2_name)">
+    <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
+      <arg name="model" value="$(find jsk_mbzirc_tasks)/urdf/quadrotor_with_hokyo30lx_and_downward_cam.urdf.xacro"/>
+      <arg name="name" value="$(arg uav2_name)" />
+      <arg name="tf_prefix" value="$(arg uav2_name)" />
+      <arg name="x" value="65"/>
+      <arg name="y" value="-25"/>
+      <arg name="z" value="0.3"/>
+    </include>
+  </group>
+  <group ns="$(arg uav3_name)">
+    <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
+      <arg name="model" value="$(find jsk_mbzirc_tasks)/urdf/quadrotor_with_hokyo30lx_and_downward_cam.urdf.xacro"/>
+      <arg name="name" value="$(arg uav3_name)" />
+      <arg name="tf_prefix" value="$(arg uav3_name)" />
+      <arg name="x" value="62"/>
+      <arg name="y" value="-25"/>
+      <arg name="z" value="0.3"/>
+    </include>
+  </group>
+
+  <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
+  <node pkg="jsk_mbzirc_tasks" name="remain_time_text_to_overlay" type="relay_field_728"
+        args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
+              'text: m.data' --wait-for-start" />
+
+  <group unless="$(arg headless)" >
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task3.rviz"/>
+
+    <group ns="$(arg uav1_name)">
+      <node pkg="jsk_mbzirc_tasks" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
+            launch-prefix="xterm -e">
+        <param name="teleopUGV" value="$(arg teleopUGV)"/>
+        <remap from="teleopUGV" to="uav_teleop_keyboard/teleopUGV"/>
+      </node>
+    </group>
+    <group ns="$(arg uav2_name)">
+      <node pkg="jsk_mbzirc_tasks" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
+            launch-prefix="xterm -e">
+        <param name="teleopUGV" value="$(arg teleopUGV)"/>
+        <remap from="teleopUGV" to="uav_teleop_keyboard/teleopUGV"/>
+      </node>
+    </group>
+    <group ns="$(arg uav3_name)">
+      <node pkg="jsk_mbzirc_tasks" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
+            launch-prefix="xterm -e">
+        <param name="teleopUGV" value="$(arg teleopUGV)"/>
+        <remap from="teleopUGV" to="uav_teleop_keyboard/teleopUGV"/>
+      </node>
+    </group>
+
+  </group>
+
+</launch>
