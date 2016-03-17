@@ -42,4 +42,11 @@
   <xacro:generic_camera name="camera" parent="base_link" ros_topic="image" cam_info_topic="camera_info" update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="100">
     <origin xyz="-0.3 0.0 0.6" rpy="0 0 0"/>
   </xacro:generic_camera>
+
+  <!-- Hand eye camera -->
+  <xacro:include filename="$(find hector_sensors_description)/urdf/generic_camera.urdf.xacro" />
+  <xacro:generic_camera name="handeye_camera" parent="r_gripper_tool_frame" ros_topic="image" cam_info_topic="camera_info" update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="90">
+    <origin xyz="-0.10 0.0 0.2" rpy="0 0.785 0"/>
+  </xacro:generic_camera>
+
 </robot>
