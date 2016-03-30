@@ -1,18 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(jsk_mbzirc_tasks)
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs)
-#if(OpenCV_VERSION VERSION_LESS "3.1")
- #     find_package(OpenCV 3.1 REQUIRED)
- #     find_package(PkgConfig REQUIRED)
-#else()
- #     find_package(OpenCV 2.4 REQUIRED)
-#endif()
-find_package(OpenCV 3.1 REQUIRED)
-
+find_package(PCL REQUIRED)
+if(OpenCV_VERSION VERSION_LESS "3.1")
+      find_package(OpenCV 3.1 REQUIRED)
+      find_package(PkgConfig REQUIRED)
+else()
+      find_package(OpenCV 2.4 REQUIRED)
+endif()
 
 ###################################
 ## catkin specific configuration ##
@@ -21,8 +20,9 @@ catkin_package(
     CATKIN_DEPENDS
 )
 
-#include_directories(include ${catkin_INCLUDE_DIRXSS})
-include_directories(include ${catkin_INCLUDE_DIRS})
+set(PCL_INCLUDE_DIRS "/usr/include/pcl-1.7/")
+set(EIGEN_INCLUDE_DIRS "/usr/include/eigen3")
+include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS})
 
 add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
 target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
