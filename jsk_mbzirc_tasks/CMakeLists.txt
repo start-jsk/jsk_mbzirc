@@ -6,12 +6,8 @@ project(jsk_mbzirc_tasks)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs)
 find_package(PCL REQUIRED)
-if(OpenCV_VERSION VERSION_LESS "3.1")
-      find_package(OpenCV 3.1 REQUIRED)
-      find_package(PkgConfig REQUIRED)
-else()
-      find_package(OpenCV 2.4 REQUIRED)
-endif()
+find_package(OpenCV REQUIRED)
+
 
 ###################################
 ## catkin specific configuration ##
