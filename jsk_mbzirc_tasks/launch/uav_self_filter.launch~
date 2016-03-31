@@ -1,0 +1,7 @@
+<launch>
+  <arg name="image" default="/camera/rgb/image_rect_color" />
+  <node pkg="jsk_mbzirc_tasks" type="uav_self_filter" name="uav_self_filter" output="screen" >
+    <remap from="input" to="$(arg image)" />
+    <remap from="target" to="/uav_self_filter/output/image" />
+  </node>
+</launch>

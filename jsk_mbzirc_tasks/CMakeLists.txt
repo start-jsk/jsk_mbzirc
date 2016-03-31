@@ -17,7 +17,10 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
+add_executable(uav_self_filter_node src/uav_self_filter_node.cpp)
+
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
+target_link_libraries(uav_self_filter_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
