@@ -24,5 +24,11 @@
       <origin xyz="0.4 0.0 -0.0" rpy="0 ${M_PI/2} 0"/>
     </xacro:generic_camera>
 
+    <!-- side facing camera -->
+    <xacro:generic_camera name="side_cam" parent="base_link" ros_topic="camera/image" cam_info_topic="camera/camera_info" 
+			    update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="100">
+      <origin xyz="-0.4 0.0 -0.0" rpy="${M_PI} ${-M_PI/4} 0"/>
+    </xacro:generic_camera>
+
 </robot>
 
