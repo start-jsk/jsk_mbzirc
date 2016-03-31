@@ -15,7 +15,9 @@
 class UAVSelfFilter {
 
 private:
-    
+    int thresh_;
+    cv::Mat mask_;
+    bool is_mask_;
     
 protected:
     virtual void onInit();
@@ -28,8 +30,8 @@ protected:
     
  public:
     UAVSelfFilter();
-    virtual void imageCB(
-        const sensor_msgs::Image::ConstPtr &);
+    virtual void imageCB(const sensor_msgs::Image::ConstPtr &);
+    void filter(cv::Mat &,  cv::Mat &);
 };
 
 

@@ -4,5 +4,11 @@
 	name="uav_self_filter" output="screen" >
     <remap from="input" to="$(arg image)" />
     <remap from="target" to="/uav_self_filter/output/image" />
+    
+    <!-- 150 set based on gazebo start podium -->
+    <rosparam>
+      ~mask_thresh: 150
+    </rosparam>
+
   </node>
 </launch>
