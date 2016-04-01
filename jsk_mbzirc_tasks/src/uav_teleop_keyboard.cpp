@@ -84,10 +84,10 @@ public:
             puts("fail to load the param");
         ros::NodeHandle n_private("~");
         n_private.param("walk_vel", walk_vel, 1.0);
-        n_private.param("run_vel", run_vel, 4.0);
-        n_private.param("yaw_rate", yaw_rate, 1.0);
+        n_private.param("run_vel", run_vel, 8.0);
+        n_private.param("yaw_rate", yaw_rate, 0.5);
         n_private.param("yaw_run_rate", yaw_rate_run, 1.5);
-        n_private.param("vertical_vel", vertical_vel, 1.0);
+        n_private.param("vertical_vel", vertical_vel, 2.0);
     }
 
     ~TeleopUAVKeyboard()   { }
