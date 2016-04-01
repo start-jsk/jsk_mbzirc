@@ -48,7 +48,6 @@ private:
     ros::NodeHandle nh_;
     message_filters::Synchronizer<MySyncPolicy> *sync;
     tf::Transform BaseToCamera;
-    bool GPUFLAG = false;
 #define Ground_Z 0.0
    //test
     tf::TransformBroadcaster br;
@@ -66,10 +65,12 @@ public:
         uav_odom_sub_ = new message_filters::Subscriber<nav_msgs::Odometry>(nh_,"/ground_truth/state",10);
         sync = new message_filters::Synchronizer<MySyncPolicy>(MySyncPolicy(3), *img_sub_, *camera_info_sub_, *uav_odom_sub_);
         sync->registerCallback(boost::bind(&uav_img2pointcloud::imageCallback,this,_1,_2,_3));
+        /*
         if(!nh_.getParam("enableGPU",GPUFLAG))
             std::cout<<"fail to load the param enableGPU, Using CPU instead"<<std::endl;
         else
             std::cout<<"With GPU support flag = " << GPUFLAG<<std::endl;
+            */
         //initialize base_link to camera optical link
         BaseToCamera.setOrigin(tf::Vector3(0.0,0.0,-0.2));
         BaseToCamera.setRotation(tf::Quaternion(0.707, -0.707, 0.000, -0.000));
@@ -122,18 +123,16 @@ void uav_img2pointcloud::p2p(const sensor_msgs::ImageConstPtr& img,
     std::clock_t start;
     double duration;
     start = std::clock();
-    if(GPUFLAG)
-    {
-        //gpu
-        process_in_cuda(a, b, c, &cvimg, &Pointcloud);
-    }
-    else
-    {
-        //cpu
-        for(int i=0;i<Pointcloud.height;i++)
-            for(int j=0;j<Pointcloud.width;j++)
-            {
-                /*  using matrix (so slow!!!!!!!!!!!!)
+
+    //gpu
+#if defined(GPU_EN)
+    process_in_cuda(a, b, c, &cvimg, &Pointcloud);
+#else
+    //cpu
+    for(int i=0;i<Pointcloud.height;i++)
+        for(int j=0;j<Pointcloud.width;j++)
+        {
+            /*  using matrix (so slow!!!!!!!!!!!!)
             cv::Mat A(2,2,CV_64FC1),A_inv(2,2,CV_64FC1),bv(2,1,CV_64FC1);
             A.at<double>(0,0) = j*c[0] - a[0]; A.at<double>(0,1) = j*c[1] - a[1];
             A.at<double>(1,0) = i*c[0] - b[0]; A.at<double>(1,1) = i*c[1] - b[1];
@@ -145,26 +144,26 @@ void uav_img2pointcloud::p2p(const sensor_msgs::ImageConstPtr& img,
             Pointcloud.points[i*Pointcloud.width+j].y = (float)Point.at<double>(1,0);
             Pointcloud.points[i*Pointcloud.width+j].z = (float)Ground_Z;
             */
-                //directly calculation make it faster, next step is to parallize it
-                float A[2][2],bv[2];
-                A[0][0] = j*c[0] - a[0]; A[0][1] = j*c[1] - a[1];
-                A[1][0] = i*c[0] - b[0]; A[1][1] = i*c[1] - b[1];
-                bv[0]= a[2]*Ground_Z + a[3] - j*c[2]*Ground_Z - j*c[3];
-                bv[1] = b[2]*Ground_Z + b[3] - i*c[2]*Ground_Z - i*c[3];
-                float DomA = A[1][1]*A[0][0]-A[0][1]*A[1][0];
-                Pointcloud.points[i*Pointcloud.width+j].x = (A[1][1]*bv[0]-A[0][1]*bv[1])/DomA;
-                Pointcloud.points[i*Pointcloud.width+j].y = (A[0][0]*bv[1]-A[1][0]*bv[0])/DomA;
-                Pointcloud.points[i*Pointcloud.width+j].z = (float)Ground_Z;
+            //directly calculation make it faster, next step is to parallize it
+            float A[2][2],bv[2];
+            A[0][0] = j*c[0] - a[0]; A[0][1] = j*c[1] - a[1];
+            A[1][0] = i*c[0] - b[0]; A[1][1] = i*c[1] - b[1];
+            bv[0]= a[2]*Ground_Z + a[3] - j*c[2]*Ground_Z - j*c[3];
+            bv[1] = b[2]*Ground_Z + b[3] - i*c[2]*Ground_Z - i*c[3];
+            float DomA = A[1][1]*A[0][0]-A[0][1]*A[1][0];
+            Pointcloud.points[i*Pointcloud.width+j].x = (A[1][1]*bv[0]-A[0][1]*bv[1])/DomA;
+            Pointcloud.points[i*Pointcloud.width+j].y = (A[0][0]*bv[1]-A[1][0]*bv[0])/DomA;
+            Pointcloud.points[i*Pointcloud.width+j].z = (float)Ground_Z;
 
-                //fill the color info
-                uint8_t rgb[4];
-                rgb[0] = cvimg.at<cv::Vec3b>(i,j)[0];
-                rgb[1] = cvimg.at<cv::Vec3b>(i,j)[1];
-                rgb[2] = cvimg.at<cv::Vec3b>(i,j)[2];
-                rgb[3] = 0;
-                Pointcloud.points[i*Pointcloud.width+j].rgb = *(float *)(rgb);
-            }
-    }
+            //fill the color info
+            uint8_t rgb[4];
+            rgb[0] = cvimg.at<cv::Vec3b>(i,j)[0];
+            rgb[1] = cvimg.at<cv::Vec3b>(i,j)[1];
+            rgb[2] = cvimg.at<cv::Vec3b>(i,j)[2];
+            rgb[3] = 0;
+            Pointcloud.points[i*Pointcloud.width+j].rgb = *(float *)(rgb);
+        }
+#endif
     //get the duration....
     duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"process_time is "<< duration << " second" <<'\n';

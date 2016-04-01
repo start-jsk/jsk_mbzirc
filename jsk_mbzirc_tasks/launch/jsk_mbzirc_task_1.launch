@@ -4,7 +4,6 @@
   <arg name="gui" default="false" />
   <arg name="headless" default="false"/>
   <arg name="teleopUGV" default="false"/>
-  <arg name="GPUEN" default="true"/>
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -48,8 +47,6 @@
     </node>
 
     <node pkg="jsk_mbzirc_tasks" type="uav_img2pointcloud" name="uav_img2pointcloud"  launch-prefix="xterm -e">
-  	<param name="enableGPU" value="$(arg GPUEN)"/>
-	<remap from="enableGPU" to="uav_img2pointcloud/enableGPU"/>
     </node>
 
   </group>

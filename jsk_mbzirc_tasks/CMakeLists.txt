@@ -7,7 +7,9 @@ project(jsk_mbzirc_tasks)
 find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(CUDA REQUIRED)
+
+#add gpu support
+set(ENABLE_CUDA OFF)
 
 
 ###################################
@@ -19,16 +21,25 @@ catkin_package(
 
 set(PCL_INCLUDE_DIRS "/usr/include/pcl-1.7/")
 set(EIGEN_INCLUDE_DIRS "/usr/include/eigen3/")
-set(CUDA_INCLUDE_DIRS "/usr/local/cuda/")
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS})
 
-cuda_add_library(UAV_IMG2POINTCLOUD_CU_LIB ${LIB_TYPE} src/uav_img2pointcloud.cu)
+if(ENABLE_CUDA)
+    find_package(CUDA REQUIRED)
+    set(CUDA_INCLUDE_DIRS "/usr/local/cuda/")
+    include_directories(${CUDA_INCLUDE_DIRS})
+    #add gpu support for uav_img2pointcloud node
+    add_definitions(-DGPU_EN)
+    cuda_add_library(UAV_IMG2POINTCLOUD_CU_LIB ${LIB_TYPE} src/uav_img2pointcloud.cu)
+    add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
+    add_dependencies(uav_img2pointcloud UAV_IMG2POINTCLOUD_CU_LIB)
+    target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${CUDA_LIBRARIES} UAV_IMG2POINTCLOUD_CU_LIB)
+else()
+    add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
+    target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+endif(ENABLE_CUDA)
 
-add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
-add_dependencies(uav_img2pointcloud UAV_IMG2POINTCLOUD_CU_LIB)
-target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${CUDA_LIBRARIES} UAV_IMG2POINTCLOUD_CU_LIB)
-
+#uav_teleop_keyboard node
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
 
