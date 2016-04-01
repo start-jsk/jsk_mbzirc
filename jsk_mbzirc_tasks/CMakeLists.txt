@@ -7,6 +7,7 @@ project(jsk_mbzirc_tasks)
 find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(CUDA REQUIRED)
 
 
 ###################################
@@ -17,11 +18,16 @@ catkin_package(
 )
 
 set(PCL_INCLUDE_DIRS "/usr/include/pcl-1.7/")
-set(EIGEN_INCLUDE_DIRS "/usr/include/eigen3")
-include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS})
+set(EIGEN_INCLUDE_DIRS "/usr/include/eigen3/")
+set(CUDA_INCLUDE_DIRS "/usr/local/cuda/")
+
+include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
+
+cuda_add_library(UAV_IMG2POINTCLOUD_CU_LIB ${LIB_TYPE} src/uav_img2pointcloud.cu)
 
 add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
-target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_dependencies(uav_img2pointcloud UAV_IMG2POINTCLOUD_CU_LIB)
+target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${CUDA_LIBRARIES} UAV_IMG2POINTCLOUD_CU_LIB)
 
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
