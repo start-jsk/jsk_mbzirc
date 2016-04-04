@@ -34,9 +34,12 @@ static void HandleError( cudaError_t err,
 __global__ void cuda_projecting(double *a, double *b, double *c, uchar *imgdata, float *pcdata)
 {
     float A[2][2],bv[2];
-    int i = blockIdx.x; //row
-    int j = blockIdx.y; //column
-    int offset = j + i*gridDim.y;
+//    int i = blockIdx.x; //row
+//    int j = blockIdx.y; //column
+//    int offset = j + i*gridDim.y;
+    int i = blockIdx.x;
+    int j = threadIdx.x;
+    int offset = j + i*blockDim.x;
     A[0][0] = j*c[0] - a[0]; A[0][1] = j*c[1] - a[1];
     A[1][0] = i*c[0] - b[0]; A[1][1] = i*c[1] - b[1];
     bv[0]= a[2]*Ground_Z + a[3] - j*c[2]*Ground_Z - j*c[3];
@@ -86,9 +89,9 @@ float process_in_cuda(double *_a, double *_b,double *_c,
     cudaEventRecord(start, 0);
 
     //run device function...
-    dim3 grid(PC->height,PC->width);
-    cuda_projecting<<<grid,1>>>(dev_a, dev_b, dev_c, dev_imgdata, dev_pcdata);
-
+//    dim3 grid(PC->height,PC->width);
+//    cuda_projecting<<<grid,1>>>(dev_a, dev_b, dev_c, dev_imgdata, dev_pcdata);
+    cuda_projecting<<<PC->height,PC->width>>>(dev_a, dev_b, dev_c, dev_imgdata, dev_pcdata);
     //copy back to pointcloud...
     HANDLE_ERROR(cudaMemcpy(PC->points.data(),dev_pcdata,pointcloudsize,cudaMemcpyDeviceToHost));
     cudaEventRecord( stop, 0 );
