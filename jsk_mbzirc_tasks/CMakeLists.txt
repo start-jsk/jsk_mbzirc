@@ -4,12 +4,17 @@ project(jsk_mbzirc_tasks)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs sensor_msgs)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 
 #add gpu support
 set(ENABLE_CUDA OFF)
+
+find_package(OpenMP)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 
 
 ###################################
@@ -42,6 +47,16 @@ endif(ENABLE_CUDA)
 #uav_teleop_keyboard node
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
+
+add_executable(uav_tracking_node
+  src/uav_tracking_node.cpp
+  src/CMT.cpp
+  src/keypoint_classifier.cpp
+  )
+
+target_link_libraries(uav_tracking_node
+  ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
