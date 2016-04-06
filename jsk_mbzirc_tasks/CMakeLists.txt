@@ -48,15 +48,17 @@ endif(ENABLE_CUDA)
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
 
-add_executable(uav_tracking_node
-  src/uav_tracking_node.cpp
-  src/CMT.cpp
-  src/keypoint_classifier.cpp
-  )
+if (OpenCV_VERSION VERSION_GREATER "3.0")
+  add_executable(uav_tracking_node
+    src/uav_tracking_node.cpp
+    src/CMT.cpp
+    src/keypoint_classifier.cpp
+    )
 
-target_link_libraries(uav_tracking_node
-  ${catkin_LIBRARIES}
- )
+  target_link_libraries(uav_tracking_node
+    ${catkin_LIBRARIES}
+    )
+endif()
 
 #############
 ## Install ##
