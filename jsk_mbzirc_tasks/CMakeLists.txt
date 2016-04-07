@@ -35,24 +35,27 @@ if(ENABLE_CUDA)
     include_directories(${CUDA_INCLUDE_DIRS})
     #add gpu support for uav_img2pointcloud node
     add_definitions(-DGPU_EN)
-    cuda_add_library(UAV_IMG2POINTCLOUD_CU_LIB ${LIB_TYPE} src/uav_img2pointcloud.cu)
-    add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
+    cuda_add_library(UAV_IMG2POINTCLOUD_CU_LIB ${LIB_TYPE} src/img2pointcloud/uav_img2pointcloud.cu)
+    add_executable(uav_img2pointcloud src/img2pointcloud/uav_img2pointcloud.cpp)
     add_dependencies(uav_img2pointcloud UAV_IMG2POINTCLOUD_CU_LIB)
     target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${CUDA_LIBRARIES} UAV_IMG2POINTCLOUD_CU_LIB)
 else()
-    add_executable(uav_img2pointcloud src/uav_img2pointcloud.cpp)
+    add_executable(uav_img2pointcloud src/img2pointcloud/uav_img2pointcloud.cpp)
     target_link_libraries(uav_img2pointcloud ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 endif(ENABLE_CUDA)
 
 #uav_teleop_keyboard node
-add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
+add_executable(uav_teleop_keyboard src/teleop/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
+#uav_teleop_joy node
+add_executable(uav_teleop_joy src/teleop/uav_teleop_joy.cpp)
+target_link_libraries(uav_teleop_joy ${catkin_LIBRARIES})
 
 if (OpenCV_VERSION VERSION_GREATER "3.0")
   add_executable(uav_tracking_node
-    src/uav_tracking_node.cpp
-    src/CMT.cpp
-    src/keypoint_classifier.cpp
+    src/tracking/uav_tracking_node.cpp
+    src/tracking/CMT.cpp
+    src/tracking/keypoint_classifier.cpp
     )
 
   target_link_libraries(uav_tracking_node
