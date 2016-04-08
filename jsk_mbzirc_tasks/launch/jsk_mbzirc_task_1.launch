@@ -38,7 +38,12 @@
         args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
               'text: m.data' --wait-for-start" />
 
-  <group if="$(arg teleopjoy)" >
+
+  <group unless="$(arg headless)" >
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
+    <node pkg="jsk_mbzirc_tasks" type="uav_img2pointcloud" name="uav_img2pointcloud"  launch-prefix="xterm -e"/>
+    
+    <group if="$(arg teleopjoy)" >
     <node pkg="jsk_mbzirc_tasks" type="uav_teleop_joy" name="uav_teleop_joy"
           launch-prefix="xterm -e">
   	<param name="teleopUGV" value="$(arg teleopUGV)"/>
@@ -56,12 +61,7 @@
 	<remap from="teleopUGV" to="uav_teleop_keyboard/teleopUGV"/>
     </node> 
   </group>
-
-  <group unless="$(arg headless)" >
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
   </group>
   
-  <node pkg="jsk_mbzirc_tasks" type="uav_img2pointcloud" name="uav_img2pointcloud"  launch-prefix="xterm -e">
-  </node>
 
 </launch>
