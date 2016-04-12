@@ -43,6 +43,7 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <nav_msgs/Odometry.h>
 
 namespace gazebo
 {
@@ -72,7 +73,8 @@ private:
   std::string namespace_;
 
   ros::NodeHandle* node_handle_;
-  ros::Publisher pub_score_, pub_time_;
+  ros::Publisher pub_score_, pub_time_, pub_gt_z_, pub_ee_z_; 
+  ros::Subscriber sub_drone_state_;
   ros::Time state_stamp_;
 
   boost::mutex lock;
@@ -86,6 +88,8 @@ private:
   bool takeoff_flag_;
   double landing_height_;
   std::string drone_name_;
+
+  void DroneStateCallback(const nav_msgs::OdometryConstPtr& state_msg);
 
 };
 

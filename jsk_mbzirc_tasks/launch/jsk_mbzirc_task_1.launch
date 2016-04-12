@@ -42,6 +42,15 @@
         args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
               'text: m.data' --wait-for-start" />
 
+  <node pkg="jsk_mbzirc_tasks" name="drone_estimated_height_text_to_overlay" type="relay_field_728"
+        args="/drone_estimated_height /drone_estimated_height_overlay jsk_rviz_plugins/OverlayText
+              'text: m.data' --wait-for-start" />
+
+  <node pkg="jsk_mbzirc_tasks" name="drone_groundtruth_height_text_to_overlay" type="relay_field_728"
+        args="/drone_groundtruth_height /drone_groundtruth_height_overlay jsk_rviz_plugins/OverlayText
+              'text: m.data' --wait-for-start" />
+
+
   <group unless="$(arg headless)" >
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
 

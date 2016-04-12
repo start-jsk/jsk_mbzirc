@@ -90,6 +90,9 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   node_handle_ = new ros::NodeHandle(namespace_);
   pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true); // set latch true
   pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
+  pub_ee_z_ = node_handle_->advertise<std_msgs::String>("drone_estimated_height", 1);
+  pub_gt_z_ = node_handle_->advertise<std_msgs::String>("drone_groundtruth_height", 1);
+  sub_drone_state_ = node_handle_->subscribe<nav_msgs::Odometry>("/state", 1, &GazeboTruck::DroneStateCallback, this, ros::TransportHints().tcpNoDelay()); 
   ros::NodeHandle param_handle(*node_handle_, "controller");
 
 
@@ -119,6 +122,13 @@ void GazeboTruck::Update()
     }
   else
     {//TODO: check contact with model "arena" is better
+      std::stringstream ss;
+      std_msgs::String msg_time;
+      ss << drone_model->GetWorldPose().pos.z - landing_height_;
+      msg_time.data = "height(ground truth):" + ss.str();
+      pub_gt_z_.publish(msg_time);
+
+
       if(drone_model->GetWorldPose().pos.z < landing_height_ + 0.05) 
         {
           ROS_FATAL("Hit ground, Your challenge was over");
@@ -192,7 +202,7 @@ void GazeboTruck::Update()
   std::stringstream ss;
   std_msgs::String msg_time;
   ss << 20*60 - current_time.Double();
-  msg_time.data = ss.str();
+  msg_time.data = "remain time:" + ss.str();
   pub_time_.publish(msg_time);
   if ( entityName != "" && distAbove < 1.0 ) {
     std_msgs::String msg_score, msg_time;
@@ -209,6 +219,19 @@ void GazeboTruck::Reset()
 {
   state_stamp_ = ros::Time();
 }
+
+/////////////////////////////////////////////////////////////////////////
+/// Callback func for drone state
+void GazeboTruck::DroneStateCallback(const nav_msgs::OdometryConstPtr& state_msg)
+{
+  std::stringstream ss;
+  std_msgs::String msg_time;
+  double z = (state_msg->pose.pose.position.z >= 0)? state_msg->pose.pose.position.z: 0;
+  ss << z;
+  msg_time.data = "height(estimation):" + ss.str();
+  pub_ee_z_.publish(msg_time);
+}
+
 
 // Register this plugin with the simulator
 GZ_REGISTER_MODEL_PLUGIN(GazeboTruck)
