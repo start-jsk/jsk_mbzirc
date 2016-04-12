@@ -14,6 +14,8 @@
 
   <arg name="cheat" default="false" />
 
+  <arg name="use_ground_truth" default="true" />
+
   <arg unless="$(arg cheat)" name="x" value="65"/>
   <arg     if="$(arg cheat)" name="x" value="0"/>
   <arg unless="$(arg cheat)" name="y" value="-25"/>
@@ -30,6 +32,9 @@
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
     <arg name="z" value="$(arg z)"/>
+    <arg name="use_ground_truth_for_tf" value="$(arg use_ground_truth)" />
+    <arg name="use_ground_truth_for_control" value="$(arg use_ground_truth)" />
+
   </include>
 
   <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
