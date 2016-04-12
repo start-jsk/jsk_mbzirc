@@ -83,6 +83,10 @@ private:
   common::Time last_time_;
   bool terminated_;
 
+  bool takeoff_flag_;
+  double landing_height_;
+  std::string drone_name_;
+
 };
 
 }

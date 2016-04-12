@@ -59,6 +59,10 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   last_time_ = world_->GetSimTime();
   terminated_ = false;
 
+  landing_height_ = -0.1; //init dummy height
+  takeoff_flag_ = false;
+  drone_name_ = std::string("quadrotor");
+
   // load parameters from sdf
   if (_sdf->HasElement("robotNamespace")) namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
@@ -66,6 +70,7 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     link_name_ = _sdf->GetElement("bodyName")->Get<std::string>();
     link_ = _model->GetLink(link_name_);
   }
+  if (_sdf->HasElement("droneName")) drone_name_ = _sdf->GetElement("droneName")->Get<std::string>();
 
   if (!link)
   {
@@ -88,7 +93,6 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   ros::NodeHandle param_handle(*node_handle_, "controller");
 
 
-
   update_connection_ = event::Events::ConnectWorldUpdateBegin(
                                                               boost::bind(&GazeboTruck::Update, this));
 }
@@ -103,6 +107,25 @@ void GazeboTruck::Update()
   if ( terminated_ ) {
     return;
   }
+
+  //drone hit the ground check(200ms delay)
+  physics::ModelPtr drone_model = world_->GetModel("quadrotor");
+  if(!drone_model) return;
+  if(!takeoff_flag_)
+    {//TODO: check contact with model "arena" is better
+      if(landing_height_ < 0) landing_height_  = drone_model->GetWorldPose().pos.z;
+      if(drone_model->GetWorldPose().pos.z > landing_height_ + 0.05) //0.05m is a margin
+        takeoff_flag_ = true;
+    }
+  else
+    {//TODO: check contact with model "arena" is better
+      if(drone_model->GetWorldPose().pos.z < landing_height_ + 0.05) 
+        {
+          ROS_FATAL("Hit ground, Your challenge was over");
+          terminated_ = true;
+        }
+    }
+
   //std::cerr << link_->GetWorldPose() << std::endl;
   common::Time current_time = world_->GetSimTime();
   double delta_time = (current_time-last_time_).Double();
