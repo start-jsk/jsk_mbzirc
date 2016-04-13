@@ -60,6 +60,7 @@ if (OpenCV_VERSION VERSION_GREATER "3.0")
 
   target_link_libraries(uav_tracking_node
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
     )
 endif()
 
