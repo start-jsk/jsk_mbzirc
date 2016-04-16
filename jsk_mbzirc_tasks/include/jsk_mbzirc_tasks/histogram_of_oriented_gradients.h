@@ -11,7 +11,7 @@ class HOGFeatureDescriptor {
 
     //  HOG Configuration Params
 #define N_BINS 9
-#define ANGLE 180.0
+#define ANGLE 180
 #define BINS_ANGLE (ANGLE / N_BINS)
 #define CELL 8
 #define BLOCK 2

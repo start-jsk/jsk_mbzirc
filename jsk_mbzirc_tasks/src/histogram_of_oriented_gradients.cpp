@@ -18,12 +18,15 @@ void HOGFeatureDescriptor::weightedVoting(
                 nearest_lower = distance;
                 lower_index = i;
             }
-        } else {
+        }
+        /*
+        else {
             if (distance < nearest_higher) {
                 nearest_higher = distance;
                 higher_index = i;
             }
         }
+        */
     }
 }
 
@@ -36,8 +39,8 @@ void HOGFeatureDescriptor::imageGradient(
     cv::Mat Imag;
     cv::Mat Iang;
     cv::cartToPolar(xsobel, ysobel, Imag, Iang, true);
-    cv::add(Iang, cv::Scalar(180), Iang, Iang < 0);
-    cv::add(Iang, cv::Scalar(-180), Iang, Iang >= 180);
+    cv::add(Iang, cv::Scalar(180.0), Iang, Iang < 0);
+    cv::add(Iang, cv::Scalar(-180.0), Iang, Iang >= 180.0);
     cv::Mat orientation_histogram;
     for (int j = 0; j < image.rows; j += CELL) {
         for (int i = 0; i < image.cols; i += CELL) {
@@ -52,17 +55,20 @@ void HOGFeatureDescriptor::imageGradient(
                        int h_bin;
                        this->weightedVoting(angle, l_bin, h_bin);
                        float l_ratio = 1.0f - (angle - l_bin)/BINS_ANGLE;
-                       // float h_ratio = 1 + (angle -
-                       // h_bin)/BINS_ANGLE;
                        float h_ratio = 1.0f - l_ratio;
-                       
                        int l_index = (l_bin-(BINS_ANGLE/2))/BINS_ANGLE;
-                       int h_index = (h_bin-(BINS_ANGLE/2))/BINS_ANGLE;
-                       
-                        bin.at<float>(0, l_index) +=
-                           (Imag.at<float>(y, x) * l_ratio);
-                        bin.at<float>(0, h_index) +=
-                           (Imag.at<float>(y, x) * h_ratio);
+                       // int h_index =
+                       // (h_bin-(BINS_ANGLE/2))/BINS_ANGLE;
+                       int h_index = l_index + 1;
+                       // bin.at<float>(0, l_index) +=
+                       //     (Imag.at<float>(y, x) * l_ratio);
+                       // bin.at<float>(0, h_index) +=
+                       //     (Imag.at<float>(y, x) * h_ratio);
+                       bin.at<float>(0, l_index) +=
+                           (Iang.at<float>(y, x) * l_ratio);
+                       bin.at<float>(0, h_index) +=
+                           (Iang.at<float>(y, x) * h_ratio);
+
                     }
                 }
                 orientation_histogram.push_back(bin);
@@ -76,31 +82,14 @@ cv::Mat HOGFeatureDescriptor::blockGradient(
     const int col, const int row, const int stride, cv::Mat &bins) {
     cv::Mat block_hogMD = cv::Mat(cv::Size(N_BINS * BLOCK * BLOCK, 1), CV_32F);    
     int icounter = 0;
-    
-    
-    // for (int j = row; j < (BLOCK * CELL + row); j += CELL) {
-    //     for (int i = col; (i < BLOCK * CELL + col); i += CELL) {
     for (int j = 0; j < BLOCK; j++) {
         for (int i = 0; i < BLOCK; i++) {
-
            int index = i + (j * stride) + col;
-           
-           
-           // int index = (j * CELL) + i;
-           // int index = (j * BLOCK * CELL) + i;
            for (int k = 0; k < N_BINS; k++) {
                block_hogMD.at<float>(0, icounter++) = bins.at<float>(index, k);
-
-               // std::cout << index  << " " << i << "  " << j << "\n";
            }
-
-           // std::cout << index  << "\n";
        }
     }
-
-    // std::cout << "COUNTER: " << icounter  << "\n";
-    // std::cout << "\n" << "\n";
-    
     return block_hogMD;
 }
 
@@ -156,7 +145,7 @@ cv::Mat HOGFeatureDescriptor::visualizeHOG(
     cv::Size cell_size = cv::Size(CELL, CELL);
     cv::resize(src, visual_image, cv::Size(src.cols*scale_factor,
                                            src.rows*scale_factor));
-    int gradientBinSize = 9;
+    int gradientBinSize = N_BINS;
     float radRangeForOneBin = M_PI/(float)gradientBinSize;
     int cells_in_x_dir = win_size.width / cell_size.width;
     int cells_in_y_dir = win_size.height / cell_size.height;

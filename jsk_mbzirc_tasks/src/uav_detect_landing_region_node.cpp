@@ -34,15 +34,15 @@ void UAVLandingRegion::imageCB(
     }
     cv::Mat image = cv_ptr->image;
     
-    this->detect(image);
+    // this->detect(image);
     
 
-    // cv::resize(image, image, cv::Size(64, 128));
+    cv::resize(image, image, cv::Size(64/2, 128/4));
     HOGFeatureDescriptor hog;
     cv::Mat desc = hog.computeHOG(image);
     cv::Mat hog_viz = hog.visualizeHOG(image, desc, image.size(), 2, 5);    
 
-    // std::cout << desc  << "\n";
+    std::cout << desc  << "\n";
 
     std::cout << "Desc: " << desc.size()  << "\n";
     
