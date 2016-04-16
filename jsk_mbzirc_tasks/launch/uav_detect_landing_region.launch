@@ -1,0 +1,8 @@
+<launch>
+  <arg name="image" default="/downward_cam/camera/image" />
+
+  <node pkg="jsk_mbzirc_tasks" type="uav_detect_landing_region_node"
+	name="uav_detect_landing_region" output="screen" >
+    <remap from="input" to="$(arg image)" />
+  </node>
+</launch>

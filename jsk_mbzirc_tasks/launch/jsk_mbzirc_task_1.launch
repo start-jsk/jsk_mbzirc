@@ -5,6 +5,7 @@
   <arg name="headless" default="false"/>
   <arg name="teleopUGV" default="false"/>
   <arg name="teleopjoy" default="false"/>
+  <arg name="is_mapping" default="false" />
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -41,8 +42,11 @@
 
   <group unless="$(arg headless)" >
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
+
+    <group if="$(arg is_mapping)" >
     <node pkg="jsk_mbzirc_tasks" type="uav_img2pointcloud" name="uav_img2pointcloud"  launch-prefix="xterm -e"/>
-    
+    </group>
+
     <group if="$(arg teleopjoy)" >
     <node pkg="jsk_mbzirc_tasks" type="uav_teleop_joy" name="uav_teleop_joy"
           launch-prefix="xterm -e">
