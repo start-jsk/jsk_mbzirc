@@ -39,8 +39,8 @@ void HOGFeatureDescriptor::imageGradient(
     cv::Mat Imag;
     cv::Mat Iang;
     cv::cartToPolar(xsobel, ysobel, Imag, Iang, true);
-    cv::add(Iang, cv::Scalar(180.0), Iang, Iang < 0);
-    cv::add(Iang, cv::Scalar(-180.0), Iang, Iang >= 180.0);
+    cv::add(Iang, cv::Scalar(ANGLE), Iang, Iang < 0);
+    cv::add(Iang, cv::Scalar(-ANGLE), Iang, Iang >= ANGLE);
     cv::Mat orientation_histogram;
     for (int j = 0; j < image.rows; j += CELL) {
         for (int i = 0; i < image.cols; i += CELL) {
@@ -60,15 +60,10 @@ void HOGFeatureDescriptor::imageGradient(
                        // int h_index =
                        // (h_bin-(BINS_ANGLE/2))/BINS_ANGLE;
                        int h_index = l_index + 1;
-                       // bin.at<float>(0, l_index) +=
-                       //     (Imag.at<float>(y, x) * l_ratio);
-                       // bin.at<float>(0, h_index) +=
-                       //     (Imag.at<float>(y, x) * h_ratio);
                        bin.at<float>(0, l_index) +=
                            (Iang.at<float>(y, x) * l_ratio);
                        bin.at<float>(0, h_index) +=
                            (Iang.at<float>(y, x) * h_ratio);
-
                     }
                 }
                 orientation_histogram.push_back(bin);
@@ -100,7 +95,8 @@ void HOGFeatureDescriptor::getHOG(
     for (int j = 0; j < image.rows - CELL; j += CELL) {
        for (int i = 0; i < image.cols - CELL; i += CELL) {
            cv::Mat hogMD = this->blockGradient(index, index, stride, bins);           
-           cv::normalize(hogMD, hogMD, 1, 0, CV_L2);
+           // cv::normalize(hogMD, hogMD, 1, 0, CV_L2);
+           cv::normalize(hogMD, hogMD, 1, 0, cv::NORM_L2);
            featureMD.push_back(hogMD);
            index++;
         }
