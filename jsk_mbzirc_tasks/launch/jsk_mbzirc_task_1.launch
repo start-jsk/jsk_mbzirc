@@ -4,6 +4,8 @@
   <arg name="gui" default="false" />
   <arg name="headless" default="false"/>
   <arg name="teleopUGV" default="false"/>
+  <arg name="use_ground_truth" default="true" />
+  <arg name="gimbal" default="false"/>
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -14,9 +16,8 @@
 
   <arg name="cheat" default="false" />
 
-  <arg name="model" default="$(find jsk_mbzirc_tasks)/urdf/quadrotor_with_hokyo30lx_and_downward_cam.urdf.xacro" />
-
-  <arg name="use_ground_truth" default="true" />
+  <arg unless="$(arg gimbal)" name="model" value="$(find jsk_mbzirc_tasks)/urdf/quadrotor_with_hokyo30lx_and_downward_cam.urdf.xacro" />
+  <arg if="$(arg gimbal)" name="model" value="$(find jsk_mbzirc_tasks)/urdf/quadrotor_with_gimbal_downward_cam.urdf.xacro" />
 
   <arg unless="$(arg cheat)" name="x" value="65"/>
   <arg     if="$(arg cheat)" name="x" value="0"/>
