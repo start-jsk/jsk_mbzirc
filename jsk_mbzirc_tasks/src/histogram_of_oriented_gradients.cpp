@@ -1,8 +1,20 @@
+// Copyright (C) 2016 by Krishneel Chaudhary @ JSK Lab, The University
+// of Tokyo
 
 #include <jsk_mbzirc_tasks/histogram_of_oriented_gradients.h>
 
-HOGFeatureDescriptor::HOGFeatureDescriptor() {
-   
+// HOGFeatureDescriptor::HOGFeatureDescriptor() {
+    
+// }
+
+HOGFeatureDescriptor::HOGFeatureDescriptor(
+    const int cell_size, const int block_per_cell,
+    const int n_bins, const float angle) :
+    CELL(cell_size),
+    BLOCK(block_per_cell),
+    ANGLE(angle),
+    N_BINS(n_bins) {
+    this->BINS_ANGLE = this->ANGLE / this->N_BINS;
 }
 
 void HOGFeatureDescriptor::weightedVoting(
