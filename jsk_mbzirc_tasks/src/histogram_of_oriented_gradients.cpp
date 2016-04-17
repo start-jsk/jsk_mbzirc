@@ -3,21 +3,18 @@
 
 #include <jsk_mbzirc_tasks/histogram_of_oriented_gradients.h>
 
-// HOGFeatureDescriptor::HOGFeatureDescriptor() {
-    
-// }
-
 HOGFeatureDescriptor::HOGFeatureDescriptor(
     const int cell_size, const int block_per_cell,
-    const int n_bins, const float angle) :
+    const int n_bins, const float angle, const int num_threads) :
     CELL(cell_size),
     BLOCK(block_per_cell),
     ANGLE(angle),
-    N_BINS(n_bins) {
+    N_BINS(n_bins),
+    num_threads_(num_threads_) {
     this->BINS_ANGLE = this->ANGLE / this->N_BINS;
 }
 
-void HOGFeatureDescriptor::weightedVoting(
+void HOGFeatureDescriptor::histogramBinVoting(
     const float &angle, int &lower_index, int &higher_index) {
     float nearest_lower = FLT_MAX;
     float nearest_higher = FLT_MAX;
@@ -46,8 +43,8 @@ void HOGFeatureDescriptor::imageGradient(
     const cv::Mat &image, cv::Mat &hog_bins) {
     cv::Mat xsobel;
     cv::Mat ysobel;
-    cv::Sobel(image, xsobel, CV_32F, 1, 0, 3);
-    cv::Sobel(image, ysobel, CV_32F, 0, 1, 3);
+    cv::Sobel(image, xsobel, CV_32F, 1, 0, 7);
+    cv::Sobel(image, ysobel, CV_32F, 0, 1, 7);
     cv::Mat Imag;
     cv::Mat Iang;
     cv::cartToPolar(xsobel, ysobel, Imag, Iang, true);
@@ -65,7 +62,7 @@ void HOGFeatureDescriptor::imageGradient(
                        float angle = static_cast<float>(Iang.at<float>(y, x));
                        int l_bin;
                        int h_bin;
-                       this->weightedVoting(angle, l_bin, h_bin);
+                       this->histogramBinVoting(angle, l_bin, h_bin);
                        float l_ratio = 1.0f - (angle - l_bin)/BINS_ANGLE;
                        float h_ratio = 1.0f - l_ratio;
                        int l_index = (l_bin-(BINS_ANGLE/2))/BINS_ANGLE;
@@ -106,7 +103,7 @@ void HOGFeatureDescriptor::getHOG(
     int index = 0;
     for (int j = 0; j < image.rows - CELL; j += CELL) {
        for (int i = 0; i < image.cols - CELL; i += CELL) {
-           cv::Mat hogMD = this->blockGradient(index, index, stride, bins);           
+           cv::Mat hogMD = this->blockGradient(index, index, stride, bins);   
            // cv::normalize(hogMD, hogMD, 1, 0, CV_L2);
            cv::normalize(hogMD, hogMD, 1, 0, cv::NORM_L2);
            featureMD.push_back(hogMD);

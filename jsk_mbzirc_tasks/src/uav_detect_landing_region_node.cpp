@@ -37,15 +37,22 @@ void UAVLandingRegion::imageCB(
     // this->detect(image);
     
 
-    cv::resize(image, image, cv::Size(64/2, 128/4));
+    // cv::resize(image, image, cv::Size(64, 128));
+
+    std::clock_t start;
+    double duration;
+    start = std::clock();
+    
     HOGFeatureDescriptor hog;
     cv::Mat desc = hog.computeHOG(image);
-    cv::Mat hog_viz = hog.visualizeHOG(image, desc, image.size(), 2, 5);    
 
-    std::cout << desc  << "\n";
-
-    std::cout << "Desc: " << desc.size()  << "\n";
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout<<"printf: "<< duration <<'\n';
     
+    cv::Mat hog_viz = hog.visualizeHOG(image, desc, image.size(), 1, 5);
+    
+    // std::cout << desc  << "\n";
+    std::cout << "Desc: " << desc.size()  << "\n";
     
     // TODO: 
     // cv::Mat templ_img = this->createLandingTemplate(image.size());

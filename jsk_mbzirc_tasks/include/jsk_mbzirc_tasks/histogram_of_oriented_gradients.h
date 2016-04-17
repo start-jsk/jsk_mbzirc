@@ -11,23 +11,16 @@
 
 class HOGFeatureDescriptor {
 
-    //  HOG Configuration Params
-
-// #define N_BINS 9
-// #define ANGLE 180
-// #define BINS_ANGLE (ANGLE / N_BINS)
-// #define CELL 8
-// #define BLOCK 2
-
  protected:
     int N_BINS;
     int ANGLE;
     int BINS_ANGLE;
     int CELL;
     int BLOCK;
-
+    int num_threads_;
+    
  private:
-    virtual void weightedVoting(
+    virtual void histogramBinVoting(
        const float &, int &, int &);
     virtual void imageGradient(
        const cv::Mat &, cv::Mat &);
@@ -35,18 +28,16 @@ class HOGFeatureDescriptor {
         const int, const int, const int, cv::Mat &);
     virtual void getHOG(
        const cv::Mat &, cv::Mat &, cv::Mat &);
-    template<typename T>
-    T computeHOGHistogramDistances(
-       const cv::Mat &, std::vector<cv::Mat> &,
-       const int = CV_COMP_BHATTACHARYYA);
    
  public:
-    // HOGFeatureDescriptor();
     HOGFeatureDescriptor(
-        const int = 8, const int = 2, const int = 9, const float = 180.0f);
-    virtual cv::Mat computeHOG(
-       const cv::Mat &);
-
+        const int = 8, const int = 2, const int = 9,
+        const float = 180.0f, const int = 1);
+    virtual cv::Mat computeHOG(const cv::Mat &);
+    template<typename T>
+    T computeHOGHistogramDistances(
+        const cv::Mat &, std::vector<cv::Mat> &,
+        const int = CV_COMP_BHATTACHARYYA);
     cv::Mat visualizeHOG(
         cv::Mat &, cv::Mat &, cv::Size, int, double);
 };
