@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<robot
+  name="quadrotor"
+  xmlns:xacro="http://www.ros.org/wiki/xacro"
+>
+
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <!-- Included URDF Files -->
+
+    <xacro:include filename="$(find hector_quadrotor_description)/urdf/quadrotor_base.urdf.xacro" />
+    <xacro:quadrotor_base_macro />
+
+
+    <xacro:include filename="$(find jsk_mbzirc_common)/urdf/gimbal/gimbal.xacro" />
+
+
+    <xacro:gimbal name="gimbal1" parent="base_link" topside="false" width="0.015" motor_height="0.015" x="0.04" y="0.03" z="0.06" imu_topic_name="/raw_imu">
+      <origin xyz="-0.05 0.0 -0.04" rpy="0 0 0"/>
+    </xacro:gimbal>
+
+    <xacro:include filename="$(find hector_sensors_description)/urdf/hokuyo_utm30lx.urdf.xacro" />
+<!--
+    <xacro:hokuyo_utm30lx name="laser0" parent="gimbal1_stabilized_link" ros_topic="scan" update_rate="40" ray_count="1081" min_angle="-135" max_angle="135">
+      <origin xyz="0.0 0.0 0.05" rpy="0 0 0"/>
+    </xacro:hokuyo_utm30lx>
+-->
+
+
+    <xacro:include filename="$(find hector_sensors_description)/urdf/generic_camera.urdf.xacro" />
+
+    <xacro:generic_camera name="downward_cam" parent="gimbal1_stabilized_link" ros_topic="camera/image" cam_info_topic="camera/camera_info" update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="100">
+      <origin xyz="0.0 0.0 -0.03" rpy="0 ${M_PI/2} 0"/>
+    </xacro:generic_camera>
+
+      <xacro:include filename="$(find hector_quadrotor_gazebo)/urdf/quadrotor_plugins.gazebo.xacro" />
+
+
+</robot>
