@@ -1,8 +1,10 @@
 <launch>
   <arg name="image" default="/downward_cam/camera/image" />
-
+  <arg name="templ_path" default="templ.jpg" />
   <node pkg="jsk_mbzirc_tasks" type="uav_detect_landing_region_node"
 	name="uav_detect_landing_region" output="screen" >
     <remap from="input" to="$(arg image)" />
+    <rosparam param="templ_path" subst_value="True">$(arg templ_path)
+    </rosparam>
   </node>
 </launch>

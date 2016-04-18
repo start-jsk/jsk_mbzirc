@@ -33,9 +33,13 @@
 class UAVLandingRegion {
 
  private:
-    cv::Mat createLandingTemplate(const cv::Size);
+    
+    cv::Mat templ_img_;
     void detect(cv::Mat &);
+    void slidingWindowDetect(cv::Mat &, const cv::Mat);
+    
  protected:
+    
     ros::NodeHandle pnh_;
     ros::Publisher pub_image_;
     ros::Publisher pub_rect_;
@@ -47,6 +51,7 @@ class UAVLandingRegion {
     void unsubscribe();
     
  public:
+    
     UAVLandingRegion();
     virtual void imageCB(const sensor_msgs::Image::ConstPtr &);
 };
