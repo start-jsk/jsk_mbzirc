@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<robot name="drone_additional" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <gazebo>
+    <plugin name="mbzirc_gazebo_drone_additional_plugin" filename="libmbzirc_gazebo_drone_additional_plugin.so">
+    </plugin>
+  </gazebo>
+</robot>

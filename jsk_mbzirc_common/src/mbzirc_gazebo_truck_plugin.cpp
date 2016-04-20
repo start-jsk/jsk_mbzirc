@@ -59,10 +59,6 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   last_time_ = world_->GetSimTime();
   terminated_ = false;
 
-  landing_height_ = -0.1; //init dummy height
-  takeoff_flag_ = false;
-  drone_name_ = std::string("quadrotor");
-
   // load parameters from sdf
   if (_sdf->HasElement("robotNamespace")) namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
@@ -70,7 +66,6 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     link_name_ = _sdf->GetElement("bodyName")->Get<std::string>();
     link_ = _model->GetLink(link_name_);
   }
-  if (_sdf->HasElement("droneName")) drone_name_ = _sdf->GetElement("droneName")->Get<std::string>();
 
   if (!link)
   {
@@ -90,11 +85,6 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   node_handle_ = new ros::NodeHandle(namespace_);
   pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true); // set latch true
   pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
-  pub_ee_z_ = node_handle_->advertise<std_msgs::String>("drone_estimated_height", 1);
-  pub_gt_z_ = node_handle_->advertise<std_msgs::String>("drone_groundtruth_height", 1);
-  sub_drone_state_ = node_handle_->subscribe<nav_msgs::Odometry>("/state", 1, &GazeboTruck::DroneStateCallback, this, ros::TransportHints().tcpNoDelay()); 
-  ros::NodeHandle param_handle(*node_handle_, "controller");
-
 
   update_connection_ = event::Events::ConnectWorldUpdateBegin(
                                                               boost::bind(&GazeboTruck::Update, this));
@@ -110,31 +100,6 @@ void GazeboTruck::Update()
   if ( terminated_ ) {
     return;
   }
-
-  //drone hit the ground check(200ms delay)
-  physics::ModelPtr drone_model = world_->GetModel("quadrotor");
-  if(!drone_model) return;
-  if(!takeoff_flag_)
-    {//TODO: check contact with model "arena" is better
-      if(landing_height_ < 0) landing_height_  = drone_model->GetWorldPose().pos.z;
-      if(drone_model->GetWorldPose().pos.z > landing_height_ + 0.05) //0.05m is a margin
-        takeoff_flag_ = true;
-    }
-  else
-    {//TODO: check contact with model "arena" is better
-      std::stringstream ss;
-      std_msgs::String msg_time;
-      ss << drone_model->GetWorldPose().pos.z - landing_height_;
-      msg_time.data = "height(ground truth):" + ss.str();
-      pub_gt_z_.publish(msg_time);
-
-
-      if(drone_model->GetWorldPose().pos.z < landing_height_ + 0.05) 
-        {
-          ROS_FATAL("Hit ground, Your challenge was over");
-          terminated_ = true;
-        }
-    }
 
   //std::cerr << link_->GetWorldPose() << std::endl;
   common::Time current_time = world_->GetSimTime();
@@ -198,7 +163,6 @@ void GazeboTruck::Update()
   rayShape->GetIntersection(distAbove, entityName);
   distAbove -= 0.00001;
 
-  //
   std::stringstream ss;
   std_msgs::String msg_time;
   ss << 20*60 - current_time.Double();
@@ -219,19 +183,6 @@ void GazeboTruck::Reset()
 {
   state_stamp_ = ros::Time();
 }
-
-/////////////////////////////////////////////////////////////////////////
-/// Callback func for drone state
-void GazeboTruck::DroneStateCallback(const nav_msgs::OdometryConstPtr& state_msg)
-{
-  std::stringstream ss;
-  std_msgs::String msg_time;
-  double z = (state_msg->pose.pose.position.z >= 0)? state_msg->pose.pose.position.z: 0;
-  ss << z;
-  msg_time.data = "height(estimation):" + ss.str();
-  pub_ee_z_.publish(msg_time);
-}
-
 
 // Register this plugin with the simulator
 GZ_REGISTER_MODEL_PLUGIN(GazeboTruck)
