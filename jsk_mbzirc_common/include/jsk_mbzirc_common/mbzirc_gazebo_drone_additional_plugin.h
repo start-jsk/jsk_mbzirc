@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MBZIRC_GAZEBO_TRUCK_PLUGIN_H
-#define MBZIRC_GAZEBO_TRUCK_PLUGIN_H
+#ifndef MBZIRC_GAZEBO_DRONE_PLUGIN_H
+#define MBZIRC_GAZEBO_DRONE_PLUGIN_H
 
 #include <boost/bind.hpp>
 
@@ -43,20 +43,18 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_srvs/Empty.h>
 #include <nav_msgs/Odometry.h>
+
 
 namespace gazebo
 {
 
-class GazeboTruck : public ModelPlugin
+class GazeboDrone : public ModelPlugin
 {
 public:
-  GazeboTruck();
-  virtual ~GazeboTruck();
-
-  // http://www.mbzirc.com/assets/files/MBZIRC-Challenge-Description-Document-V2-7SEP2015.pdf
-  static const float CIRCLE_RADIUS = 20.0;
-  static const float CIRCLE_DISTANCE = 55.0;
+  GazeboDrone();
+  virtual ~GazeboDrone();
 
 protected:
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
@@ -73,17 +71,23 @@ private:
   std::string namespace_;
 
   ros::NodeHandle* node_handle_;
-  ros::Publisher pub_score_, pub_time_; 
+  ros::Publisher  pub_gt_z_, pub_ee_z_; 
   ros::Subscriber sub_drone_state_;
+  ros::ServiceClient motor_client_;
+
   ros::Time state_stamp_;
 
   boost::mutex lock;
 
+  float landing_height_;
+  bool takeoff_flag_;
+bool terminated_flag_;
+
   event::ConnectionPtr update_connection_;
 
-  double traversed_;
-  common::Time last_time_;
-  bool terminated_;
+
+  void DroneStateCallback(const nav_msgs::OdometryConstPtr& state_msg);
+
 };
 
 }
