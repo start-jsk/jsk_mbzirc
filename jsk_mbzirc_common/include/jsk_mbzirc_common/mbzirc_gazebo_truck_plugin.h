@@ -72,7 +72,7 @@ private:
   std::string namespace_;
 
   ros::NodeHandle* node_handle_;
-  ros::Publisher pub_score_, pub_time_; 
+  ros::Publisher pub_score_, pub_time_;
   ros::Time state_stamp_;
 
   boost::mutex lock;
