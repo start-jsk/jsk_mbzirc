@@ -43,7 +43,6 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <nav_msgs/Odometry.h>
 
 namespace gazebo
 {
@@ -74,7 +73,6 @@ private:
 
   ros::NodeHandle* node_handle_;
   ros::Publisher pub_score_, pub_time_; 
-  ros::Subscriber sub_drone_state_;
   ros::Time state_stamp_;
 
   boost::mutex lock;
@@ -84,6 +82,7 @@ private:
   double traversed_;
   common::Time last_time_;
   bool terminated_;
+
 };
 
 }
