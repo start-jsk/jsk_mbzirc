@@ -42,6 +42,7 @@ from std_msgs.msg import String
 
 NAME = 'check_mission'
 
+
 class MissionCompleted(unittest.TestCase):
     def __init__(self, *args):
         super(MissionCompleted, self).__init__(*args)
@@ -54,15 +55,15 @@ class MissionCompleted(unittest.TestCase):
         #
         sub = rospy.Subscriber('/score', String, self.callback)
 
-        while not self.message_received :
+        while not self.message_received:
             rospy.sleep(1)
 
         assert(self.message_received)
-        
+
     def callback(self, msg):
         #
         rospy.loginfo("recevied message (%s)", msg)
-        if msg.data == "Mission Completed" :
+        if msg.data == "Mission Completed":
             self.message_received = True
 
 if __name__ == '__main__':
@@ -75,5 +76,3 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         pass
     print("exiting")
-
-        
