@@ -28,8 +28,10 @@
  */
 
 #include <jsk_mbzirc_common/mbzirc_gazebo_panel_plugin.h>
+#include <string>
 
-namespace gazebo {
+namespace gazebo
+{
 
 GazeboPanel::GazeboPanel()
 {
@@ -60,17 +62,21 @@ void GazeboPanel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // load parameters from sdf
   if (_sdf->HasElement("robotNamespace")) namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
 
-  if (_sdf->HasElement("bodyName") && _sdf->GetElement("bodyName")->GetValue()) {
-    link_name_ = _sdf->GetElement("bodyName")->Get<std::string>();
-    link_ = _model->GetLink(link_name_);
-  }
+  if (_sdf->HasElement("bodyName") && _sdf->GetElement("bodyName")->GetValue())
+    {
+      link_name_ = _sdf->GetElement("bodyName")->Get<std::string>();
+      link_ = _model->GetLink(link_name_);
+    }
 
-  if (_sdf->HasElement("jointName") && _sdf->GetElement("jointName")->GetValue()) {
-    std::string joint_name_ = _sdf->GetElement("jointName")->Get<std::string>();
-    joint_ = _model->GetJoint(joint_name_);
-  } else {
-    joint_ = _model->GetJoint("stem_joint");
-  }
+  if (_sdf->HasElement("jointName") && _sdf->GetElement("jointName")->GetValue())
+    {
+      std::string joint_name_ = _sdf->GetElement("jointName")->Get<std::string>();
+      joint_ = _model->GetJoint(joint_name_);
+    }
+  else
+    {
+      joint_ = _model->GetJoint("stem_joint");
+    }
 
   if (!link)
   {
@@ -88,7 +94,7 @@ void GazeboPanel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   node_handle_ = new ros::NodeHandle(namespace_);
-  pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true); // set latch true
+  pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true);  // set latch true
   pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
   ros::NodeHandle param_handle(*node_handle_, "controller");
 
@@ -103,12 +109,12 @@ void GazeboPanel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 // Update the controller
 void GazeboPanel::Update()
 {
-
   boost::mutex::scoped_lock scoped_lock(lock);
 
-  if ( terminated_ ) {
-    return;
-  }
+  if ( terminated_ )
+    {
+      return;
+    }
 
   common::Time current_time = world_->GetSimTime();
 
@@ -125,13 +131,14 @@ void GazeboPanel::Update()
   ss << 20*60 - current_time.Double();
   msg_time.data = ss.str();
   pub_time_.publish(msg_time);
-  if ( fabs(angle) > 3.14) {
-    std_msgs::String msg_score, msg_time;
-    msg_score.data = "Mission Completed";
-    ROS_INFO_STREAM("Remaining time is " << msg_time.data << "[sec], Score is " << msg_score.data);
-    pub_score_.publish(msg_score);
-    terminated_ = true;
-  }
+  if ( fabs(angle) > 3.14)
+    {
+      std_msgs::String msg_score, msg_time;
+      msg_score.data = "Mission Completed";
+      ROS_INFO_STREAM("Remaining time is " << msg_time.data << "[sec], Score is " << msg_score.data);
+      pub_score_.publish(msg_score);
+      terminated_ = true;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,4 +151,4 @@ void GazeboPanel::Reset()
 // Register this plugin with the simulator
 GZ_REGISTER_MODEL_PLUGIN(GazeboPanel)
 
-} // namespace gazebo
+}  // namespace gazebo

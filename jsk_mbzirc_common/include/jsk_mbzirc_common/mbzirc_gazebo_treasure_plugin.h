@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2016, JSK Robotics Laboratory, The University of Tokyo
  * All rights reserved.
@@ -27,8 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MBZIRC_GAZEBO_TREASURE_PLUGIN_H
-#define MBZIRC_GAZEBO_TREASURE_PLUGIN_H
+#ifndef JSK_MBZIRC_COMMON_MBZIRC_GAZEBO_TREASURE_PLUGIN_H
+#define JSK_MBZIRC_COMMON_MBZIRC_GAZEBO_TREASURE_PLUGIN_H
 
 #include <boost/bind.hpp>
 #include <boost/random.hpp>
@@ -45,6 +46,7 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <string>
 
 namespace gazebo
 {
@@ -61,7 +63,6 @@ protected:
   virtual void Reset();
 
 private:
-
   physics::WorldPtr world_;
   physics::LinkPtr link_;
   physics::ModelPtr model_;
@@ -81,6 +82,6 @@ private:
   bool static_object_;
 };
 
-}
+}  // namespace gazebo
 
-#endif
+#endif  // JSK_MBZIRC_COMMON_MBZIRC_GAZEBO_TREASURE_PLUGIN_H

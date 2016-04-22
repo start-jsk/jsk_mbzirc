@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MBZIRC_GAZEBO_PANEL_PLUGIN_H
-#define MBZIRC_GAZEBO_PANEL_PLUGIN_H
+#ifndef JSK_MBZIRC_COMMON_MBZIRC_GAZEBO_PANEL_PLUGIN_H
+#define JSK_MBZIRC_COMMON_MBZIRC_GAZEBO_PANEL_PLUGIN_H
 
 #include <boost/bind.hpp>
 
@@ -43,6 +43,7 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <string>
 
 namespace gazebo
 {
@@ -63,7 +64,6 @@ protected:
   virtual void Reset();
 
 private:
-
   physics::WorldPtr world_;
   physics::LinkPtr link_;
   physics::JointPtr joint_;
@@ -81,9 +81,8 @@ private:
   event::ConnectionPtr update_connection_;
 
   bool terminated_;
-
 };
 
-}
+}  // namespace gazebo
 
-#endif
+#endif  // JSK_MBZIRC_COMMON_MBZIRC_GAZEBO_PANEL_PLUGIN_H
