@@ -42,7 +42,7 @@ void UAVLandingRegion::imageCB(
     }
     cv::Mat image = cv_ptr->image;
     
-    // this->detect(image);    
+    // this->detect(image);
 
     // cv::resize(image, image, cv::Size(64, 128));
 
@@ -119,22 +119,21 @@ void UAVLandingRegion::slidingWindowDetect(
                 }
 
 #ifdef _OPENMP
-#pragma omp critical 
+#pragma omp critical
 #endif
                 {
-                if (d < dist && d < 0.5) {
-                r_rect = rect;
-                dist = d;
-            }
-            }
-                
+                   if (d < dist && d < 0.5) {
+                      r_rect = rect;
+                      dist = d;
+                   }
+                }
             }
         }
     }
 
     std::cout << "Dist: " << dist  << "\n";
     
-    cv::rectangle(weight, r_rect, cv::Scalar(0, 255,0), 3);
+    cv::rectangle(weight, r_rect, cv::Scalar(0, 255, 0), 3);
     std::string wname = "dist";
     cv::namedWindow(wname, cv::WINDOW_NORMAL);
     cv::imshow(wname, weight);
