@@ -4,7 +4,7 @@ import roslib
 roslib.load_manifest("jsk_mbzirc_tasks")
 
 import rospy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, PointCloud2
 from cv_bridge import CvBridge
 from sklearn.neighbors import NearestNeighbors
 
@@ -25,94 +25,6 @@ pub_topic_ = '/output'
 def plot_image(name, image):
     cv2.namedWindow(str(name), cv2.WINDOW_NORMAL)
     cv2.imshow(str(name), image)
-
-def circular_region(roi, thresh):
-    if (roi == None):
-        return False
-    (_, im_bw) = cv2.threshold(roi, 125, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY)
-
-    if (im_bw == None):
-        return False
-
-    # GRADIENT
-
-    im_edge = cv2.Canny(im_bw, 50, 100)
-    lines = cv2.HoughLines(im_edge, 1, np.pi/180.0, 200)
-    print lines
-    img = cv2.cvtColor(roi, cv2.COLOR_GRAY2BGR)
-    # for rho,theta in lines[0]:
-    #     a = np.cos(theta)
-    #     b = np.sin(theta)
-    #     x0 = a*rho
-    #     y0 = b*rho
-    #     x1 = int(x0 + 1000*(-b))
-    #     y1 = int(y0 + 1000*(a))
-    #     x2 = int(x0 - 1000*(-b))
-    #     y2 = int(y0 - 1000*(a))
-    #     cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
-
-    plot_image("edge1", im_edge)
-    plot_image("bw", img)
-    
-
-    img = im_bw.reshape(-1)
-    counter = 0
-    for i in img:
-        if (i == 0):
-            counter += 1
-    
-    print counter
-            
-    if (counter < 0.4 * math.pow(10, 2)):
-        return True
-    else:
-        return False
-        #return im_bw
-    
-
-def junction_point(contour, image, lenght = 10):
-    im_color = image.copy()
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    angle_prev = math.pi
-    junction_pt = []
-    for i in range(len(contour)):
-        # i = i + 1
-        # if (i+1 < len(contour)):
-        #     delta = contour[i+1] - contour[i-1]
-        #     angle = math.atan2(delta[0, 0], delta[0, 1]) + math.pi
-        #     diff = math.fabs(angle - angle_prev)
-        #     print diff* math.pi/2
-            
-        #     if (diff > math.pi/2.5):                
-        #print contour[i,0]
-        center = (contour[i, 0][0], contour[i, 0][1])
-        
-        top_left = (contour[i, 0][0] - lenght/2, contour[i, 0][1] - lenght/2)
-        roi = image[top_left[1]:top_left[1] + lenght, top_left[0]:top_left[0] + lenght]
-
-        if (roi.size == math.pow(lenght, 2)):
-            is_junct = circular_region(roi, lenght)
-
-            if (is_junct):
-                junction_pt.append(center)
-                cv2.circle(im_color, center, 5, (255, 0, 0), -1)
-                
-
-
-
-            plot_image("junction", im_color)
-            plot_image("roi", roi)
-            cv2.waitKey(0)
-                    # plotTing
-                    #print angle
-                
-                    #plot_image("junction", image)
-                    #cv2.waitKey(0)                    
-
-            #angle_prev = angle
-            
-    plot_image("junction", im_color)
-    return junction_pt
         
 #skelonize  use the one in jsk_perception
 def skeletonize(img):
@@ -219,20 +131,6 @@ def detect_edges(image):
     
     detect_lines(im_edge, image)
 
-    """"
-    [
-        cv2.drawContours(image, contours, count, (0, 255, 0), 3)  \
-        for count, contour in enumerate(contours) \
-        if len(contour) > 10
-    ]
-    """""
-    """"
-    for contour in contours:
-        j_pt = junction_point(contour, image)
-        if j_pt:
-            for pts in j_pt:
-                cv2.circle(image, pts, 5, (255, 0, 0), -1)
-    """""
     
     #junction_point(contours[22], image)
     #cv2.drawContours(image, contours, 22, (0, 255, 0), 3)
@@ -259,7 +157,8 @@ def image_callback(img_msg):
     # cv2.namedWindow("image", cv2.WINDOW_NORMAL)
     # cv2.imshow("image", cv_img)
     cv2.waitKey(3)
-    
+
+        
 def subscribe():
     rospy.Subscriber(sub_image_, Image, image_callback)
     
