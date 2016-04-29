@@ -18,8 +18,8 @@ import cv2
 import random
 import time
 
-#sub_image_ = '/downward_cam/camera/image'
-sub_image_ = '/image_publisher/output'
+sub_image_ = '/downward_cam/camera/image'
+#sub_image_ = '/image_publisher/output'
 sub_matrix_ = '/paramatrix'
 
 pub_image_ = None
@@ -63,41 +63,71 @@ def line_intersection_points(x1, y1, x2, y2, x3, y3, x4, y4):
 
 def detect_lines(im_edge, image):
     lines = cv2.HoughLines(im_edge, 1, np.pi/180, 100)
-    inter_points = []
-    for rho,theta in lines[0]:
+    
+    flag_bit = np.zeros((lines[0].shape[0], 1)) # mark processed lines
+
+    filtered_lines = []
+    filter_dist_thresh = 10
+    filter_angl_thresh = 10  * (np.pi/180.0) #degrees
+    for flag, (rho,theta) in zip(flag_bit, lines[0]):
         a = np.cos(theta)
         b = np.sin(theta)
         x0 = a*rho
         y0 = b*rho
-        x1 = int(x0 + 1000*(-b))
-        y1 = int(y0 + 1000*(a))
-        x2 = int(x0 - 1000*(-b))
-        y2 = int(y0 - 1000*(a))
-        cv2.line(image,(x1,y1),(x2,y2),(0,255,0), 1)
+        x1 = int(x0 + 10000*(-b))
+        y1 = int(y0 + 10000*(a))
+        x2 = int(x0 - 10000*(-b))
+        y2 = int(y0 - 10000*(a))
+        #cv2.line(image,(x1,y1),(x2,y2),(0,255,0), 2)
         
-        for rho0, theta0 in lines[0]:
-            a0 = np.cos(theta0)
-            b0 = np.sin(theta0)
-            x00 = a0*rho0
-            y00 = b0*rho0
-            x10 = int(x00 + 1000*(-b0))
-            y10 = int(y00 + 1000*(a0))
-            x20 = int(x00 - 1000*(-b0))
-            y20 = int(y00 - 1000*(a0))
+        if not flag:            
+            current_best = []
+            for index, (rho0, theta0) in enumerate(lines[0]):
+                a0 = np.cos(theta0)
+                b0 = np.sin(theta0)
+                x00 = a0*rho0
+                y00 = b0*rho0
+                x10 = int(x00 + 10000*(-b0))
+                y10 = int(y00 + 10000*(a0))
+                x20 = int(x00 - 10000*(-b0))
+                y20 = int(y00 - 10000*(a0))
 
-            print x0, " ", y0, "\t", x00, " ", y00, "\t", np.sqrt((x0-x00)**2 + (y0 - y00)**2)
-            line_dist = distance.euclidean((x0, y0), (x00, y00))
-            
-            #if line_dist > 
+                line_dist = distance.euclidean((x0, y0), (x00, y00))
+                angle_dist = math.fabs(theta - theta0)
+                if line_dist < filter_dist_thresh and angle_dist < filter_angl_thresh:
+                    #current_best.append((x00, y00, x20, y20))
+                    filtered_lines.append((x10, y10, x20, y20))
+                    #flag_bit[index] = True
 
-            (ptx, pty) = line_intersection_points(x00, y00, x20, y20, x1, y1, x2, y2)
+                #print "SAVING: ", line_dist, ",  ", rho, " ", rho0, "\t", theta, " ", theta0
+                #plot_image("lines", image)
+                #cv2.waitKey(0)
+                #print current_best
+            #filtered_lines.append(current_best[0]) 
+            #filtered_lines.append(current_best[1]) 
+
+    print filtered_lines
+    inter_points = []
+    for line in filtered_lines:
+        x1 = line[0]
+        y1 = line[1]
+        x2 = line[2]
+        y2 = line[3]
+        cv2.line(image,(x1,y1),(x2,y2),(0,0, 255), 1)
+
+        for l in filtered_lines:
+            x10 = line[0]
+            y10 = line[1]
+            x20 = line[2]
+            y20 = line[3]
+            (ptx, pty) = line_intersection_points(x10, y10, x20, y20, x1, y1, x2, y2)
+            #print ptx, "\t", pty
             if ptx > 0 and ptx < image.shape[1] and pty > 0 and pty < image.shape[0]:
                 inter_points.append([[int(ptx), int(pty)]])
                 cv2.circle(image, (int(ptx), int(pty)), 3, (255,0,255), -1)
-                plot_image("lines", image)
-                cv2.waitKey(0)
-        
+                
     plot_image("lines", image)
+    cv2.waitKey(3)
     return np.array(inter_points)
 
 def vector_angle(vector1, vector2):
@@ -216,10 +246,10 @@ def image_callback(img_msg):
     # timer
     start = time.time()
 
-    detect_edges(cv_img)
+    #detect_edges(cv_img)
     
-    #im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-    #detect_and_filter_keypoints(im_gray, 'HOUGH_LINES')
+    im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+    detect_and_filter_keypoints(im_gray, 'HARRIS')
 
     end = time.time()
     rospy.logwarn("TIME: %s", str(end - start))
