@@ -184,8 +184,7 @@ def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
 
     temp_im = image.copy()
     possible_candidate = []
-    for distance, index in zip(distances, indices):  # fix to not repeat on done array
-        
+    for distance, index in zip(distances, indices):  # fix to not repeat on done array        
         centeroid_index = -1
         for dist, idx in zip(distance, index):
             if dist == 0:
@@ -210,13 +209,19 @@ def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
         #     cv2.waitKey(0)
 
         # image = temp_im.copy()
-        # print
+
 
     print (possible_candidate)
     if len(possible_candidate) > 3:
+        aver_x = 0
+        aver_y = 0
         for pc in possible_candidate:
             cv2.circle(image, (corners[pc][0][0], corners[pc][0][1]), 4, (255, 255, 0), 1)
-            
+            aver_x += corners[pc][0][0]
+            aver_y += corners[pc][0][1]
+        aver_x /= len(possible_candidate)
+        aver_y /= len(possible_candidate)
+        cv2.circle(image, (aver_x, aver_y), 7, (0, 255, 0), -1)
 
     plot_image("lines", im_gray)
     plot_image("edge1", image)
