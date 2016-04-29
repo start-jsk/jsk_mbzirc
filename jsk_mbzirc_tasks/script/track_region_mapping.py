@@ -18,8 +18,8 @@ import cv2
 import random
 import time
 
-sub_image_ = '/downward_cam/camera/image'
-#sub_image_ = '/image_publisher/output'
+#sub_image_ = '/downward_cam/camera/image'
+sub_image_ = '/image_publisher/output'
 sub_matrix_ = '/paramatrix'
 
 pub_image_ = None
@@ -54,7 +54,7 @@ def skeletonize(img):
 def line_intersection_points(x1, y1, x2, y2, x3, y3, x4, y4):
     denominator = (x1 - x2) * (y3 - y4) - (y1 -y2) * (x3 - x4)
     if denominator == 0:
-        return (0,0)
+        return (-1, -1)
 
     intersect_x = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2) * (x3*y4 - y3*x4)) / denominator
     intersect_y = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2) * (x3*y4 - y3*x4)) / denominator
@@ -63,8 +63,6 @@ def line_intersection_points(x1, y1, x2, y2, x3, y3, x4, y4):
 
 def detect_lines(im_edge, image):
     lines = cv2.HoughLines(im_edge, 1, np.pi/180, 100)
-    
-    #print "LENGT: ", len(lines[0])
     inter_points = []
     for rho,theta in lines[0]:
         a = np.cos(theta)
@@ -87,38 +85,42 @@ def detect_lines(im_edge, image):
             x20 = int(x00 - 1000*(-b0))
             y20 = int(y00 - 1000*(a0))
 
+            print x0, " ", y0, "\t", x00, " ", y00, "\t", np.sqrt((x0-x00)**2 + (y0 - y00)**2)
+            line_dist = distance.euclidean((x0, y0), (x00, y00))
+            
+            #if line_dist > 
+
             (ptx, pty) = line_intersection_points(x00, y00, x20, y20, x1, y1, x2, y2)
             if ptx > 0 and ptx < image.shape[1] and pty > 0 and pty < image.shape[0]:
-                inter_points.append((int(ptx), int(pty)))
+                inter_points.append([[int(ptx), int(pty)]])
                 cv2.circle(image, (int(ptx), int(pty)), 3, (255,0,255), -1)
-                #plot_image("lines", image)
-                #cv2.waitKey(0)
-
-    #plot_image("lines", image)
-    #cv2.waitKey(3)
+                plot_image("lines", image)
+                cv2.waitKey(0)
+        
+    plot_image("lines", image)
     return np.array(inter_points)
-
 
 def vector_angle(vector1, vector2):
     cos_angl = np.dot(vector1, vector2)
     sin_angl = np.linalg.norm(np.cross(vector1, vector2))
     return np.arctan2(sin_angl, cos_angl)
 
-def detect_and_filter_keypoints(im_gray):
+def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
     
     image = cv2.cvtColor(im_gray, cv2.COLOR_GRAY2BGR)
-    corners = cv2.goodFeaturesToTrack(im_gray, 400, 0.005, 5, useHarrisDetector=True)
-    corners = np.int0(corners)
-    
-    # im_edge = cv2.Canny(im_gray, 100, 200)
-    # corners = detect_lines(im_edge, im_gray)
+    image = cv2.GaussianBlur(image, (5, 5), 0)
+    corners = None
+    if corner_type is 'HARRIS':
+        corners = cv2.goodFeaturesToTrack(im_gray, 400, 0.005, 5, useHarrisDetector=True)
+        corners = np.int0(corners)
+    elif corner_type is 'HOUGH_LINES':
+        im_edge = cv2.Canny(im_gray, 100, 200)
+        corners = detect_lines(im_edge, im_gray)
 
     temp_corners = []
     ground_z = 0.0
     for i in corners:
         x,y = i.ravel()
-        #x = i[0]
-        #y = i[1]
         
         a00 = x * proj_matrix_[2, 0] - proj_matrix_[0, 0]
         a01 = x * proj_matrix_[2, 1] - proj_matrix_[0, 1]
@@ -148,24 +150,37 @@ def detect_and_filter_keypoints(im_gray):
     #distances, indices = nearest_neigb.kneighbors(np.array(temp_corners))
     distances, indices = nearest_neigb.radius_neighbors(np.array(temp_corners))    
     
+    
 
     temp_im = image.copy()
     possible_candidate = []
     for distance, index in zip(distances, indices):  # fix to not repeat on done array
-
-        #cv2.circle(image, (corners[index[0]][0][0], corners[index[0]][0][1]), 5, (0, 255, 0), 2)
-        // FIX: angle computation
+        
+        centeroid_index = -1
         for dist, idx in zip(distance, index):
-            angle = vector_angle(temp_corners[index[0]], temp_corners[idx]) * (180.0/np.pi)
-            if (dist > (radius_thresh/2) and dist < radius_thresh) and (angle > 40 and angle < 180):
+            if dist == 0:
+                centeroid_index = idx
+                break
+                
+        #print "\033[34m CENTROID: \033[0m", centeroid_index
+        #cv2.circle(image, (corners[centeroid_index][0][0],\
+        #                   corners[centeroid_index][0][1]), 5, (0, 255, 0), 2)
+        #print "INDEX: ", index, "\t", np.average(distance), "\t", distance
+
+        #avg_dist = np.average(distance)
+        #if (avg_dist > 2.5 and avg_dist < 5):
+        for dist, idx in zip(distance, index):
+            angle = vector_angle(temp_corners[centeroid_index], temp_corners[idx]) * (180.0/np.pi)
+            if (dist > (radius_thresh/2) and dist < radius_thresh) and(angle > 75 and angle < 180):
                 possible_candidate.append(idx)                
 
-            print "ANGLE: ", angle, "\t", dist, "\t", idx
-            cv2.circle(image, (corners[idx][0][0], corners[idx][0][1]), 3, (255, 255, 0), -1)
-            plot_image("edge1", image)
-            cv2.waitKey(0)
+        #     print "ANGLE: ", angle, "\t", dist, "\t", idx
+        #     cv2.circle(image, (corners[idx][0][0], corners[idx][0][1]), 3, (255, 255, 0), -1)
+        #     plot_image("edge1", image)
+        #     cv2.waitKey(0)
 
-        image = temp_im.copy()
+        # image = temp_im.copy()
+        # print
 
     print (possible_candidate)
     if len(possible_candidate) > 3:
@@ -180,17 +195,12 @@ def detect_and_filter_keypoints(im_gray):
 
 
 def detect_edges(image):
-    
+
     im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     im_edge = cv2.Canny(im_gray, 100, 200)
     #(contours, _) = cv2.findContours(im_edge.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
     
-    #detect_lines(im_edge, image)
-
-    
-    #junction_point(contours[22], image)
-    #cv2.drawContours(image, contours, 22, (0, 255, 0), 3)
-    #plot_image("edge", image)
+    detect_lines(im_edge, image)    
 
 def image_callback(img_msg):
     if not is_proj_mat_:
@@ -206,11 +216,10 @@ def image_callback(img_msg):
     # timer
     start = time.time()
 
-    #detect_edges(cv_img)
-
-
-    im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-    detect_and_filter_keypoints(im_gray)
+    detect_edges(cv_img)
+    
+    #im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+    #detect_and_filter_keypoints(im_gray, 'HOUGH_LINES')
 
     end = time.time()
     rospy.logwarn("TIME: %s", str(end - start))
