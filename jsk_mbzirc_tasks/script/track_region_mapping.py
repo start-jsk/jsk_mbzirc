@@ -4,9 +4,11 @@ import roslib
 roslib.load_manifest("jsk_mbzirc_tasks")
 
 import rospy
-from sensor_msgs.msg import Image, PointCloud2
 from cv_bridge import CvBridge
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import NearestNeighbors, KDTree, DistanceMetric
+from sensor_msgs.msg import Image, PointCloud2
+from jsk_recognition_msgs.msg import VectorArray
+from scipy.spatial import distance
 
 import numpy as np
 from  collections import Counter
@@ -18,9 +20,13 @@ import time
 
 sub_image_ = '/downward_cam/camera/image'
 #sub_image_ = '/image_publisher/output'
+sub_matrix_ = '/paramatrix'
 
 pub_image_ = None
 pub_topic_ = '/output'
+
+proj_matrix_ = None
+is_proj_mat_ = False
 
 def plot_image(name, image):
     cv2.namedWindow(str(name), cv2.WINDOW_NORMAL)
@@ -45,64 +51,21 @@ def skeletonize(img):
     plot_image("skelon", skel)
     return skel
 
-# function
-def detect_and_filter_keypoints(im_gray):
-    image = cv2.cvtColor(im_gray, cv2.COLOR_GRAY2BGR)
-    corners = cv2.goodFeaturesToTrack(im_gray, 400, 0.005, 5, useHarrisDetector=True)
-    corners = np.int0(corners)
-    
-    temp_corners = []
-    for i in corners:
-        x,y = i.ravel()
-        temp_corners.append((x,y))
-        cv2.circle(image, (x, y), 3, (0, 0, 255), -1)
+def line_intersection_points(x1, y1, x2, y2, x3, y3, x4, y4):
+    denominator = (x1 - x2) * (y3 - y4) - (y1 -y2) * (x3 - x4)
+    if denominator == 0:
+        return (0,0)
 
-    #find the neigbours
-    nearest_neigb = NearestNeighbors(n_neighbors = 4, algorithm="kd_tree").fit(np.array(temp_corners))
-    distances, indices = nearest_neigb.kneighbors(np.array(temp_corners))
+    intersect_x = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2) * (x3*y4 - y3*x4)) / denominator
+    intersect_y = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2) * (x3*y4 - y3*x4)) / denominator
     
-    #print distances
-    dist_thresh = 10 #pixel
-    good_corners = []
-    #cache_table = np.zeros((corners.shape[0]), dtype=np.bool)
-    
-    for i, index in enumerate(indices):  # fix to not repeat on done array
-        sum_dist = []
-        j = 0
-        for idx in index:
-            sum_dist.append(np.sum(distances[idx]))
-        weight_sum = np.sum(np.abs(np.array(sum_dist) - np.mean(np.array(sum_dist))))
-        
-        print weight_sum
-
-        if weight_sum < dist_thresh:
-            good_corners.append(idx)
-    
-    for i in good_corners:
-        x = corners[i][0][0]
-        y = corners[i][0][1]
-        cv2.circle(image, (x, y), 3, (0, 255, 0), -1)
-
-    plot_image("lines", im_gray)
-    plot_image("edge1", image)
-
-    return
+    return (intersect_x, intersect_y)
 
 def detect_lines(im_edge, image):
-    lines = cv2.HoughLines(im_edge, 1, np.pi/180.0, 100)
-    #lines = cv2.HoughLinesP(im_edge, 1,np.pi/180, 100) #, minLineLength = 600, maxLineGap = 100)
+    lines = cv2.HoughLines(im_edge, 1, np.pi/180, 100)
     
-    im_gray = np.zeros((image.shape[0], image.shape[1], 1), np.uint8)
-
-    # filter based on theta and rho -----todo
-    """"
-    good_lines = []
-    for rho,theta in lines[0]:
-        for r, t in lines[0]:
-            if math.fabs(rho - r) < 10 and math.fabs(theta - t) < np.pi/8 and rho != r:
-                print "SAME: ", rho, ", ", r , "\t" , theta * (180.0/np.pi)
-    #---------------------"""""
-
+    #print "LENGT: ", len(lines[0])
+    inter_points = []
     for rho,theta in lines[0]:
         a = np.cos(theta)
         b = np.sin(theta)
@@ -112,24 +75,117 @@ def detect_lines(im_edge, image):
         y1 = int(y0 + 1000*(a))
         x2 = int(x0 - 1000*(-b))
         y2 = int(y0 - 1000*(a))
-        cv2.line(im_gray,(x1, y1),(x2, y2),(255), 3)
+        cv2.line(image,(x1,y1),(x2,y2),(0,255,0), 1)
         
-    # reduce the width to single dim
-    plot_image("orig_line", im_gray)
-    im_gray = skeletonize(im_gray)
+        for rho0, theta0 in lines[0]:
+            a0 = np.cos(theta0)
+            b0 = np.sin(theta0)
+            x00 = a0*rho0
+            y00 = b0*rho0
+            x10 = int(x00 + 1000*(-b0))
+            y10 = int(y00 + 1000*(a0))
+            x20 = int(x00 - 1000*(-b0))
+            y20 = int(y00 - 1000*(a0))
+
+            (ptx, pty) = line_intersection_points(x00, y00, x20, y20, x1, y1, x2, y2)
+            if ptx > 0 and ptx < image.shape[1] and pty > 0 and pty < image.shape[0]:
+                inter_points.append((int(ptx), int(pty)))
+                cv2.circle(image, (int(ptx), int(pty)), 3, (255,0,255), -1)
+                #plot_image("lines", image)
+                #cv2.waitKey(0)
+
+    #plot_image("lines", image)
+    #cv2.waitKey(3)
+    return np.array(inter_points)
+
+
+def vector_angle(vector1, vector2):
+    cos_angl = np.dot(vector1, vector2)
+    sin_angl = np.linalg.norm(np.cross(vector1, vector2))
+    return np.arctan2(sin_angl, cos_angl)
+
+def detect_and_filter_keypoints(im_gray):
     
-    im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    detect_and_filter_keypoints(im_gray)
+    image = cv2.cvtColor(im_gray, cv2.COLOR_GRAY2BGR)
+    corners = cv2.goodFeaturesToTrack(im_gray, 400, 0.005, 5, useHarrisDetector=True)
+    corners = np.int0(corners)
+    
+    # im_edge = cv2.Canny(im_gray, 100, 200)
+    # corners = detect_lines(im_edge, im_gray)
+
+    temp_corners = []
+    ground_z = 0.0
+    for i in corners:
+        x,y = i.ravel()
+        #x = i[0]
+        #y = i[1]
+        
+        a00 = x * proj_matrix_[2, 0] - proj_matrix_[0, 0]
+        a01 = x * proj_matrix_[2, 1] - proj_matrix_[0, 1]
+        a10 = y * proj_matrix_[2, 0] - proj_matrix_[1, 0]
+        a11 = y * proj_matrix_[2, 1] - proj_matrix_[1, 1]
+        bv0 = proj_matrix_[0, 2] * ground_z + proj_matrix_[0, 3] -  \
+              x * proj_matrix_[2, 2] * ground_z - x * proj_matrix_[2, 3]
+        bv1 = proj_matrix_[1, 2] * ground_z + proj_matrix_[1, 3] -  \
+              y * proj_matrix_[2, 2] * ground_z - y * proj_matrix_[2, 3]
+        partition = a11 * a00 - a01 * a10
+        pos_x = (a11 * bv0 - a01 * bv1) / partition
+        pos_y = (a00 * bv1 - a10 * bv0) / partition
+        
+        temp_corners.append((pos_x, pos_y, ground_z))
+        #temp_corners.append((x,y))
+        cv2.circle(image, (x, y), 3, (0, 0, 255), -1)
+        
+
+    #find the neigbours
+    radius_thresh = 6.0
+    #n_neighbors = 4,
+    nearest_neigb = NearestNeighbors(radius = radius_thresh, \
+                                     algorithm="kd_tree", \
+                                     leaf_size = 30, \
+                                     metric = 'euclidean', \
+                                     n_jobs = 1).fit(np.array(temp_corners))
+    #distances, indices = nearest_neigb.kneighbors(np.array(temp_corners))
+    distances, indices = nearest_neigb.radius_neighbors(np.array(temp_corners))    
+    
+
+    temp_im = image.copy()
+    possible_candidate = []
+    for distance, index in zip(distances, indices):  # fix to not repeat on done array
+
+        #cv2.circle(image, (corners[index[0]][0][0], corners[index[0]][0][1]), 5, (0, 255, 0), 2)
+        // FIX: angle computation
+        for dist, idx in zip(distance, index):
+            angle = vector_angle(temp_corners[index[0]], temp_corners[idx]) * (180.0/np.pi)
+            if (dist > (radius_thresh/2) and dist < radius_thresh) and (angle > 40 and angle < 180):
+                possible_candidate.append(idx)                
+
+            print "ANGLE: ", angle, "\t", dist, "\t", idx
+            cv2.circle(image, (corners[idx][0][0], corners[idx][0][1]), 3, (255, 255, 0), -1)
+            plot_image("edge1", image)
+            cv2.waitKey(0)
+
+        image = temp_im.copy()
+
+    print (possible_candidate)
+    if len(possible_candidate) > 3:
+        for pc in possible_candidate:
+            cv2.circle(image, (corners[pc][0][0], corners[pc][0][1]), 4, (255, 255, 0), 1)
+            
+
+    plot_image("lines", im_gray)
+    plot_image("edge1", image)
 
     return
+
 
 def detect_edges(image):
     
     im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     im_edge = cv2.Canny(im_gray, 100, 200)
-    (contours, _) = cv2.findContours(im_edge.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
+    #(contours, _) = cv2.findContours(im_edge.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
     
-    detect_lines(im_edge, image)
+    #detect_lines(im_edge, image)
 
     
     #junction_point(contours[22], image)
@@ -137,6 +193,9 @@ def detect_edges(image):
     #plot_image("edge", image)
 
 def image_callback(img_msg):
+    if not is_proj_mat_:
+        rospy.logwarn("PROJECTION MATRIX NODE ERROR")
+
     bridge = CvBridge()
     cv_img = None
     try:
@@ -148,6 +207,8 @@ def image_callback(img_msg):
     start = time.time()
 
     #detect_edges(cv_img)
+
+
     im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
     detect_and_filter_keypoints(im_gray)
 
@@ -158,10 +219,15 @@ def image_callback(img_msg):
     # cv2.imshow("image", cv_img)
     cv2.waitKey(3)
 
+def projection_matrix_callback(data):
+    global proj_matrix_
+    proj_matrix_ = np.reshape(data.data, (3, 4))
+    global is_proj_mat_
+    is_proj_mat_ = True
         
 def subscribe():
+    rospy.Subscriber(sub_matrix_, VectorArray, projection_matrix_callback)
     rospy.Subscriber(sub_image_, Image, image_callback)
-    
 
 def onInit():
     global pub_image_
