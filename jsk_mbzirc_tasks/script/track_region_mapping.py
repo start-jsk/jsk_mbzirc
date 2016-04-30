@@ -212,6 +212,8 @@ def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
 
 
     print (possible_candidate)
+    
+    centroid_point = []
     if len(possible_candidate) > 3:
         aver_x = 0
         aver_y = 0
@@ -221,12 +223,12 @@ def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
             aver_y += corners[pc][0][1]
         aver_x /= len(possible_candidate)
         aver_y /= len(possible_candidate)
+        centroid_point.append((aver_x, aver_y))
+        
         cv2.circle(image, (aver_x, aver_y), 7, (0, 255, 0), -1)
-
-    plot_image("lines", im_gray)
     plot_image("edge1", image)
-
-    return
+    
+    return (np.array(possible_candidate), np.array(centroid_point))
 
 
 def detect_edges(image):
@@ -234,8 +236,33 @@ def detect_edges(image):
     im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     im_edge = cv2.Canny(im_gray, 100, 200)
     #(contours, _) = cv2.findContours(im_edge.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
-    
     detect_lines(im_edge, image)    
+
+
+# side is square region
+def vehicle_track_region(image, center_corners, centroid_point, size = 9):
+    if center_corners.size < 4 or centroid_point.shape[0] == 0:
+        rospy.logerr("NOT ENOUGHT POINTS TO GET REGION")
+        return
+    #image = cv2.resize(image, (image.shape[1]/2, image.shape[0]/2))
+    im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    im_edge = cv2.Canny(im_gray, 100, 200)
+
+    # region growing
+    height, width = image.shape[:2]
+    im_mask = np.zeros((height + 2, width + 2), np.uint8)
+    print centroid_point
+    im_flooded = image.copy()
+    cv2.floodFill(im_flooded, im_mask, (centroid_point[0, 0], centroid_point[0, 1]), (0, 255, 0), 4)
+    
+
+    # (contours, _) = cv2.findContours(im_edge.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
+    # for i, contour in enumerate(contours):
+    #     print len(contour)
+        
+    #     cv2.drawContours(image, contours, i, (0,255,0), 3)
+    plot_image("contour_pos", im_flooded)
+
 
 def image_callback(img_msg):
     if not is_proj_mat_:
@@ -250,17 +277,15 @@ def image_callback(img_msg):
 
     # timer
     start = time.time()
-
     #detect_edges(cv_img)
     
     im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-    detect_and_filter_keypoints(im_gray, 'HARRIS')
+    corner_points, centroid_point = detect_and_filter_keypoints(im_gray, 'HARRIS')
+    
+    vehicle_track_region(cv_img, corner_points, centroid_point)
 
     end = time.time()
     rospy.logwarn("TIME: %s", str(end - start))
-
-    # cv2.namedWindow("image", cv2.WINDOW_NORMAL)
-    # cv2.imshow("image", cv_img)
     cv2.waitKey(3)
 
 def projection_matrix_callback(data):
