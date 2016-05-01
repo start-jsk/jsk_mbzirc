@@ -48,7 +48,8 @@ install(DIRECTORY launch gazebo_model
 ## Testing ##
 #############
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  find_package(rostest REQUIRED)
+  find_package(roslaunch REQUIRED)
   roslaunch_add_file_check(launch/mbzirc_arena.launch)
   roslaunch_add_file_check(launch/mbzirc_arena_1.launch)
   roslaunch_add_file_check(launch/mbzirc_arena_2.launch)
