@@ -33,6 +33,7 @@ install(DIRECTORY launch urdf config
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
+  find_package(roslint REQUIRED)
   # https://github.com/ros/ros_comm/pull/730
   roslint_cpp()
   roslint_python()
