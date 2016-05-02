@@ -31,7 +31,8 @@ install(DIRECTORY launch urdf config
 ## Testing ##
 #############
 if(CATKIN_ENABLE_TESTING)
-  find_package(catkin REQUIRED COMPONENTS rostest roslaunch)
+  find_package(rostest REQUIRED)
+  find_package(roslaunch REQUIRED)
   # https://github.com/ros/ros_comm/pull/730
   set(roslaunch_check_script ${PROJECT_SOURCE_DIR}/script/roslaunch-check)
   roslaunch_add_file_check(launch/jsk_mbzirc_task_1.launch)
