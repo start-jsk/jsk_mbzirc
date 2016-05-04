@@ -11,8 +11,8 @@
   <param name="remaining_time_test/hz" value="1000.0" />
   <param name="remaining_time_test/hzerror" value="200" />
   <param name="remaining_time_test/test_duration" value="5.0" />
-  <test test-name="remaining_time_test" pkg="rostest" type="hztest"  name="remaining_time_test" retry="2" />
+  <test test-name="remaining_time_test" pkg="rostest" type="hztest"  name="remaining_time_test" retry="10" />
 
-  <test test-name="completed_test" pkg="jsk_mbzirc_tasks" type="check_mission.py"  name="completed_test" retry="2" time-limit="600" />
+  <test test-name="completed_test" pkg="jsk_mbzirc_tasks" type="check_mission.py"  name="completed_test" retry="10" time-limit="120" />
 
 </launch>
