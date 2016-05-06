@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /OverlayText1
+        - /OverlayText2
+        - /OverlayText3
       Splitter Ratio: 0.5
     Tree Height: 428
   - Class: rviz/Selection
@@ -103,7 +105,7 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 0
+      Max Intensity: 1.10511e-19
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: LaserScan
@@ -145,12 +147,48 @@ Visualization Manager:
       Topic: /remaining_time_overlay
       Value: true
       font: DejaVu Sans Mono
-      height: 100
-      left: 10
+      height: 50
+      left: 0
       line width: 2
-      text size: 64
+      text size: 32
       top: 10
-      width: 370
+      width: 500
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 170; 0; 0
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /drone_groundtruth_height_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 40
+      left: 0
+      line width: 3
+      text size: 20
+      top: 60
+      width: 500
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 0; 170; 0
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /drone_estimated_height_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 40
+      left: 0
+      line width: 2
+      text size: 20
+      top: 100
+      width: 500
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -210,5 +248,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1855
-  X: 65
-  Y: 24
+  X: 551
+  Y: 310

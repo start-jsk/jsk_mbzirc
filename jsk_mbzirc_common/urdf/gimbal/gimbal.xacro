@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!-- Revolute-Revolute Manipulator -->
+<robot name="gimbal_module" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- gazebo problem
+    problem1: the mass should not be too light(0.01, 0.02g is wrong) 
+     problem2: the continuous joint should have the root parent(means, there is no tree in the parent)
+-->
+
+
+  <!-- Constants for robot dimensions -->
+  <xacro:property name="PI" value="3.1415926535897931"/>  
+  <xacro:property name="link_mass" value="0.2"/>  
+  <xacro:property name="motor_mass" value="0.2"/>
+
+<!--
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/gimbal_module</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+  -->
+
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find jsk_mbzirc_common)/urdf/gimbal/materials.xacro" />
+
+  <xacro:macro name="motor" params="name parent *origin motor_height r ">
+    <joint name="${name}_motor_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}"/>
+      <child link="${name}_motor"/>
+    </joint>
+
+    <link name="${name}_motor">
+      <inertial>
+        <mass value="${motor_mass}" />
+        <origin xyz="0 0 ${motor_height/2}" rpy="0 0 0" />
+        <inertia
+            ixx="${motor_mass  * (r*r / 4.0 + motor_height * motor_height/ 12.0)}" ixy="0.0" ixz="0.0"
+            iyy="${motor_mass  * (r*r / 4.0 + motor_height * motor_height/ 12.0)}" iyz="0.0"
+            izz="${motor_mass / 2.0 * (r*r)}"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 ${motor_height/2}" rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="${r}" length="${motor_height}"/>q
+        </geometry>
+        <material name="orange"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${motor_height/2}" rpy="0 0 0" />
+        <geometry>
+          <!-- <cylinder radius="${r/2}" length="${motor_height/2}"/> -->
+          <box size="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_motor">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Orange</material>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="single_link" params="name *origin d1 d2 l">
+    <link name="${name}_link">
+      <inertial>
+        <mass value="${link_mass}" />
+        <xacro:insert_block name="origin" />
+        <inertia
+	    ixx="${link_mass / 12.0 * (d1*d1 + l*l)}" ixy="0.0" ixz="0.0"
+	    iyy="${link_mass / 12.0 * (l*l + d2*d2)}" iyz="0.0"
+	    izz="${link_mass / 12.0 * (d1*d2 + d1*d2)}"/>
+      </inertial>
+      <visual>
+        <xacro:insert_block name="origin" />
+        <geometry>
+	  <box size="${d1} ${d2} ${l}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <xacro:insert_block name="origin" />
+        <geometry>
+          <!--	  <box size="${d1} ${d2} ${l}"/> -->
+          <box size="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <gazebo reference="${name}_link">
+      <mu1>0.2</mu1>
+      <mu2>0.2</mu2>
+      <material>Gazebo/Black</material>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="gimbal" params="name parent topside *origin width motor_height z y x imu_topic_name">
+    <joint name="${name}_root_joint" type="fixed">
+     <xacro:insert_block name="origin" /> 
+      <parent link="${parent}"/>
+      <child link="${name}_first_link"/>
+    </joint>
+
+    <xacro:single_link name="${name}_first"  l="${z}" d1="${width}" d2="${width}" >
+      <xacro:if value="${topside}">
+        <origin xyz="0 0 ${z/2}" rpy="0 0 0" />
+      </xacro:if>
+      <xacro:unless value="${topside}">
+        <origin xyz="0 0 ${-z/2}" rpy="0 0 0" />
+      </xacro:unless>
+    </xacro:single_link>
+
+
+    <xacro:motor name="${name}_first" parent="${name}_first_link"  motor_height="${motor_height}" r="${width}" >
+      <xacro:if value="${topside}">
+        <origin xyz="${width/2} 0.0 ${z - width/2}" rpy="0 ${M_PI/2}  0"/>
+      </xacro:if>
+      <xacro:unless value="${topside}">
+        <origin xyz="${width/2} 0.0 ${-z + width/2}" rpy="0 ${M_PI/2}  0"/>
+      </xacro:unless>
+    </xacro:motor>
+
+
+    <joint name="${name}_rotor_joint1" type="continuous">
+      <parent link="${name}_first_link"/>
+      <child link="${name}_second_link"/>
+      <xacro:if value="${topside}">
+        <origin xyz="${motor_height + width} 0 ${z - width/2}" rpy="${-M_PI/2} 0 0"/>
+      </xacro:if>
+      <xacro:unless value="${topside}">
+        <origin xyz="${motor_height + width} 0  ${-z + width/2}" rpy="${-M_PI/2} 0 0"/>
+      </xacro:unless>
+      <axis xyz="1 0 0"/>
+      <dynamics damping="0.01"/>
+    </joint>
+
+
+    <xacro:single_link name="${name}_second"  l="${y}" d1="${width}" d2="${width}" >
+        <origin xyz="0 0 ${-y/2}" rpy="0 0 0" />
+    </xacro:single_link>
+
+    <joint name="second_third_links_joint" type="fixed">
+      <origin xyz="${-width/2} 0 ${-y - width/2}" rpy="${M_PI/2} 0 ${-M_PI/2}"/>
+      <parent link="${name}_second_link"/>
+      <child link="${name}_third_link"/>
+    </joint>
+
+    <xacro:single_link name="${name}_third"  l="${x + width}" d1="${width}" d2="${width}" >
+        <origin xyz="0 0 ${-x/2 - width/2}" rpy="0 0 0" />
+    </xacro:single_link>
+
+
+    <xacro:motor name="${name}_second" parent="${name}_third_link" motor_height="${motor_height}" r="${width}" >
+      <origin xyz="0  ${width/2} ${-x - width}" rpy="${-M_PI/2} 0 0"/>
+    </xacro:motor>
+
+
+    <joint name="${name}_rotor_joint2" type="continuous">
+      <parent link="${name}_second_link"/>
+      <child link="${name}_stabilized_link"/>
+      <origin xyz="${x + width / 2} 0 0" rpy="${M_PI/2} 0 0 "/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="0.01"/>
+    </joint>
+
+    <xacro:single_link name="${name}_stabilized"  l="${2*y}" d1="${width * 2}" d2="${width/2}" >
+      <origin xyz="0 0 0" rpy=" ${M_PI/2} 0 0" />
+    </xacro:single_link>
+
+
+    <gazebo>
+      <plugin name="mbzirc_gazebo_gimbal_plugin" filename="libmbzirc_gazebo_gimbal_plugin.so">
+        <imuTopic>${imu_topic_name}</imuTopic>
+        <firstServoName>${name}_rotor_joint1</firstServoName>
+        <secondServoName>${name}_rotor_joint2</secondServoName>
+      </plugin>
+    </gazebo>
+
+  </xacro:macro>
+
+
+</robot>

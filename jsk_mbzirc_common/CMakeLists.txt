@@ -30,11 +30,17 @@ target_link_libraries(mbzirc_gazebo_panel_plugin ${GAZEBO_LIBRARIES} ${catkin_LI
 add_library(mbzirc_gazebo_treasure_plugin src/mbzirc_gazebo_treasure_plugin.cpp)
 target_link_libraries(mbzirc_gazebo_treasure_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_library(mbzirc_gazebo_gimbal_plugin src/mbzirc_gazebo_gimbal_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_gimbal_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_library(mbzirc_gazebo_drone_additional_plugin src/mbzirc_gazebo_drone_additional_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_drone_additional_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 #############
 ## Install ##
 #############
 install(TARGETS
-  mbzirc_gazebo_truck_plugin mbzirc_gazebo_panel_plugin mbzirc_gazebo_treasure_plugin
+  mbzirc_gazebo_truck_plugin mbzirc_gazebo_panel_plugin mbzirc_gazebo_treasure_plugin mbzirc_gazebo_gimbal_plugin
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   )
