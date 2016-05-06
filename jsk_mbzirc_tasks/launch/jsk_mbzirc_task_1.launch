@@ -33,7 +33,7 @@
   </include>
 
   <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
-  <node pkg="jsk_mbzirc_tasks" name="remain_time_text_to_overlay" type="relay_field_728"
+  <node pkg="jsk_mbzirc_tasks" name="remain_time_text_to_overlay" type="relay_field_728.py"
         args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
               'text: m.data' --wait-for-start" />
 

@@ -44,7 +44,7 @@
 #define KEYCODE_D 0x64
 #define KEYCODE_C 0x63
 #define KEYCODE_S 0x73
-#define KEYCODE_W 0x77 
+#define KEYCODE_W 0x77
 #define KEYCODE_Q 0x71
 #define KEYCODE_E 0x65
 #define KEYCODE_O 0x6f
@@ -79,8 +79,8 @@ public:
         gripper.data = 0;
 
         vel_pub_ = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-        grip_pub_ = n_.advertise<std_msgs::Float64>("/r_gripper_controller/command",1);
-        if(!n_.getParam("teleopUGV",teleopUGV))
+        grip_pub_ = n_.advertise<std_msgs::Float64>("/r_gripper_controller/command", 1);
+        if (!n_.getParam("teleopUGV", teleopUGV))
             puts("fail to load the param");
         ros::NodeHandle n_private("~");
         n_private.param("walk_vel", walk_vel, 1.0);
@@ -92,7 +92,6 @@ public:
 
     ~TeleopUAVKeyboard()   { }
     void keyboardLoop();
-
 };
 
 int kfd = 0;
@@ -111,7 +110,7 @@ int main(int argc, char** argv)
     TeleopUAVKeyboard tpk;
     tpk.init();
 
-    signal(SIGINT,quit);
+    signal(SIGINT, quit);
 
     tpk.keyboardLoop();
 
@@ -121,13 +120,13 @@ int main(int argc, char** argv)
 void TeleopUAVKeyboard::keyboardLoop()
 {
     char c;
-    bool dirty=false;
-    bool dirtygripper=false;
+    bool dirty = false;
+    bool dirtygripper = false;
 
     // get the console in raw mode
     tcgetattr(kfd, &cooked);
     memcpy(&raw, &cooked, sizeof(struct termios));
-    raw.c_lflag &=~ (ICANON | ECHO);
+    raw.c_lflag &= ~(ICANON | ECHO);
     // Setting a new line, then end of file
     raw.c_cc[VEOL] = 1;
     raw.c_cc[VEOF] = 2;
@@ -135,7 +134,7 @@ void TeleopUAVKeyboard::keyboardLoop()
 
     puts("Reading from keyboard");
     puts("---------------------------");
-    if(teleopUGV)
+    if (teleopUGV)
     {
         puts("Reading from keyboard");
         puts("---------------------------");
@@ -154,10 +153,10 @@ void TeleopUAVKeyboard::keyboardLoop()
     }
 
 
-    for(;;)
+    for (;;)
     {
         // get the next event from the keyboard
-        if(read(kfd, &c, 1) < 0)
+        if (read(kfd, &c, 1) < 0)
         {
             perror("read():");
             exit(-1);
@@ -165,7 +164,7 @@ void TeleopUAVKeyboard::keyboardLoop()
 
         cmd.linear.x = cmd.linear.y = cmd.angular.z = cmd.linear.z = 0;
 
-        switch(c)
+        switch (c)
         {
         // Walking
         case KEYCODE_W:
@@ -231,17 +230,15 @@ void TeleopUAVKeyboard::keyboardLoop()
             cmd.angular.z = - yaw_rate_run;
             dirty = true;
             break;
-
-
-          //Gripper
+            // Gripper
         case KEYCODE_O:
             gripper.data += 0.01;
-            gripper.data = gripper.data>0.5?0.5:gripper.data;
+            gripper.data = gripper.data > 0.5?0.5:gripper.data;
             dirtygripper = true;
             break;
         case KEYCODE_C:
             gripper.data -= 0.01;
-            gripper.data = gripper.data<0?0:gripper.data;
+            gripper.data = gripper.data < 0?0:gripper.data;
             dirtygripper = true;
             dirty = true;
             break;
@@ -251,11 +248,9 @@ void TeleopUAVKeyboard::keyboardLoop()
         {
             vel_pub_.publish(cmd);
         }
-        if(dirtygripper == true)
+        if (dirtygripper == true)
         {
             grip_pub_.publish(gripper);
         }
-
-
     }
 }

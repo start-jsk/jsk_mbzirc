@@ -40,13 +40,15 @@ from std_msgs.msg import Float64
 
 __author__ = 'kei.okada@gmail.com (Kei Okada)'
 
+
 def open_hand():
     msg = Float64()
     msg.data = 0.4
-    rospy.loginfo("send %f"%msg.data)
+    rospy.loginfo("send %f" % msg.data)
     for i in range(10):
         pub.publish(msg)
         rospy.sleep(0.1)
+
 
 def close_hand():
     msg = Float64()
@@ -61,7 +63,7 @@ if __name__ == '__main__':
     # for for 5 sec
     rospy.sleep(5)
 
-    rospy.loginfo("start program %f"%rospy.get_time())
+    rospy.loginfo("start program %f" % rospy.get_time())
     arm = MoveGroupCommander("ur5_arm")
     arm.set_planner_id('RRTConnectkConfigDefault')
     pub = rospy.Publisher("/r_gripper_controller/command", Float64, queue_size=1)
@@ -71,11 +73,16 @@ if __name__ == '__main__':
     rospy.loginfo("init pose")
     msg = FollowJointTrajectoryGoal()
     msg.trajectory.header.stamp = rospy.Time.now() + rospy.Duration(0.2)
-    msg.trajectory.joint_names = ['ur5_arm_shoulder_pan_joint', 'ur5_arm_shoulder_lift_joint', 'ur5_arm_elbow_joint', 'ur5_arm_wrist_1_joint', 'ur5_arm_wrist_2_joint', 'ur5_arm_wrist_3_joint']
-    msg.trajectory.points.append(JointTrajectoryPoint(positions=[-1.57,-0.1745,-2.79,-1.57,0,0], time_from_start = rospy.Duration(2)))
+    msg.trajectory.joint_names = ['ur5_arm_shoulder_pan_joint',
+                                  'ur5_arm_shoulder_lift_joint',
+                                  'ur5_arm_elbow_joint',
+                                  'ur5_arm_wrist_1_joint',
+                                  'ur5_arm_wrist_2_joint',
+                                  'ur5_arm_wrist_3_joint']
+    msg.trajectory.points.append(JointTrajectoryPoint(positions=[-1.57, -0.1745, -2.79, -1.57, 0, 0],
+                                                      time_from_start=rospy.Duration(2)))
     client.send_goal(msg)
     client.wait_for_result()
-
 
     # open
     open_hand()
@@ -101,9 +108,9 @@ if __name__ == '__main__':
         for r in numpy.arange(start_angle, start_angle-3.14*2, -1.0):
             rospy.loginfo(angles)
             angles[5] = r
-            rospy.loginfo("rotate (%f)"%(r))
+            rospy.loginfo("rotate (%f)" % (r))
             msg.trajectory.header.stamp = rospy.Time.now() + rospy.Duration(0.2)
-            msg.trajectory.points = [JointTrajectoryPoint(positions=angles, time_from_start = rospy.Duration(1))]
+            msg.trajectory.points = [JointTrajectoryPoint(positions=angles, time_from_start=rospy.Duration(1))]
             client.send_goal(msg)
             client.wait_for_result()
 
@@ -113,8 +120,7 @@ if __name__ == '__main__':
         # back
         angles[5] = start_angle
         arm.set_joint_value_target(angles)
-        rospy.loginfo("rotate (%f)"%(r))
+        rospy.loginfo("rotate (%f)" % (r))
         arm.plan() and arm.go()
-    
-    rospy.loginfo("done")
 
+    rospy.loginfo("done")

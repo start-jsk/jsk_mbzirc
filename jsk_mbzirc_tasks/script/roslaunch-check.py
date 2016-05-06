@@ -44,10 +44,11 @@ import rosunit
 #
 import roslib
 
+
 def check_roslaunch(f):
     """
-    Check roslaunch file for errors, returning error message if check fails. This routine
-    is mainly to support rostest's roslaunch_check.
+    Check roslaunch file for errors, returning error message if check fails.
+    This routine is mainly to support rostest's roslaunch_check.
 
     :param f: roslaunch file name, ``str``
     :returns: error message or ``None``
@@ -56,27 +57,28 @@ def check_roslaunch(f):
         rl_config = roslaunch.config.load_config_default([f], roslaunch.rlutil.DEFAULT_MASTER_PORT, verbose=False)
     except roslaunch.core.RLException as e:
         return str(e)
-    
+
     errors = []
     # check for missing deps
     try:
         base_pkg, file_deps, missing = roslaunch.depends.roslaunch_deps([f])
     except rospkg.common.ResourceNotFound as r:
-        errors.append("Could not find package [%s] included from [%s]"%(str(r), f))
+        errors.append("Could not find package [%s] included from [%s]" % (str(r), f))
         missing = {}
         file_deps = {}
     except roslaunch.substitution_args.ArgException as e:
-        errors.append("Could not resolve arg [%s] in [%s]"%(str(e), f))
+        errors.append("Could not resolve arg [%s] in [%s]" % (str(e), f))
         missing = {}
         file_deps = {}
     for pkg, miss in missing.items():
         if miss:
-            print("Missing package dependencies: %s/package.xml: %s"%(pkg, ', '.join(miss)))
-        # even if the pkgs is not found in packges.xml, if other package.xml provdes that pkgs, then it will be ok
+            print("Missing package dependencies: %s/package.xml: %s" % (pkg, ', '.join(miss)))
+        # even if the pkgs is not found in packges.xml, if other package.xml provdes that pkgs,
+        # then it will be ok
         miss_all = list(set(miss) - set(reduce(lambda x, y: x+y, [file_deps[pkg].pkgs for pkg in file_deps.keys()])))
         if miss_all:
-            errors.append("Missing package dependencies: %s/package.xml: %s"%(pkg, ', '.join(miss_all)))
-    
+            errors.append("Missing package dependencies: %s/package.xml: %s" % (pkg, ', '.join(miss_all)))
+
     # load all node defs
     nodes = []
     for filename, rldeps in file_deps.items():
@@ -88,16 +90,16 @@ def check_roslaunch(f):
         try:
             rospack.get_path(pkg)
         except:
-            errors.append("cannot find package [%s] for node [%s]"%(pkg, node_type))
+            errors.append("cannot find package [%s] for node [%s]" % (pkg, node_type))
 
     # check for missing nodes
     for pkg, node_type in nodes:
         try:
             if not roslib.packages.find_node(pkg, node_type, rospack=rospack):
-                errors.append("cannot find node [%s] in package [%s]"%(node_type, pkg))
+                errors.append("cannot find node [%s] in package [%s]" % (node_type, pkg))
         except Exception as e:
-            errors.append("unable to find node [%s/%s]: %s"%(pkg, node_type, str(e)))
-                
+            errors.append("unable to find node [%s/%s]: %s" % (pkg, node_type, str(e)))
+
     # Check for configuration errors, #2889
     for err in rl_config.config_errors:
         errors.append('ROSLaunch config error: %s' % err)
@@ -105,12 +107,14 @@ def check_roslaunch(f):
     if errors:
         return '\n'.join(errors)
 
+
 def check_roslaunch_file(roslaunch_file):
     print("checking", roslaunch_file)
     error_msg = check_roslaunch(roslaunch_file)
     # error message has to be XML attr safe
     if error_msg:
-        return "[%s]:\n\t%s"%(roslaunch_file,error_msg)
+        return "[%s]:\n\t%s" % (roslaunch_file, error_msg)
+
 
 def check_roslaunch_dir(roslaunch_dir):
     error_msgs = []
@@ -122,7 +126,7 @@ def check_roslaunch_dir(roslaunch_dir):
     # error message has to be XML attr safe
     return '\n'.join([e for e in error_msgs if e])
 
-## run check and output test result file
+    # run check and output test result file
 if __name__ == '__main__':
     from optparse import OptionParser
     parser = OptionParser(usage="usage: \troslaunch-check [options] <file|directory> [env=value...]")
@@ -174,11 +178,11 @@ if __name__ == '__main__':
         os.makedirs(dir_path)
 
     if error_msg:
-        print("FAILURE:\n%s"%error_msg, file=sys.stderr)
+        print("FAILURE:\n%s" % error_msg, file=sys.stderr)
         with open(test_file, 'w') as f:
-            message = "roslaunch check [%s] failed"%(roslaunch_path)
+            message = "roslaunch check [%s] failed" % (roslaunch_path)
             f.write(rosunit.junitxml.test_failure_junit_xml(test_name, message, stdout=error_msg))
-        print("wrote test file to [%s]"%test_file)
+        print("wrote test file to [%s]" % test_file)
         sys.exit(1)
     else:
         print("passed")
