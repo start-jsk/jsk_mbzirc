@@ -185,7 +185,7 @@ void GazeboTruck::Update()
   std::stringstream ss;
   std_msgs::String msg_time;
   ss << 20*60 - current_time.Double();
-  msg_time.data = ss.str();
+  msg_time.data = "remain time:" + ss.str();
   pub_time_.publish(msg_time);
   if ( entityName != "" && distAbove < 1.0 )
     {
