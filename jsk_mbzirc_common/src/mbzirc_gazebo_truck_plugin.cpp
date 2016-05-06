@@ -88,7 +88,6 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   node_handle_ = new ros::NodeHandle(namespace_);
   pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true);  // set latch true
   pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
-  ros::NodeHandle param_handle(*node_handle_, "controller");
 
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboTruck::Update, this));
 }
