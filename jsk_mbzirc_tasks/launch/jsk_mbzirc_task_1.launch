@@ -44,7 +44,8 @@
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>
 
     <group if="$(arg is_mapping)" >
-    <node pkg="jsk_mbzirc_tasks" type="uav_img2pointcloud" name="uav_img2pointcloud"  launch-prefix="xterm -e"/>
+    <node pkg="jsk_mbzirc_tasks" type="uav_img2pointcloud" name="uav_img2pointcloud"  />
+	  <!-- launch-prefix="xterm -e"/> -->
     </group>
 
     <group if="$(arg teleopjoy)" >
