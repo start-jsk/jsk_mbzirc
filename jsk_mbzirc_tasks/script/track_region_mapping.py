@@ -19,11 +19,10 @@ import random
 import time
 
 sub_image_ = '/downward_cam/camera/image'
-#sub_image_ = '/image_publisher/output'
 sub_matrix_ = '/paramatrix'
 
 pub_image_ = None
-pub_topic_ = '/output'
+pub_topic_ = '/track_region_mapping/output/track_mask'
 
 proj_matrix_ = None
 is_proj_mat_ = False
@@ -247,22 +246,19 @@ def vehicle_track_region(image, center_corners, centroid_point, size = 9):
     #image = cv2.resize(image, (image.shape[1]/2, image.shape[0]/2))
     im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     im_edge = cv2.Canny(im_gray, 100, 200)
-
-    # region growing
-    height, width = image.shape[:2]
-    im_mask = np.zeros((height + 2, width + 2), np.uint8)
-    print centroid_point
-    im_flooded = image.copy()
-    cv2.floodFill(im_flooded, im_mask, (centroid_point[0, 0], centroid_point[0, 1]), (0, 255, 0), 4)
+    im_mask = cv2.copyMakeBorder(im_edge, 1, 1, 1, 1, cv2.BORDER_REPLICATE)
     
-
-    # (contours, _) = cv2.findContours(im_edge.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
-    # for i, contour in enumerate(contours):
-    #     print len(contour)
-        
-    #     cv2.drawContours(image, contours, i, (0,255,0), 3)
+    # region growing
+    im_diff = im_mask.copy()
+    im_flooded = image.copy()
+    (retval, rect) = cv2.floodFill(im_flooded, im_mask, \
+                                   (centroid_point[0, 0], centroid_point[0, 1]), (255, 255, 0), \
+                                   flags = 8 | (255 << 8))
+    im_diff = im_mask - im_diff
+    plot_image("diff", im_diff)
     plot_image("contour_pos", im_flooded)
 
+    return im_diff
 
 def image_callback(img_msg):
     if not is_proj_mat_:
@@ -282,7 +278,11 @@ def image_callback(img_msg):
     im_gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
     corner_points, centroid_point = detect_and_filter_keypoints(im_gray, 'HARRIS')
     
-    vehicle_track_region(cv_img, corner_points, centroid_point)
+    im_track_mask = vehicle_track_region(cv_img, corner_points, centroid_point)
+    if not im_track_mask is None:
+        pub_image_.publish(bridge.cv2_to_imgmsg(im_track_mask, "mono8"))
+    else:
+        pass
 
     end = time.time()
     rospy.logwarn("TIME: %s", str(end - start))
