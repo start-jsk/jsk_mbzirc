@@ -19,7 +19,7 @@
 
 #include <geometry_msgs/PolygonStamped.h>
 #include <jsk_recognition_msgs/Rect.h>
-
+#include <jsk_recognition_msgs/VectorArray.h>
 #include <jsk_mbzirc_tasks/histogram_of_oriented_gradients.h>
 
 #include <opencv2/opencv.hpp>
@@ -27,30 +27,59 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <boost/thread/mutex.hpp>
 
+namespace jsk_msgs = jsk_recognition_msgs;
+
 class UAVLandingRegion {
 
  private:
-    
+    typedef message_filters::sync_policies::ApproximateTime<
+    sensor_msgs::Image, sensor_msgs::Image> SyncPolicy;
+    message_filters::Subscriber<sensor_msgs::Image> sub_image_;
+    message_filters::Subscriber<sensor_msgs::Image> sub_mask_;
+    boost::shared_ptr<message_filters::Synchronizer<SyncPolicy> >sync_;
+
+    int num_threads_;
     cv::Mat templ_img_;
-    void detect(cv::Mat &);
-    void slidingWindowDetect(cv::Mat &, const cv::Mat);
-    
+    int down_size_;
+    float ground_plane_;
+
+    float track_width_;
+    boost::shared_ptr<HOGFeatureDescriptor> hog_;
+    cv::Ptr<cv::ml::SVM> svm_;
+   
  protected:
-    
     ros::NodeHandle pnh_;
     ros::Publisher pub_image_;
     ros::Publisher pub_rect_;
-    ros::Subscriber sub_image_;
-    ros::Subscriber sub_screen_pt_;
    
     void onInit();
     void subscribe();
     void unsubscribe();
+
+    enum {
+       EVEN, ODD};
+   
     
  public:
-    
     UAVLandingRegion();
-    virtual void imageCB(const sensor_msgs::Image::ConstPtr &);
+    virtual void imageCB(const sensor_msgs::Image::ConstPtr &,
+                         const sensor_msgs::Image::ConstPtr &);
+    void slidingWindowDetect(cv::Mat &, const cv::Mat);
+    void skeletonization(cv::Mat &);
+    void iterativeThinning(cv::Mat&, int);
+    void traceandDetectLandingMarker(const cv::Mat,
+                                     const cv::Mat,
+                                     const cv::Size);
+    cv::Mat convertImageToMat(const sensor_msgs::Image::ConstPtr &,
+                              std::string);
+    cv::Size getSlidingWindowSize(const cv::Mat,
+                                  const jsk_msgs::VectorArray);
+
+    //! Training
+    cv::Mat extractFeauture(cv::Mat &);
+    bool trainTrackDetector(const std::string,
+                            const std::string);
+    void trainSVM(const cv::Mat, const cv::Mat, std::string);
 };
 
 

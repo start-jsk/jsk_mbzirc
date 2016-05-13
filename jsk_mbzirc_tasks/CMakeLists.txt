@@ -4,7 +4,7 @@ project(jsk_mbzirc_tasks)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs sensor_msgs jsk_recognition_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf message_filters nav_msgs sensor_msgs jsk_recognition_msgs jsk_perception)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 

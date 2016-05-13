@@ -2,7 +2,10 @@
 #include <jsk_mbzirc_tasks/uav_detect_landing_region.h>
 
 UAVLandingRegion::UAVLandingRegion() :
-    down_size_(1) {
+    down_size_(1), ground_plane_(0.0), track_width_(3.0f) {
+
+    this->hog_ = boost::shared_ptr<HOGFeatureDescriptor>(
+       new HOGFeatureDescriptor());
     
     std::string templ_path;
     pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
@@ -13,6 +16,12 @@ UAVLandingRegion::UAVLandingRegion() :
     }
 
     // TODO(ADD): LOAD TRAINED MODEL
+    bool load_svm = false;
+    if (load_svm) {
+       std::string load_svm;
+       pnh_.getParam("svm_path", load_svm);
+       this->svm_->load(static_cast<std::string>(load_svm));
+    }
     
     this->onInit();
 }
@@ -50,13 +59,17 @@ void UAVLandingRegion::imageCB(
        ROS_ERROR("EMPTY IMAGE. SKIP LANDING SITE DETECTION");
        return;
     }
+    cv::Size im_downsize = cv::Size(image.cols/this->down_size_,
+                                    image.rows/this->down_size_);
+    cv::resize(image, image, im_downsize);
+    cv::resize(im_mask, im_mask, im_downsize);
+    
+    cv::Mat detector_path = im_mask.clone();
+    this->skeletonization(detector_path);
 
-    const int errod_size = 2;
-    const int morph_size = 2 * errod_size + 1;
-    cv::Mat element = cv::getStructuringElement(
-       cv::MORPH_ELLIPSE, cv::Size(morph_size, morph_size),
-       cv::Point(errod_size, errod_size));
-    cv::erode(im_mask, im_mask, element);
+    //! compute sliding window size
+    
+    
     
     // HOGFeatureDescriptor hog;
     // cv::Mat desc = hog.computeHOG(image);
@@ -80,6 +93,60 @@ void UAVLandingRegion::imageCB(
     this->pub_image_.publish(pub_msg);
 }
 
+void UAVLandingRegion::traceandDetectLandingMarker(
+    const cv::Mat image, const cv::Mat marker, const cv::Size wsize) {
+    if (image.empty() || marker.empty() || image.size() != marker.size()) {
+        ROS_ERROR("EMPTY INPUT IMAGE FOR DETECTION");
+        return;
+    }
+
+    // 1 - detect
+    // 2 - non_max_suprresion
+    // 3 - return bounding box
+}
+
+cv::Size UAVLandingRegion::getSlidingWindowSize(
+    const cv::Mat marker_img,
+    const jsk_msgs::VectorArray projection_matrix) {
+    float A[2][2];
+    float bv[2];
+
+    // TODO(FIX): check if this can be down during skeleton
+    for (int y = 0; y < marker_img.rows; y++) {
+       bool is_break = false;
+       for (int x = 0; x < marker_img.cols; x++) {
+          if (marker_img.at<uchar>(y, x) == 255) {
+             int i = y;
+             int j = x;
+             
+             A[0][0] = j * projection_matrix.data.at(8) -
+                projection_matrix.data.at(0);
+             A[0][1] = j * projection_matrix.data.at(9) -
+                projection_matrix.data.at(1);
+             A[1][0] = i * projection_matrix.data.at(8) -
+                projection_matrix.data.at(4);
+             A[1][1] = i * projection_matrix.data.at(9) -
+                projection_matrix.data.at(5);
+             bv[0] = projection_matrix.data.at(2)*ground_plane_ +
+                projection_matrix.data.at(3) - j*projection_matrix.data.at(
+                   10)*ground_plane_ - j*projection_matrix.data.at(11);
+             bv[1] = projection_matrix.data.at(4)*ground_plane_ +
+                projection_matrix.data.at(7) - i*projection_matrix.data.at(
+                   10)*ground_plane_ - i*projection_matrix.data.at(11);
+             float dominator = A[1][1] * A[0][0] - A[0][1] * A[1][0];
+
+             float x = (A[1][1]*bv[0]-A[0][1]*bv[1]) / dominator;
+             float y = (A[0][0]*bv[1]-A[1][0]*bv[0]) / dominator;
+             float z = this->ground_plane_;
+
+             
+          }
+       }
+       if (is_break) {
+          break;
+       }
+    }    
+}
 
 void UAVLandingRegion::slidingWindowDetect(
     cv::Mat &weight, const cv::Mat image) {
@@ -215,6 +282,81 @@ cv::Mat UAVLandingRegion::convertImageToMat(
         return cv::Mat();
     }
     return cv_ptr->image.clone();
+}
+
+cv::Mat UAVLandingRegion::extractFeauture(
+    cv::Mat &image) {
+    if (image.empty()) {
+      return cv::Mat();
+    }
+    cv::Mat desc = this->hog_->computeHOG(image);
+    return desc;
+}
+
+void UAVLandingRegion::trainSVM(
+    const cv::Mat feature_vector, cv::Mat labels, std::string save_path) {
+    if (feature_vector.empty() || feature_vector.size() != labels.size()) {
+       ROS_ERROR("TRAINING FAILED DUE TO UNEVEN DATA");
+       return;
+    }
+    this->svm_ = cv::ml::SVM::create();
+    this->svm_->setType(cv::ml::SVM::C_SVC);
+    this->svm_->setKernel(cv::ml::SVM::INTER);
+    this->svm_->setDegree(0.0);
+    this->svm_->setGamma(0.90);
+    this->svm_->setCoef0(0.70);
+    this->svm_->setC(100);
+    this->svm_->setNu(0.70);
+    this->svm_->setP(1.0);
+    // this->svm_->setClassWeights(cv::Mat());
+    cv::TermCriteria term_crit  = cv::TermCriteria(
+        cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS,
+        static_cast<int>(1e5), FLT_EPSILON);
+    this->svm_->setTermCriteria(term_crit);
+    cv::Ptr<cv::ml::ParamGrid> param_grid = new cv::ml::ParamGrid();
+    param_grid->minVal = 0;
+    param_grid->maxVal = 0;
+    param_grid->logStep = 1;
+    this->svm_->train(feature_vector, cv::ml::ROW_SAMPLE, labels);
+
+    if (!save_path.empty()) {
+       this->svm_->save(static_cast<std::string>(save_path));
+    }
+    ROS_INFO("\033[34mSVM SUCCESSFULLY TRAINED AND SAVED TO\033[0m");
+}
+
+bool UAVLandingRegion::trainTrackDetector(
+    const std::string save_path, const std::string dataset_path) {
+    if (save_path.empty() || dataset_path.empty()) {
+      ROS_ERROR("PROVIDE THE SAVE AND DATASET PATH");
+      return false;
+    }
+    cv::FileStorage fs;
+    fs.open(dataset_path, cv::FileStorage::READ);
+    if (!fs.isOpened()) {
+       ROS_ERROR("CANNOT LOCATE .xml FILE");
+       return false;
+    }
+
+    cv::FileNode fn = fs["strings"];
+    if (fn.type() != cv::FileNode::SEQ) {
+       ROS_ERROR("STRING NO A SEQUENCE");
+       return false;
+    }
+
+    cv::Mat feature_vector;
+    for (cv::FileNodeIterator it = fn.begin(); it != fn.end(); ++it) {
+       cv::Mat img = cv::imread(static_cast<std::string>(*it), 0);
+       if (!img.empty()) {
+          cv::Mat feature;
+          // extract feature
+          feature_vector.push_back(feature);
+       }
+    }
+
+    fn = fs["labels"];
+    
+    return true;
 }
 
 int main(int argc, char *argv[]) {

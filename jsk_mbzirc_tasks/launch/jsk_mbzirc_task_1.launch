@@ -6,6 +6,7 @@
   <arg name="teleopUGV" default="false"/>
   <arg name="teleopjoy" default="false"/>
   <arg name="is_mapping" default="false" />
+  <arg name="use_ground_truth" default="false" />
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>
@@ -32,6 +33,8 @@
     <arg name="x" value="$(arg x)"/>
     <arg name="y" value="$(arg y)"/>
     <arg name="z" value="$(arg z)"/>
+   <arg name="use_ground_truth_for_tf" value="$(arg use_ground_truth)" />
+    <arg name="use_ground_truth_for_control" value="$(arg use_ground_truth)" />
   </include>
 
   <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
@@ -67,6 +70,14 @@
     </node> 
   </group>
   </group>
+
+  <node pkg="jsk_mbzirc_tasks" name="drone_estimated_height_text_to_overlay" type="relay_field_728"
+        args="/drone_estimated_height /drone_estimated_height_overlay jsk_rviz_plugins/OverlayText
+              'text: m.data' --wait-for-start" />
+
+  <node pkg="jsk_mbzirc_tasks" name="drone_groundtruth_height_text_to_overlay" type="relay_field_728"
+        args="/drone_groundtruth_height /drone_groundtruth_height_overlay jsk_rviz_plugins/OverlayText
+              'text: m.data' --wait-for-start" />
   
 
 </launch>
