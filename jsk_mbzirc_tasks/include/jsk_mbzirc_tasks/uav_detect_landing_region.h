@@ -46,6 +46,7 @@ class UAVLandingRegion {
     float track_width_;
     boost::shared_ptr<HOGFeatureDescriptor> hog_;
     cv::Ptr<cv::ml::SVM> svm_;
+    cv::Size sliding_window_size_;
    
  protected:
     ros::NodeHandle pnh_;

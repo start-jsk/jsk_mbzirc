@@ -3,9 +3,11 @@
 
 UAVLandingRegion::UAVLandingRegion() :
     down_size_(1), ground_plane_(0.0), track_width_(3.0f) {
-
+   
     this->hog_ = boost::shared_ptr<HOGFeatureDescriptor>(
        new HOGFeatureDescriptor());
+
+    this->sliding_window_size_ = cv::Size(32, 32);
     
     std::string templ_path;
     pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
@@ -138,14 +140,12 @@ cv::Size UAVLandingRegion::getSlidingWindowSize(
              float x = (A[1][1]*bv[0]-A[0][1]*bv[1]) / dominator;
              float y = (A[0][0]*bv[1]-A[1][0]*bv[0]) / dominator;
              float z = this->ground_plane_;
-
-             
           }
        }
        if (is_break) {
           break;
        }
-    }    
+    }
 }
 
 void UAVLandingRegion::slidingWindowDetect(
