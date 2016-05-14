@@ -1,5 +1,5 @@
 
-#include <jsk_mbzirc/tasks/uav_detect_landing_region_trainer.h>
+#include <jsk_mbzirc_tasks/uav_detect_landing_region_trainer.h>
 
 UAVLandingRegionTrainer::UAVLandingRegionTrainer() :
     stride_(8) {
@@ -7,7 +7,7 @@ UAVLandingRegionTrainer::UAVLandingRegionTrainer() :
        new HOGFeatureDescriptor());
 
     //! set window size
-    this->sliding_wsize_ = cv::Size(0, 0);
+    this->sliding_window_size_ = cv::Size(32, 32);
     
     //! get paths
     this->positive_data_path_ = "";
@@ -54,9 +54,9 @@ void UAVLandingRegionTrainer::getTrainingDataset(
              iss >> img_path;
              std::string l;
              iss >> l;
-             cv::Mat img = imread(img_path, CV_LOAD_IMAGE_GRAYSCALE);
+             cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_GRAYSCALE);
              if (img.data) {
-                cv::resize(img, img, this->sliding_wsize_);
+                cv::resize(img, img, this->sliding_window_size_);
                 cv::Mat desc = this->extractFeauture(img);
                 if (desc.data) {
                    feature_vector.push_back(desc);
@@ -67,6 +67,7 @@ void UAVLandingRegionTrainer::getTrainingDataset(
           }
        }
     }
+   
     std::cout << "Training Dataset Reading Completed......" << std::endl;
 }
 

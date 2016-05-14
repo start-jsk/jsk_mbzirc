@@ -4,10 +4,10 @@
 UAVLandingRegion::UAVLandingRegion() :
     down_size_(1), ground_plane_(0.0), track_width_(3.0f) {
    
-    this->hog_ = boost::shared_ptr<HOGFeatureDescriptor>(
-       new HOGFeatureDescriptor());
+    // this->hog_ = boost::shared_ptr<HOGFeatureDescriptor>(
+    //    new HOGFeatureDescriptor());
 
-    this->sliding_window_size_ = cv::Size(32, 32);
+    // this->sliding_window_size_ = cv::Size(32, 32);
     
     std::string templ_path;
     pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
@@ -291,38 +291,6 @@ cv::Mat UAVLandingRegion::extractFeauture(
     }
     cv::Mat desc = this->hog_->computeHOG(image);
     return desc;
-}
-
-void UAVLandingRegion::trainSVM(
-    const cv::Mat feature_vector, cv::Mat labels, std::string save_path) {
-    if (feature_vector.empty() || feature_vector.size() != labels.size()) {
-       ROS_ERROR("TRAINING FAILED DUE TO UNEVEN DATA");
-       return;
-    }
-    this->svm_ = cv::ml::SVM::create();
-    this->svm_->setType(cv::ml::SVM::C_SVC);
-    this->svm_->setKernel(cv::ml::SVM::INTER);
-    this->svm_->setDegree(0.0);
-    this->svm_->setGamma(0.90);
-    this->svm_->setCoef0(0.70);
-    this->svm_->setC(100);
-    this->svm_->setNu(0.70);
-    this->svm_->setP(1.0);
-    // this->svm_->setClassWeights(cv::Mat());
-    cv::TermCriteria term_crit  = cv::TermCriteria(
-        cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS,
-        static_cast<int>(1e5), FLT_EPSILON);
-    this->svm_->setTermCriteria(term_crit);
-    cv::Ptr<cv::ml::ParamGrid> param_grid = new cv::ml::ParamGrid();
-    param_grid->minVal = 0;
-    param_grid->maxVal = 0;
-    param_grid->logStep = 1;
-    this->svm_->train(feature_vector, cv::ml::ROW_SAMPLE, labels);
-
-    if (!save_path.empty()) {
-       this->svm_->save(static_cast<std::string>(save_path));
-    }
-    ROS_INFO("\033[34mSVM SUCCESSFULLY TRAINED AND SAVED TO\033[0m");
 }
 
 bool UAVLandingRegion::trainTrackDetector(

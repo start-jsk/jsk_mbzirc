@@ -5,8 +5,6 @@
 
 #include <omp.h>
 
-#include <ros/ros.h>
-#include <ros/console.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -20,16 +18,12 @@
 #include <geometry_msgs/PolygonStamped.h>
 #include <jsk_recognition_msgs/Rect.h>
 #include <jsk_recognition_msgs/VectorArray.h>
-#include <jsk_mbzirc_tasks/histogram_of_oriented_gradients.h>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <boost/thread/mutex.hpp>
+#include <jsk_mbzirc_tasks/uav_detect_landing_region_trainer.h>
 
 namespace jsk_msgs = jsk_recognition_msgs;
 
-class UAVLandingRegion {
+class UAVLandingRegion: public UAVLandingRegionTrainer {
 
  private:
     typedef message_filters::sync_policies::ApproximateTime<
@@ -44,9 +38,9 @@ class UAVLandingRegion {
     float ground_plane_;
 
     float track_width_;
-    boost::shared_ptr<HOGFeatureDescriptor> hog_;
-    cv::Ptr<cv::ml::SVM> svm_;
-    cv::Size sliding_window_size_;
+    // boost::shared_ptr<HOGFeatureDescriptor> hog_;
+    // cv::Ptr<cv::ml::SVM> svm_;
+    // cv::Size sliding_window_size_;
    
  protected:
     ros::NodeHandle pnh_;
@@ -80,7 +74,6 @@ class UAVLandingRegion {
     cv::Mat extractFeauture(cv::Mat &);
     bool trainTrackDetector(const std::string,
                             const std::string);
-    void trainSVM(const cv::Mat, const cv::Mat, std::string);
 };
 
 

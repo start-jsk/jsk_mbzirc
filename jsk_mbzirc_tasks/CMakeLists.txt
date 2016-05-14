@@ -67,11 +67,13 @@ if (OpenCV_VERSION VERSION_GREATER "3.0")
   add_executable(uav_detect_landing_region_node
     src/uav_detect_landing_region_node.cpp
     src/histogram_of_oriented_gradients.cpp
+    src/uav_detect_landing_region_trainer.cpp
 )
   target_link_libraries(uav_detect_landing_region_node
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     )
+
 
 endif()
 
