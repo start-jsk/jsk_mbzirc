@@ -23,6 +23,8 @@ class UAVLandingRegionTrainer {
    
  public:
     UAVLandingRegionTrainer();
+    void trainUAVLandingRegionDetector(const std::string, const std::string,
+                                       const std::string);
     void getTrainingDataset(cv::Mat &, cv::Mat &, const std::string);
     void uploadDataset(const std::string);
     cv::Mat extractFeauture(cv::Mat &);

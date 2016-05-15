@@ -4,26 +4,44 @@
 UAVLandingRegion::UAVLandingRegion() :
     down_size_(1), ground_plane_(0.0), track_width_(3.0f) {
    
-    // this->hog_ = boost::shared_ptr<HOGFeatureDescriptor>(
-    //    new HOGFeatureDescriptor());
+    // std::string templ_path;
+    // pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
+    // this->templ_img_ = cv::imread(templ_path, CV_LOAD_IMAGE_COLOR);
+    // if (this->templ_img_.empty()) {
+    //     ROS_ERROR("TEMPLATE NOT FOUND");
+    //     return;
+    // }
 
-    // this->sliding_window_size_ = cv::Size(32, 32);
-    
-    std::string templ_path;
-    pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
-    this->templ_img_ = cv::imread(templ_path, CV_LOAD_IMAGE_COLOR);
-    if (this->templ_img_.empty()) {
-        ROS_ERROR("TEMPLATE NOT FOUND");
-        return;
+    //! svm load or save path
+    std::string svm_path = "/home/krishneel/Desktop/mbzirc/data/svm.xml";
+    // this->pnh_.getParam("/uav_detect_landing_region/svm_path", svm_path);
+    if (svm_path.empty()) {
+       ROS_ERROR("NOT SVM DETECTOR PATH. PROVIDE A VALID PATH");
+       return;
     }
+     
+    //! train svm
+    bool is_train = true;
+    // this->pnh_.getParam("/uav_detect_landing_region/train_detector", is_train);
+    if (is_train) {
+       std::string object_data_path;
+       std::string background_dataset_path;
+       this->pnh_.getParam("/uav_detect_landing_region/object_dataset_path",
+                           object_data_path);
+       this->pnh_.getParam("/uav_detect_landiang_region/object_dataset_path",
+                           background_dataset_path);
 
-    // TODO(ADD): LOAD TRAINED MODEL
-    bool load_svm = false;
-    if (load_svm) {
-       std::string load_svm;
-       pnh_.getParam("svm_path", load_svm);
-       this->svm_->load(static_cast<std::string>(load_svm));
+       object_data_path = "/home/krishneel/Desktop/mbzirc/data/positive.txt";
+       background_dataset_path =
+          "/home/krishneel/Desktop/mbzirc/data/negative.txt";
+       
+       this->trainUAVLandingRegionDetector(object_data_path,
+                                           background_dataset_path, svm_path);
+       
+       ROS_INFO("\033[34m-- SVM DETECTOR SUCCESSFULLY TRAINED \033[0m");
     }
+    this->svm_->load(static_cast<std::string>(svm_path));
+    ROS_INFO("\033[34m-- SVM DETECTOR SUCCESSFULLY LOADED \033[0m");
     
     this->onInit();
 }
@@ -55,37 +73,26 @@ void UAVLandingRegion::unsubscribe() {
 void UAVLandingRegion::imageCB(
     const sensor_msgs::Image::ConstPtr & image_msg,
     const sensor_msgs::Image::ConstPtr &mask_msg) {
+    std::cout << "CALLBK"  << "\n";
     cv::Mat image = this->convertImageToMat(image_msg, "bgr8");
     cv::Mat im_mask = this->convertImageToMat(mask_msg, "mono8");
     if (image.empty() || im_mask.empty()) {
        ROS_ERROR("EMPTY IMAGE. SKIP LANDING SITE DETECTION");
        return;
     }
+
     cv::Size im_downsize = cv::Size(image.cols/this->down_size_,
                                     image.rows/this->down_size_);
     cv::resize(image, image, im_downsize);
     cv::resize(im_mask, im_mask, im_downsize);
     
     cv::Mat detector_path = im_mask.clone();
-    this->skeletonization(detector_path);
-
-    //! compute sliding window size
-    
-    
-    
-    // HOGFeatureDescriptor hog;
-    // cv::Mat desc = hog.computeHOG(image);
-    // cv::Mat hog_viz = hog.visualizeHOG(image, desc, image.size(),
-    // 1, 5);
+    // this->skeletonization(detector_path);
 
     cv::Mat weight;
     this->slidingWindowDetect(weight, image);
     
-    // std::cout << desc  << "\n";
-    // std::cout << "Desc: " << desc.size()  << "\n";
 
-    // cv::namedWindow("template", cv::WINDOW_NORMAL);
-    // cv::imshow("template", hog_viz);
     cv::waitKey(5);
     
     cv_bridge::CvImagePtr pub_msg(new cv_bridge::CvImage);
@@ -154,12 +161,12 @@ void UAVLandingRegion::slidingWindowDetect(
         ROS_ERROR("EMPTY INPUT IMAGE FOR SLIDING WINDOW DETECTION");
         return;
     }
-    cv::resize(templ_img_, templ_img_, cv::Size(32, 32));
-    const int step_stride = templ_img_.cols/4;
-    HOGFeatureDescriptor hog;
-    cv::Mat templ_desc = hog.computeHOG(this->templ_img_);
+    // cv::resize(templ_img_, templ_img_, cv::Size(32, 32));
+    const int step_stride = 4;
+    // HOGFeatureDescriptor hog;
+    // cv::Mat templ_desc = hog.computeHOG(this->templ_img_);
 
-    // weight = cv::Mat::ones(image.size(), CV_32F);
+
     weight = image.clone();
     cv::Rect r_rect;
     double dist = 100;
@@ -168,39 +175,22 @@ void UAVLandingRegion::slidingWindowDetect(
 #endif
     for (int i = 0; i < image.rows; i += step_stride) {
         for (int j = 0; j < image.cols; j += step_stride) {
-            cv::Rect rect = cv::Rect(j, i, templ_img_.cols, templ_img_.rows);
+           cv::Rect rect = cv::Rect(j, i, 32, 32);
             if (rect.x + rect.width < image.cols &&
                 rect.y + rect.height < image.rows) {
                 cv::Mat roi = image(rect).clone();
-                cv::Mat desc = hog.computeHOG(roi);
-                double d = cv::compareHist(
-                    templ_desc, desc, CV_COMP_BHATTACHARYYA);
-                
-                if (isnan(d)) {
-                    d = 1;
-                }
-
-#ifdef _OPENMP
-#pragma omp critical
-#endif
-                {
-                   if (d < dist && d < 0.5) {
-                      r_rect = rect;
-                      dist = d;
-                   }
+                cv::Mat desc = this->extractFeauture(roi);
+                float response = this->svm_->predict(desc);
+                if (response == 1) {
+                   cv::rectangle(weight, rect, cv::Scalar(0, 255, 0), 1);
                 }
             }
         }
     }
 
-    std::cout << "Dist: " << dist  << "\n";
-    
-    cv::rectangle(weight, r_rect, cv::Scalar(0, 255, 0), 3);
-    std::string wname = "dist";
+    std::string wname = "result";
     cv::namedWindow(wname, cv::WINDOW_NORMAL);
     cv::imshow(wname, weight);
-    
-    // std::cout <<  weight << "\n";
 }
 
 

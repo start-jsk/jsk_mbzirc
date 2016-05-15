@@ -6,7 +6,7 @@
   <arg name="teleopUGV" default="false"/>
   <arg name="teleopjoy" default="false"/>
   <arg name="is_mapping" default="false" />
-  <arg name="use_ground_truth" default="false" />
+  <arg name="use_ground_truth" default="true" />
 
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena_1.launch" >
     <arg name="paused" default="$(arg paused)"/>

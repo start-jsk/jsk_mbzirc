@@ -8,6 +8,7 @@ from cv_bridge import CvBridge
 from sklearn.neighbors import NearestNeighbors, KDTree, DistanceMetric
 from sensor_msgs.msg import Image, PointCloud2
 from jsk_recognition_msgs.msg import VectorArray
+from std_msgs.msg import Header
 from scipy.spatial import distance
 
 import numpy as np
@@ -26,6 +27,18 @@ pub_topic_ = '/track_region_mapping/output/track_mask'
 
 proj_matrix_ = None
 is_proj_mat_ = False
+
+def help():
+    print "\033[32m "
+    print "----------------------------------------------------------------------------"
+    print "\t\tNODE FOR TEAM JSK MBZIRC @ U-TOKYO"
+    print "----------------------------------------------------------------------------"
+    print "| ROS node for detecting the x-region on the vehicle track."
+    print "| Using projection mapping the pixel distance are converted to world coordinate"    
+    print "| system and the known prior is used for filtering."
+    print "| The final track region is segmented using region growing with edge and color."
+    print "----------------------------------------------------------------------------"
+    print "\033[0m"
 
 def plot_image(name, image):
     cv2.namedWindow(str(name), cv2.WINDOW_NORMAL)
@@ -280,7 +293,9 @@ def image_callback(img_msg):
     
     im_track_mask = vehicle_track_region(cv_img, corner_points, centroid_point)
     if not im_track_mask is None:
-        pub_image_.publish(bridge.cv2_to_imgmsg(im_track_mask, "mono8"))
+        ros_img = bridge.cv2_to_imgmsg(im_track_mask, "mono8")
+        ros_img.header = img_msg.header
+        pub_image_.publish(ros_img)
     else:
         pass
 

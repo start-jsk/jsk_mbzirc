@@ -6,29 +6,39 @@ UAVLandingRegionTrainer::UAVLandingRegionTrainer() :
     this->hog_ = boost::shared_ptr<HOGFeatureDescriptor>(
        new HOGFeatureDescriptor());
 
-    //! set window size
     this->sliding_window_size_ = cv::Size(32, 32);
+}
+
+void UAVLandingRegionTrainer::trainUAVLandingRegionDetector(
+    const std::string positive_path, const std::string negative_path,
+    const std::string svm_path) {
+    this->positive_data_path_ = positive_path;
+    this->negative_data_path_ = negative_path;
+    this->svm_save_path_ = svm_path;
     
-    //! get paths
-    this->positive_data_path_ = "";
-    this->negative_data_path_ = "";
-    this->svm_save_path_ = "";
+    std::cout << "ABOUT TO TRAIN"  << "\n";
+    this->uploadDataset(svm_path);
 }
 
 void UAVLandingRegionTrainer::uploadDataset(
     const std::string dpath) {
+    /*
     if (!dpath.empty()) {
        ROS_ERROR("PROVIDE DATASET TEXT FILE PATH");
        return;
     }
+   */
     // read text file and extract features and labels
     cv::Mat feature_vector;
     cv::Mat labels;
     this->getTrainingDataset(feature_vector, labels, this->positive_data_path_);
     this->getTrainingDataset(feature_vector, labels, this->negative_data_path_);
 
+    cv::Mat labelMD;
+    labels.convertTo(labelMD, CV_32S);
+    
     // train
-    this->trainSVM(feature_vector, labels, this->svm_save_path_);
+    this->trainSVM(feature_vector, labelMD, this->svm_save_path_);
     
     // generate manifest
     
@@ -83,7 +93,7 @@ cv::Mat UAVLandingRegionTrainer::extractFeauture(
 
 void UAVLandingRegionTrainer::trainSVM(
     const cv::Mat feature_vector, cv::Mat labels, std::string save_path) {
-    if (feature_vector.empty() || feature_vector.size() != labels.size()) {
+    if (feature_vector.empty() || feature_vector.rows != labels.rows) {
        ROS_ERROR("TRAINING FAILED DUE TO UNEVEN DATA");
        return;
     }
