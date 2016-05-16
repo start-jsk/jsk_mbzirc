@@ -87,6 +87,7 @@ cv::Mat UAVLandingRegionTrainer::extractFeauture(
     if (image.empty()) {
       return cv::Mat();
     }
+    cv::resize(image, image, this->sliding_window_size_);
     cv::Mat desc = this->hog_->computeHOG(image);
     return desc;
 }
@@ -103,7 +104,7 @@ void UAVLandingRegionTrainer::trainSVM(
     this->svm_->setDegree(0.0);
     this->svm_->setGamma(0.90);
     this->svm_->setCoef0(0.70);
-    this->svm_->setC(100);
+    this->svm_->setC(1);
     this->svm_->setNu(0.70);
     this->svm_->setP(1.0);
     // this->svm_->setClassWeights(cv::Mat());

@@ -62,9 +62,7 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     void slidingWindowDetect(cv::Mat &, const cv::Mat);
     void skeletonization(cv::Mat &);
     void iterativeThinning(cv::Mat&, int);
-    void traceandDetectLandingMarker(const cv::Mat,
-                                     const cv::Mat,
-                                     const cv::Size);
+    void traceandDetectLandingMarker(cv::Mat, const cv::Mat, const cv::Size);
     cv::Mat convertImageToMat(const sensor_msgs::Image::ConstPtr &,
                               std::string);
     cv::Size getSlidingWindowSize(const cv::Mat,

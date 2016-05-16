@@ -90,7 +90,9 @@ void UAVLandingRegion::imageCB(
     // this->skeletonization(detector_path);
 
     cv::Mat weight;
-    this->slidingWindowDetect(weight, image);
+    // this->slidingWindowDetect(weight, image);
+    this->traceandDetectLandingMarker(image, im_mask, im_downsize);
+    
     
 
     cv::waitKey(5);
@@ -103,12 +105,49 @@ void UAVLandingRegion::imageCB(
 }
 
 void UAVLandingRegion::traceandDetectLandingMarker(
-    const cv::Mat image, const cv::Mat marker, const cv::Size wsize) {
-    if (image.empty() || marker.empty() || image.size() != marker.size()) {
+    cv::Mat img, const cv::Mat marker, const cv::Size wsize) {
+    if (img.empty() || marker.empty() || img.size() != marker.size()) {
         ROS_ERROR("EMPTY INPUT IMAGE FOR DETECTION");
         return;
     }
+    cv::Mat image = marker.clone();
+    if (image.type() != CV_8UC1) {
+       cv::cvtColor(image, image, CV_BGR2GRAY);
+    }
+    cv::Mat im_edge;
+    cv::Canny(image, im_edge, 50, 100);
 
+    cv::Mat weight = img.clone();
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(8)
+#endif
+    for (int j = 0; j < im_edge.rows; j++) {
+       for (int i = 0; i < im_edge.cols; i++) {
+          if (static_cast<int>(im_edge.at<uchar>(j, i)) != 0) {
+             cv::Rect rect = cv::Rect(i, j, 20/down_size_, 20/down_size_);
+            if (rect.x + rect.width < image.cols &&
+                rect.y + rect.height < image.rows) {
+                cv::Mat roi = img(rect).clone();
+                cv::resize(roi, roi, cv::Size(32, 32));
+                
+                cv::Mat desc = this->extractFeauture(roi);
+                float response = this->svm_->predict(desc);
+                if (response == 1) {
+                   cv::rectangle(weight, rect, cv::Scalar(0, 255, 0), 1);
+                }
+            }
+          }
+       }
+    }
+
+    std::string wname = "result";
+    cv::namedWindow(wname, cv::WINDOW_NORMAL);
+    cv::imshow(wname, weight);
+
+    wname = "edge";
+    cv::namedWindow(wname, cv::WINDOW_NORMAL);
+    cv::imshow(wname, im_edge);
+    
     // 1 - detect
     // 2 - non_max_suprresion
     // 3 - return bounding box
@@ -175,7 +214,7 @@ void UAVLandingRegion::slidingWindowDetect(
 #endif
     for (int i = 0; i < image.rows; i += step_stride) {
         for (int j = 0; j < image.cols; j += step_stride) {
-           cv::Rect rect = cv::Rect(j, i, 32, 32);
+           cv::Rect rect = cv::Rect(j, i, 32/down_size_, 32/down_size_);
             if (rect.x + rect.width < image.cols &&
                 rect.y + rect.height < image.rows) {
                 cv::Mat roi = image(rect).clone();
