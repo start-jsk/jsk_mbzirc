@@ -52,7 +52,7 @@
     <node pkg="joy" type="joy_node" name="teleop_joy" >
       	<remap from="joy" to="teleop_joy" />
     </node>
-  </group>
+    </group>
 
   <group unless="$(arg teleopjoy)" >
     <node pkg="jsk_mbzirc_tasks" type="uav_teleop_keyboard" name="uav_teleop_keyboard"
