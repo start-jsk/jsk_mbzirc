@@ -2,7 +2,8 @@
 #include <jsk_mbzirc_tasks/uav_detect_landing_region.h>
 
 UAVLandingRegion::UAVLandingRegion() :
-    down_size_(1), ground_plane_(0.0), track_width_(3.0f) {
+    down_size_(2), ground_plane_(0.0), track_width_(3.0f),
+    landing_marker_width_(1.5f), min_wsize_(8) {
    
     // std::string templ_path;
     // pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
@@ -22,7 +23,8 @@ UAVLandingRegion::UAVLandingRegion() :
      
     //! train svm
     bool is_train = true;
-    // this->pnh_.getParam("/uav_detect_landing_region/train_detector", is_train);
+    // this->pnh_.getParam("/uav_detect_landing_region/train_detector",
+    // is_train);
     if (is_train) {
        std::string object_data_path;
        std::string background_dataset_path;
@@ -57,12 +59,14 @@ void UAVLandingRegion::onInit() {
 void UAVLandingRegion::subscribe() {
     this->sub_image_.subscribe(this->pnh_, "input_image", 1);
     this->sub_mask_.subscribe(this->pnh_, "input_mask", 1);
+    this->sub_proj_.subscribe(this->pnh_, "input_proj_mat", 1);
     this->sync_ = boost::make_shared<message_filters::Synchronizer<
-                                        SyncPolicy> >(100);
-    this->sync_->connectInput(this->sub_image_, this->sub_mask_);
+       SyncPolicy> >(100);
+    this->sync_->connectInput(
+       this->sub_image_, this->sub_mask_, this->sub_proj_);
     this->sync_->registerCallback(
       boost::bind(
-         &UAVLandingRegion::imageCB, this, _1, _2));
+         &UAVLandingRegion::imageCB, this, _1, _2, _3));
 }
 
 void UAVLandingRegion::unsubscribe() {
@@ -71,9 +75,12 @@ void UAVLandingRegion::unsubscribe() {
 }
 
 void UAVLandingRegion::imageCB(
-    const sensor_msgs::Image::ConstPtr & image_msg,
-    const sensor_msgs::Image::ConstPtr &mask_msg) {
+    const sensor_msgs::Image::ConstPtr &image_msg,
+    const sensor_msgs::Image::ConstPtr &mask_msg,
+    const jsk_msgs::VectorArray::ConstPtr &proj_mat_msg) {
+   
     std::cout << "CALLBK"  << "\n";
+    
     cv::Mat image = this->convertImageToMat(image_msg, "bgr8");
     cv::Mat im_mask = this->convertImageToMat(mask_msg, "mono8");
     if (image.empty() || im_mask.empty()) {
@@ -87,13 +94,14 @@ void UAVLandingRegion::imageCB(
     cv::resize(im_mask, im_mask, im_downsize);
     
     cv::Mat detector_path = im_mask.clone();
-    // this->skeletonization(detector_path);
 
-    cv::Mat weight;
-    // this->slidingWindowDetect(weight, image);
-    this->traceandDetectLandingMarker(image, im_mask, im_downsize);
+    cv::Size wsize = this->getSlidingWindowSize(*proj_mat_msg);
+    if (wsize.width < this->min_wsize_) {
+       ROS_WARN("HIGH ALTITUDE. SKIPPING DETECTION");
+       return;
+    }
     
-    
+    this->traceandDetectLandingMarker(image, im_mask, wsize);
 
     cv::waitKey(5);
     
@@ -124,7 +132,7 @@ void UAVLandingRegion::traceandDetectLandingMarker(
     for (int j = 0; j < im_edge.rows; j++) {
        for (int i = 0; i < im_edge.cols; i++) {
           if (static_cast<int>(im_edge.at<uchar>(j, i)) != 0) {
-             cv::Rect rect = cv::Rect(i, j, 20/down_size_, 20/down_size_);
+             cv::Rect rect = cv::Rect(i, j, wsize.width, wsize.height);
             if (rect.x + rect.width < image.cols &&
                 rect.y + rect.height < image.rows) {
                 cv::Mat roi = img(rect).clone();
@@ -154,84 +162,57 @@ void UAVLandingRegion::traceandDetectLandingMarker(
 }
 
 cv::Size UAVLandingRegion::getSlidingWindowSize(
-    const cv::Mat marker_img,
     const jsk_msgs::VectorArray projection_matrix) {
     float A[2][2];
     float bv[2];
 
-    // TODO(FIX): check if this can be down during skeleton
-    for (int y = 0; y < marker_img.rows; y++) {
-       bool is_break = false;
-       for (int x = 0; x < marker_img.cols; x++) {
-          if (marker_img.at<uchar>(y, x) == 255) {
-             int i = y;
-             int j = x;
-             
-             A[0][0] = j * projection_matrix.data.at(8) -
-                projection_matrix.data.at(0);
-             A[0][1] = j * projection_matrix.data.at(9) -
-                projection_matrix.data.at(1);
-             A[1][0] = i * projection_matrix.data.at(8) -
-                projection_matrix.data.at(4);
-             A[1][1] = i * projection_matrix.data.at(9) -
-                projection_matrix.data.at(5);
-             bv[0] = projection_matrix.data.at(2)*ground_plane_ +
-                projection_matrix.data.at(3) - j*projection_matrix.data.at(
-                   10)*ground_plane_ - j*projection_matrix.data.at(11);
-             bv[1] = projection_matrix.data.at(4)*ground_plane_ +
-                projection_matrix.data.at(7) - i*projection_matrix.data.at(
-                   10)*ground_plane_ - i*projection_matrix.data.at(11);
-             float dominator = A[1][1] * A[0][0] - A[0][1] * A[1][0];
+    const int NUM_POINTS = 2;
+    const float pixel_lenght = 10;
+    float init_point = 10;
+    cv::Point2f point[NUM_POINTS];
+    point[0] = cv::Point2f(init_point, init_point);
+    point[1] = cv::Point2f(init_point + pixel_lenght,
+                           init_point + pixel_lenght);
 
-             float x = (A[1][1]*bv[0]-A[0][1]*bv[1]) / dominator;
-             float y = (A[0][0]*bv[1]-A[1][0]*bv[0]) / dominator;
-             float z = this->ground_plane_;
-          }
-       }
-       if (is_break) {
-          break;
-       }
+    cv::Point3_<float> world_coords[NUM_POINTS];
+    for (int k = 0; k < NUM_POINTS; k++) {
+       int i = static_cast<int>(point[k].y);
+       int j = static_cast<int>(point[k].x);
+          
+       A[0][0] = j * projection_matrix.data.at(8) -
+          projection_matrix.data.at(0);
+       A[0][1] = j * projection_matrix.data.at(9) -
+          projection_matrix.data.at(1);
+       A[1][0] = i * projection_matrix.data.at(8) -
+          projection_matrix.data.at(4);
+       A[1][1] = i * projection_matrix.data.at(9) -
+          projection_matrix.data.at(5);
+       bv[0] = projection_matrix.data.at(2)*ground_plane_ +
+          projection_matrix.data.at(3) - j*projection_matrix.data.at(
+             10)*ground_plane_ - j*projection_matrix.data.at(11);
+       bv[1] = projection_matrix.data.at(4)*ground_plane_ +
+          projection_matrix.data.at(7) - i*projection_matrix.data.at(
+             10)*ground_plane_ - i*projection_matrix.data.at(11);
+       float dominator = A[1][1] * A[0][0] - A[0][1] * A[1][0];
+
+       world_coords[k].x = (A[1][1]*bv[0]-A[0][1]*bv[1]) / dominator;
+       world_coords[k].y = (A[0][0]*bv[1]-A[1][0]*bv[0]) / dominator;
+       world_coords[k].z = this->ground_plane_;
     }
+    
+    float world_distance = this->EuclideanDistance(world_coords);
+    float wsize = (pixel_lenght * landing_marker_width_) / world_distance;
+
+    return cv::Size(static_cast<int>(wsize), static_cast<int>(wsize));
 }
 
-void UAVLandingRegion::slidingWindowDetect(
-    cv::Mat &weight, const cv::Mat image) {
-    if (image.empty()) {
-        ROS_ERROR("EMPTY INPUT IMAGE FOR SLIDING WINDOW DETECTION");
-        return;
-    }
-    // cv::resize(templ_img_, templ_img_, cv::Size(32, 32));
-    const int step_stride = 4;
-    // HOGFeatureDescriptor hog;
-    // cv::Mat templ_desc = hog.computeHOG(this->templ_img_);
-
-
-    weight = image.clone();
-    cv::Rect r_rect;
-    double dist = 100;
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(8)
-#endif
-    for (int i = 0; i < image.rows; i += step_stride) {
-        for (int j = 0; j < image.cols; j += step_stride) {
-           cv::Rect rect = cv::Rect(j, i, 32/down_size_, 32/down_size_);
-            if (rect.x + rect.width < image.cols &&
-                rect.y + rect.height < image.rows) {
-                cv::Mat roi = image(rect).clone();
-                cv::Mat desc = this->extractFeauture(roi);
-                float response = this->svm_->predict(desc);
-                if (response == 1) {
-                   cv::rectangle(weight, rect, cv::Scalar(0, 255, 0), 1);
-                }
-            }
-        }
-    }
-
-    std::string wname = "result";
-    cv::namedWindow(wname, cv::WINDOW_NORMAL);
-    cv::imshow(wname, weight);
+float UAVLandingRegion::EuclideanDistance(
+    const cv::Point3_<float> *world_coords) {
+    float x = world_coords[1].x - world_coords[0].x;
+    float y = world_coords[1].y - world_coords[0].y;
+    float z = world_coords[1].z - world_coords[0].z;
+    return std::sqrt((std::pow(x, 2) + (std::pow(y, 2)) + (std::pow(z, 2))));
 }
-
 
 void UAVLandingRegion::skeletonization(
     cv::Mat &image) {

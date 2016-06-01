@@ -27,17 +27,22 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
 
  private:
     typedef message_filters::sync_policies::ApproximateTime<
-    sensor_msgs::Image, sensor_msgs::Image> SyncPolicy;
+    sensor_msgs::Image, sensor_msgs::Image, jsk_msgs::VectorArray> SyncPolicy;
     message_filters::Subscriber<sensor_msgs::Image> sub_image_;
     message_filters::Subscriber<sensor_msgs::Image> sub_mask_;
+    message_filters::Subscriber<jsk_msgs::VectorArray> sub_proj_;
     boost::shared_ptr<message_filters::Synchronizer<SyncPolicy> >sync_;
 
     int num_threads_;
     cv::Mat templ_img_;
     int down_size_;
     float ground_plane_;
+    int min_wsize_;
 
     float track_width_;
+    float landing_marker_width_;
+   
+   
     // boost::shared_ptr<HOGFeatureDescriptor> hog_;
     // cv::Ptr<cv::ml::SVM> svm_;
     // cv::Size sliding_window_size_;
@@ -58,15 +63,15 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
  public:
     UAVLandingRegion();
     virtual void imageCB(const sensor_msgs::Image::ConstPtr &,
-                         const sensor_msgs::Image::ConstPtr &);
-    void slidingWindowDetect(cv::Mat &, const cv::Mat);
+                         const sensor_msgs::Image::ConstPtr &,
+                         const jsk_msgs::VectorArray::ConstPtr &);
     void skeletonization(cv::Mat &);
     void iterativeThinning(cv::Mat&, int);
     void traceandDetectLandingMarker(cv::Mat, const cv::Mat, const cv::Size);
     cv::Mat convertImageToMat(const sensor_msgs::Image::ConstPtr &,
                               std::string);
-    cv::Size getSlidingWindowSize(const cv::Mat,
-                                  const jsk_msgs::VectorArray);
+    cv::Size getSlidingWindowSize(const jsk_msgs::VectorArray);
+    float EuclideanDistance(const cv::Point3_<float> *);
 
     //! Training
     cv::Mat extractFeauture(cv::Mat &);
