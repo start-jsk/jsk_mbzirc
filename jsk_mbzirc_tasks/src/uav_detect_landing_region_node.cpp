@@ -78,8 +78,6 @@ void UAVLandingRegion::imageCB(
     const sensor_msgs::Image::ConstPtr &image_msg,
     const sensor_msgs::Image::ConstPtr &mask_msg,
     const jsk_msgs::VectorArray::ConstPtr &proj_mat_msg) {
-   
-    std::cout << "CALLBK"  << "\n";
     
     cv::Mat image = this->convertImageToMat(image_msg, "bgr8");
     cv::Mat im_mask = this->convertImageToMat(mask_msg, "mono8");
@@ -118,25 +116,26 @@ void UAVLandingRegion::traceandDetectLandingMarker(
         ROS_ERROR("EMPTY INPUT IMAGE FOR DETECTION");
         return;
     }
-    cv::Mat image = marker.clone();
+    // cv::Mat image = marker.clone();
+    cv::Mat image = img.clone();
     if (image.type() != CV_8UC1) {
        cv::cvtColor(image, image, CV_BGR2GRAY);
     }
     cv::Mat im_edge;
     cv::Canny(image, im_edge, 50, 100);
-
     cv::Mat weight = img.clone();
+    
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(8)
 #endif
-    for (int j = 0; j < im_edge.rows; j++) {
-       for (int i = 0; i < im_edge.cols; i++) {
+    for (int j = 0; j < im_edge.rows; j += 2) {
+       for (int i = 0; i < im_edge.cols; i += 2) {
           if (static_cast<int>(im_edge.at<uchar>(j, i)) != 0) {
              cv::Rect rect = cv::Rect(i, j, wsize.width, wsize.height);
             if (rect.x + rect.width < image.cols &&
                 rect.y + rect.height < image.rows) {
                 cv::Mat roi = img(rect).clone();
-                cv::resize(roi, roi, cv::Size(32, 32));
+                cv::resize(roi, roi, this->sliding_window_size_);
                 
                 cv::Mat desc = this->extractFeauture(roi);
                 float response = this->svm_->predict(desc);
