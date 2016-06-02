@@ -9,4 +9,14 @@
     <remap from="input_mask" to="/track_region_mapping/output/track_mask" />
     <remap from="input_proj_mat" to="$(arg projection)" />
   </node>
+
+  <node pkg="jsk_mbzirc_tasks" type="non_maximum_suppression.py"
+	name="non_maximum_suppression" output="screen" >
+    <remap from="non_maximum_suppression" to="non_maximum_suppression" />
+  </node>
+  
+  <node pkg="jsk_mbzirc_tasks" type="track_region_mapping.py"
+	name="track_region_mapping" output="screen" >
+  </node>
+
 </launch>

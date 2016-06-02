@@ -17,7 +17,7 @@ UAVLandingRegion::UAVLandingRegion() :
     }
      
     //! train svm
-    bool is_train = true;
+    bool is_train = !true;
     // this->pnh_.getParam("/uav_detect_landing_region/train_detector",
     // is_train);
     if (is_train) {
@@ -47,8 +47,8 @@ void UAVLandingRegion::onInit() {
     this->subscribe();
     this->pub_image_ = pnh_.advertise<sensor_msgs::Image>(
        "/image", sizeof(char));
-    this->pub_rect_ = pnh_.advertise<jsk_recognition_msgs::Rect>(
-       "/rect", sizeof(char));
+    this->pub_point_ = pnh_.advertise<geometry_msgs::PointStamped>(
+       "/uav_landing_region/output/point", sizeof(char));
 }
 
 void UAVLandingRegion::subscribe() {
@@ -96,16 +96,21 @@ void UAVLandingRegion::imageCB(
     
     cv::Point2f marker_point = this->traceandDetectLandingMarker(
        image, im_mask, wsize);
-
-    
-    
-    cv::waitKey(5);
+    if (marker_point.x == -1) {
+       return;
+    }
+    geometry_msgs::PointStamped ros_point = this->pointToWorldCoords(
+       *proj_mat_msg, marker_point.x, marker_point.y);
+    ros_point.header = image_msg->header;
+    this->pub_point_.publish(ros_point);
     
     cv_bridge::CvImagePtr pub_msg(new cv_bridge::CvImage);
     pub_msg->header = image_msg->header;
     pub_msg->encoding = sensor_msgs::image_encodings::BGR8;
     pub_msg->image = image.clone();
     this->pub_image_.publish(pub_msg);
+
+    cv::waitKey(5);
 }
 
 cv::Point2f UAVLandingRegion::traceandDetectLandingMarker(
@@ -256,6 +261,36 @@ cv::Mat UAVLandingRegion::convertImageToMat(
         return cv::Mat();
     }
     return cv_ptr->image.clone();
+}
+
+geometry_msgs::PointStamped UAVLandingRegion::pointToWorldCoords(
+    const jsk_msgs::VectorArray projection_matrix,
+    const float x, const float y) {
+    float A[2][2];
+    float bv[2];
+    int i = static_cast<int>(y);
+    int j = static_cast<int>(x);
+    A[0][0] = j * projection_matrix.data.at(8) -
+       projection_matrix.data.at(0);
+    A[0][1] = j * projection_matrix.data.at(9) -
+       projection_matrix.data.at(1);
+    A[1][0] = i * projection_matrix.data.at(8) -
+       projection_matrix.data.at(4);
+    A[1][1] = i * projection_matrix.data.at(9) -
+       projection_matrix.data.at(5);
+    bv[0] = projection_matrix.data.at(2)*ground_plane_ +
+       projection_matrix.data.at(3) - j*projection_matrix.data.at(
+             10)*ground_plane_ - j*projection_matrix.data.at(11);
+    bv[1] = projection_matrix.data.at(4)*ground_plane_ +
+       projection_matrix.data.at(7) - i*projection_matrix.data.at(
+          10)*ground_plane_ - i*projection_matrix.data.at(11);
+    float dominator = A[1][1] * A[0][0] - A[0][1] * A[1][0];
+
+    geometry_msgs::PointStamped world_coords;
+    world_coords.point.x = (A[1][1]*bv[0]-A[0][1]*bv[1]) / dominator;
+    world_coords.point.y = (A[0][0]*bv[1]-A[1][0]*bv[0]) / dominator;
+    world_coords.point.z = this->ground_plane_;
+    return world_coords;
 }
 
 int main(int argc, char *argv[]) {

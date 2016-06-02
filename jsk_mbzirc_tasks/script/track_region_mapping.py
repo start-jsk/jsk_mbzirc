@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 
 import roslib
 roslib.load_manifest("jsk_mbzirc_tasks")
@@ -154,6 +154,8 @@ def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
     corners = None
     if corner_type is 'HARRIS':
         corners = cv2.goodFeaturesToTrack(im_gray, 400, 0.005, 5, useHarrisDetector=True)
+        if corners is None:
+            return
         corners = np.int0(corners)
     elif corner_type is 'HOUGH_LINES':
         im_edge = cv2.Canny(im_gray, 100, 200)

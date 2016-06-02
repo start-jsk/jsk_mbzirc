@@ -49,7 +49,7 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
  protected:
     ros::NodeHandle pnh_;
     ros::Publisher pub_image_;
-    ros::Publisher pub_rect_;
+    ros::Publisher pub_point_;
     ros::ServiceClient nms_client_;
    
     void onInit();
@@ -71,7 +71,8 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
                               std::string);
     cv::Size getSlidingWindowSize(const jsk_msgs::VectorArray);
     float EuclideanDistance(const cv::Point3_<float> *);
-
+    geometry_msgs::PointStamped pointToWorldCoords(
+       const jsk_msgs::VectorArray, const float, const float);
 };
 
 
