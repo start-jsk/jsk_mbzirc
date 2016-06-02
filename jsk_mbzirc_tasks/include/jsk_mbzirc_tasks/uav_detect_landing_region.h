@@ -65,8 +65,6 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     virtual void imageCB(const sensor_msgs::Image::ConstPtr &,
                          const sensor_msgs::Image::ConstPtr &,
                          const jsk_msgs::VectorArray::ConstPtr &);
-    void skeletonization(cv::Mat &);
-    void iterativeThinning(cv::Mat&, int);
     cv::Point2f traceandDetectLandingMarker(cv::Mat, const cv::Mat,
                                             const cv::Size);
     cv::Mat convertImageToMat(const sensor_msgs::Image::ConstPtr &,
@@ -74,10 +72,6 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     cv::Size getSlidingWindowSize(const jsk_msgs::VectorArray);
     float EuclideanDistance(const cv::Point3_<float> *);
 
-    //! Training
-    cv::Mat extractFeauture(cv::Mat &);
-    bool trainTrackDetector(const std::string,
-                            const std::string);
 };
 
 

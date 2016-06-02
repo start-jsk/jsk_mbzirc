@@ -246,74 +246,6 @@ float UAVLandingRegion::EuclideanDistance(
     return std::sqrt((std::pow(x, 2) + (std::pow(y, 2)) + (std::pow(z, 2))));
 }
 
-void UAVLandingRegion::skeletonization(
-    cv::Mat &image) {
-    if (image.empty()) {
-       ROS_ERROR("--CANNOT THIN EMPTY DATA...");
-       return;
-    }
-    if (image.type() == CV_8UC3) {
-       cv::cvtColor(image, image, CV_BGR2GRAY);
-    }
-    cv::Mat img;
-    image.convertTo(img, CV_32F, 1/255.0);
-    cv::Mat prev = cv::Mat::zeros(img.size(), CV_32F);
-    cv::Mat difference;
-    do {
-       this->iterativeThinning(img, 0);
-       this->iterativeThinning(img, 1);
-       cv::absdiff(img, prev, difference);
-       img.copyTo(prev);
-
-    } while (cv::countNonZero(difference) > 0);
-    image = img.clone();
-    img = cv::Mat();
-}
-   
-void UAVLandingRegion::iterativeThinning(
-    cv::Mat& img, int iter) {
-    if (img.empty()) {
-       ROS_ERROR("--CANNOT THIN EMPTY DATA...");
-       return;
-    }
-    cv::Mat marker = cv::Mat::zeros(img.size(), CV_32F);
-#ifdef _OPENMP
-#pragma omp parallel for collapse(2) num_threads(this->num_threads_)
-#endif
-    for (int i = 1; i < img.rows-1; i++) {
-       for (int j = 1; j < img.cols-1; j++) {
-          float val[9] = {};
-          int icounter = 0;
-          for (int y = -1; y <= 1; y++) {
-             for (int x = -1; x <= 1; x++) {
-                val[icounter] = img.at<float>(i + y, j + x);
-                icounter++;
-             }
-          }
-          int A = ((val[1] == 0 && val[2] == 1) ? ODD : EVEN)
-             + ((val[2] == 0 && val[5] == 1) ? ODD : EVEN)
-             + ((val[5] == 0 && val[8] == 1) ? ODD : EVEN)
-             + ((val[8] == 0 && val[7] == 1) ? ODD : EVEN)
-             + ((val[7] == 0 && val[6] == 1) ? ODD : EVEN)
-             + ((val[6] == 0 && val[3] == 1) ? ODD : EVEN)
-             + ((val[3] == 0 && val[0] == 1) ? ODD : EVEN)
-             + ((val[0] == 0 && val[1] == 1) ? ODD : EVEN);
-          int B  = val[0] + val[1] + val[2] + val[3]
-             + val[5] + val[6] + val[7] + val[8];
-          int m1 = iter == EVEN ? (val[1] * val[5] * val[7])
-             : (val[1] * val[3] * val[5]);
-          int m2 = iter == EVEN ? (val[3] * val[5] * val[7])
-             : (val[1] * val[3] * val[7]);
-          if (A == 1 && (B >= 2 && B <= 6) && !m1 && !m2) {
-             marker.at<float>(i, j) = sizeof(char);
-          }
-       }
-    }
-    cv::bitwise_not(marker, marker);
-    cv::bitwise_and(img, marker, img);
-    marker = cv::Mat();
-}
-
 cv::Mat UAVLandingRegion::convertImageToMat(
     const sensor_msgs::Image::ConstPtr &image_msg, std::string encoding) {
     cv_bridge::CvImagePtr cv_ptr;
@@ -324,49 +256,6 @@ cv::Mat UAVLandingRegion::convertImageToMat(
         return cv::Mat();
     }
     return cv_ptr->image.clone();
-}
-
-cv::Mat UAVLandingRegion::extractFeauture(
-    cv::Mat &image) {
-    if (image.empty()) {
-      return cv::Mat();
-    }
-    cv::Mat desc = this->hog_->computeHOG(image);
-    return desc;
-}
-
-bool UAVLandingRegion::trainTrackDetector(
-    const std::string save_path, const std::string dataset_path) {
-    if (save_path.empty() || dataset_path.empty()) {
-      ROS_ERROR("PROVIDE THE SAVE AND DATASET PATH");
-      return false;
-    }
-    cv::FileStorage fs;
-    fs.open(dataset_path, cv::FileStorage::READ);
-    if (!fs.isOpened()) {
-       ROS_ERROR("CANNOT LOCATE .xml FILE");
-       return false;
-    }
-
-    cv::FileNode fn = fs["strings"];
-    if (fn.type() != cv::FileNode::SEQ) {
-       ROS_ERROR("STRING NO A SEQUENCE");
-       return false;
-    }
-
-    cv::Mat feature_vector;
-    for (cv::FileNodeIterator it = fn.begin(); it != fn.end(); ++it) {
-       cv::Mat img = cv::imread(static_cast<std::string>(*it), 0);
-       if (!img.empty()) {
-          cv::Mat feature;
-          // extract feature
-          feature_vector.push_back(feature);
-       }
-    }
-
-    fn = fs["labels"];
-    
-    return true;
 }
 
 int main(int argc, char *argv[]) {
