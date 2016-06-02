@@ -8,15 +8,28 @@
     <!-- <remap from="input_mask" to="$(arg image)" /> -->
     <remap from="input_mask" to="/track_region_mapping/output/track_mask" />
     <remap from="input_proj_mat" to="$(arg projection)" />
-  </node>
+
+    <param name="svm_path" value="$(find jsk_mbzirc_tasks)/data/svm.xml" />
+    <remap from="svm_path" to="/uav_detect_landing_region/svm_path" />
+
+    <param name="object_dataset_path" value="$(find jsk_mbzirc_tasks)/data/positive.txt" />
+    <remap from="object_dataset_path" to="/uav_detect_landing_region/object_dataset_path" />
+   
+     <param name="background_dataset_path" value="$(find jsk_mbzirc_tasks)/data/negative.txt" />
+     <remap from="background_dataset_path" to="/uav_detect_landing_region/background_dataset_path" />
+
+     <param name="data_directory" value="$(find jsk_mbzirc_tasks)/" />
+     <remap from="data_directory" to="/uav_detect_landing_region/data_directory" />
+
+   </node>
 
   <node pkg="jsk_mbzirc_tasks" type="non_maximum_suppression.py"
-	name="non_maximum_suppression" output="screen" >
+  	name="non_maximum_suppression" output="screen" >
     <remap from="non_maximum_suppression" to="non_maximum_suppression" />
   </node>
   
   <node pkg="jsk_mbzirc_tasks" type="track_region_mapping.py"
-	name="track_region_mapping" output="screen" >
+  	name="track_region_mapping" output="screen" >
   </node>
 
 </launch>

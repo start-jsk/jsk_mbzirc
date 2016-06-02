@@ -10,11 +10,12 @@ UAVLandingRegionTrainer::UAVLandingRegionTrainer() :
 }
 
 void UAVLandingRegionTrainer::trainUAVLandingRegionDetector(
-    const std::string positive_path, const std::string negative_path,
-    const std::string svm_path) {
+    const std::string data_directory, const std::string positive_path,
+    const std::string negative_path, const std::string svm_path) {
     this->positive_data_path_ = positive_path;
     this->negative_data_path_ = negative_path;
     this->svm_save_path_ = svm_path;
+    this->data_directory_ = data_directory;
     
     std::cout << "ABOUT TO TRAIN"  << "\n";
     this->uploadDataset(svm_path);
@@ -64,7 +65,8 @@ void UAVLandingRegionTrainer::getTrainingDataset(
              iss >> img_path;
              std::string l;
              iss >> l;
-             cv::Mat img = cv::imread(img_path, CV_LOAD_IMAGE_GRAYSCALE);
+             cv::Mat img = cv::imread(this->data_directory_ + img_path,
+                                      CV_LOAD_IMAGE_GRAYSCALE);
              if (img.data) {
                 cv::resize(img, img, this->sliding_window_size_);
                 cv::Mat desc = this->extractFeauture(img);
@@ -120,6 +122,6 @@ void UAVLandingRegionTrainer::trainSVM(
 
     if (!save_path.empty()) {
        this->svm_->save(static_cast<std::string>(save_path));
+       ROS_INFO("\033[34mSVM SUCCESSFULLY TRAINED AND SAVED TO\033[0m");
     }
-    ROS_INFO("\033[34mSVM SUCCESSFULLY TRAINED AND SAVED TO\033[0m");
 }

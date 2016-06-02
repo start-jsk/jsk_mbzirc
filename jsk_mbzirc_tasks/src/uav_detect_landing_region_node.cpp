@@ -4,40 +4,39 @@
 UAVLandingRegion::UAVLandingRegion() :
     down_size_(2), ground_plane_(0.0), track_width_(3.0f),
     landing_marker_width_(1.5f), min_wsize_(8), nms_thresh_(0.01f) {
-
     this->nms_client_ = this->pnh_.serviceClient<
        jsk_tasks::NonMaximumSuppression>("non_maximum_suppression");
-   
+    
+    this->svm_ = cv::ml::SVM::create();
+    
     //! svm load or save path
-    std::string svm_path = "/home/krishneel/Desktop/mbzirc/data/svm.xml";
-    // this->pnh_.getParam("/uav_detect_landing_region/svm_path", svm_path);
+    std::string svm_path;
+    this->pnh_.getParam("svm_path", svm_path);
     if (svm_path.empty()) {
        ROS_ERROR("NOT SVM DETECTOR PATH. PROVIDE A VALID PATH");
        return;
     }
      
     //! train svm
-    bool is_train = !true;
-    // this->pnh_.getParam("/uav_detect_landing_region/train_detector",
-    // is_train);
+    bool is_train = true;
     if (is_train) {
        std::string object_data_path;
        std::string background_dataset_path;
-       this->pnh_.getParam("/uav_detect_landing_region/object_dataset_path",
-                           object_data_path);
-       this->pnh_.getParam("/uav_detect_landiang_region/object_dataset_path",
-                           background_dataset_path);
+       this->pnh_.getParam("object_dataset_path", object_data_path);
+       this->pnh_.getParam("background_dataset_path", background_dataset_path);
 
-       object_data_path = "/home/krishneel/Desktop/mbzirc/data/positive.txt";
-       background_dataset_path =
-          "/home/krishneel/Desktop/mbzirc/data/negative.txt";
+       std::string data_path;
+       this->pnh_.getParam("data_directory", data_path);
        
-       this->trainUAVLandingRegionDetector(object_data_path,
+       this->trainUAVLandingRegionDetector(data_path, object_data_path,
                                            background_dataset_path, svm_path);
        
        ROS_INFO("\033[34m-- SVM DETECTOR SUCCESSFULLY TRAINED \033[0m");
     }
-    this->svm_->load(static_cast<std::string>(svm_path));
+    // TODO(BUG):  the loaded model doesnot work....
+    // this->svm_->load(static_cast<std::string>(svm_path));
+    // this->svm_ = cv::Algorithm::load<cv::ml::SVM>(svm_path);
+    
     ROS_INFO("\033[34m-- SVM DETECTOR SUCCESSFULLY LOADED \033[0m");
     
     this->onInit();
@@ -73,7 +72,7 @@ void UAVLandingRegion::imageCB(
     const sensor_msgs::Image::ConstPtr &image_msg,
     const sensor_msgs::Image::ConstPtr &mask_msg,
     const jsk_msgs::VectorArray::ConstPtr &proj_mat_msg) {
-    
+   
     cv::Mat image = this->convertImageToMat(image_msg, "bgr8");
     cv::Mat im_mask = this->convertImageToMat(mask_msg, "mono8");
     if (image.empty() || im_mask.empty()) {
@@ -93,6 +92,8 @@ void UAVLandingRegion::imageCB(
        ROS_WARN("HIGH ALTITUDE. SKIPPING DETECTION");
        return;
     }
+
+    std::cout << "DETECTION"  << "\n";
     
     cv::Point2f marker_point = this->traceandDetectLandingMarker(
        image, im_mask, wsize);
@@ -141,8 +142,8 @@ cv::Point2f UAVLandingRegion::traceandDetectLandingMarker(
                 rect.y + rect.height < image.rows) {
                 cv::Mat roi = img(rect).clone();
                 cv::resize(roi, roi, this->sliding_window_size_);
-                
                 cv::Mat desc = this->extractFeauture(roi);
+                
                 float response = this->svm_->predict(desc);
                 if (response == 1) {
                    jsk_msgs::Rect bbox;

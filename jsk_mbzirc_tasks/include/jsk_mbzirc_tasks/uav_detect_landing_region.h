@@ -45,7 +45,7 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     float track_width_;
     float landing_marker_width_;
     float ground_plane_;
-   
+    
  protected:
     ros::NodeHandle pnh_;
     ros::Publisher pub_image_;
@@ -55,10 +55,6 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     void onInit();
     void subscribe();
     void unsubscribe();
-
-    enum {
-       EVEN, ODD};
-   
     
  public:
     UAVLandingRegion();
