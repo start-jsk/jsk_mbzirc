@@ -3,16 +3,11 @@
 
 UAVLandingRegion::UAVLandingRegion() :
     down_size_(2), ground_plane_(0.0), track_width_(3.0f),
-    landing_marker_width_(1.5f), min_wsize_(8) {
-   
-    // std::string templ_path;
-    // pnh_.getParam("/uav_detect_landing_region/templ_path", templ_path);
-    // this->templ_img_ = cv::imread(templ_path, CV_LOAD_IMAGE_COLOR);
-    // if (this->templ_img_.empty()) {
-    //     ROS_ERROR("TEMPLATE NOT FOUND");
-    //     return;
-    // }
+    landing_marker_width_(1.5f), min_wsize_(8), nms_thresh_(0.01f) {
 
+    this->nms_client_ = this->pnh_.serviceClient<
+       jsk_tasks::NonMaximumSuppression>("non_maximum_suppression");
+   
     //! svm load or save path
     std::string svm_path = "/home/krishneel/Desktop/mbzirc/data/svm.xml";
     // this->pnh_.getParam("/uav_detect_landing_region/svm_path", svm_path);
@@ -99,8 +94,11 @@ void UAVLandingRegion::imageCB(
        return;
     }
     
-    this->traceandDetectLandingMarker(image, im_mask, wsize);
+    cv::Point2f marker_point = this->traceandDetectLandingMarker(
+       image, im_mask, wsize);
 
+    
+    
     cv::waitKey(5);
     
     cv_bridge::CvImagePtr pub_msg(new cv_bridge::CvImage);
@@ -110,11 +108,11 @@ void UAVLandingRegion::imageCB(
     this->pub_image_.publish(pub_msg);
 }
 
-void UAVLandingRegion::traceandDetectLandingMarker(
+cv::Point2f UAVLandingRegion::traceandDetectLandingMarker(
     cv::Mat img, const cv::Mat marker, const cv::Size wsize) {
     if (img.empty() || marker.empty() || img.size() != marker.size()) {
         ROS_ERROR("EMPTY INPUT IMAGE FOR DETECTION");
-        return;
+        return cv::Point2f(-1, -1);
     }
     // cv::Mat image = marker.clone();
     cv::Mat image = img.clone();
@@ -124,7 +122,9 @@ void UAVLandingRegion::traceandDetectLandingMarker(
     cv::Mat im_edge;
     cv::Canny(image, im_edge, 50, 100);
     cv::Mat weight = img.clone();
-    
+
+    jsk_tasks::NonMaximumSuppression nms_srv;
+    //! 1 - detect
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(8)
 #endif
@@ -140,24 +140,57 @@ void UAVLandingRegion::traceandDetectLandingMarker(
                 cv::Mat desc = this->extractFeauture(roi);
                 float response = this->svm_->predict(desc);
                 if (response == 1) {
-                   cv::rectangle(weight, rect, cv::Scalar(0, 255, 0), 1);
+                   jsk_msgs::Rect bbox;
+                   bbox.x = rect.x;
+                   bbox.y = rect.y;
+                   bbox.width = rect.width;
+                   bbox.height = rect.height;
+                   nms_srv.request.rect.push_back(bbox);
+                   nms_srv.request.probabilities.push_back(response);
+                   
+                   // cv::rectangle(weight, rect, cv::Scalar(0, 255, 0), 1);
                 }
             }
           }
        }
     }
+    nms_srv.request.threshold = this->nms_thresh_;
 
+    //! 2 - non_max_suprresion
+    cv::Point2f center = cv::Point2f(-1, -1);
+    if (this->nms_client_.call(nms_srv)) {
+       for (int i = 0; i < nms_srv.response.bbox_count; i++) {
+          cv::Rect_<int> rect = cv::Rect_<int>(
+             nms_srv.response.bbox[i].x,
+             nms_srv.response.bbox[i].y,
+             nms_srv.response.bbox[i].width,
+             nms_srv.response.bbox[i].height);
+          
+          center.x = rect.x + rect.width / 2;
+          center.y = rect.y + rect.height / 2;
+
+          // for viz
+          cv::Point2f vert1 = cv::Point2f(center.x, center.y - wsize.width);
+          cv::Point2f vert2 = cv::Point2f(center.x, center.y + wsize.width);
+          cv::Point2f hori1 = cv::Point2f(center.x - wsize.width, center.y);
+          cv::Point2f hori2 = cv::Point2f(center.x + wsize.width, center.y);
+          cv::line(weight, vert1, vert2, cv::Scalar(0, 0, 255), 1);
+          cv::line(weight, hori1, hori2, cv::Scalar(0, 0, 255), 1);
+          cv::rectangle(weight, rect, cv::Scalar(0, 255, 0), 1);
+       }
+    } else {
+       ROS_FATAL("NON-MAXIMUM SUPPRESSION SRV NOT CALLED");
+       return cv::Point2f(-1, -1);
+    }
+    
+    // 3 - return bounding box
+    // TODO(REMOVE OTHER FALSE POSITIVES): HERE?
+    
     std::string wname = "result";
     cv::namedWindow(wname, cv::WINDOW_NORMAL);
     cv::imshow(wname, weight);
 
-    wname = "edge";
-    cv::namedWindow(wname, cv::WINDOW_NORMAL);
-    cv::imshow(wname, im_edge);
-    
-    // 1 - detect
-    // 2 - non_max_suprresion
-    // 3 - return bounding box
+    return center;
 }
 
 cv::Size UAVLandingRegion::getSlidingWindowSize(

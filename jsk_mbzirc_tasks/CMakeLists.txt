@@ -8,6 +8,16 @@ find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport tf mess
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 
+add_service_files(
+  FILES
+  NonMaximumSuppression.srv)
+
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+  std_msgs
+  jsk_recognition_msgs)
+
 #add gpu support
 set(ENABLE_CUDA ON)
 

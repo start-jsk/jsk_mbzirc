@@ -16,12 +16,15 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include <geometry_msgs/PolygonStamped.h>
+#include <geometry_msgs/PointStamped.h>
 #include <jsk_recognition_msgs/Rect.h>
 #include <jsk_recognition_msgs/VectorArray.h>
 
 #include <jsk_mbzirc_tasks/uav_detect_landing_region_trainer.h>
+#include <jsk_mbzirc_tasks/NonMaximumSuppression.h>
 
 namespace jsk_msgs = jsk_recognition_msgs;
+namespace jsk_tasks = jsk_mbzirc_tasks;
 
 class UAVLandingRegion: public UAVLandingRegionTrainer {
 
@@ -36,21 +39,18 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     int num_threads_;
     cv::Mat templ_img_;
     int down_size_;
-    float ground_plane_;
     int min_wsize_;
-
+    float nms_thresh_;
+   
     float track_width_;
     float landing_marker_width_;
-   
-   
-    // boost::shared_ptr<HOGFeatureDescriptor> hog_;
-    // cv::Ptr<cv::ml::SVM> svm_;
-    // cv::Size sliding_window_size_;
+    float ground_plane_;
    
  protected:
     ros::NodeHandle pnh_;
     ros::Publisher pub_image_;
     ros::Publisher pub_rect_;
+    ros::ServiceClient nms_client_;
    
     void onInit();
     void subscribe();
@@ -67,7 +67,8 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
                          const jsk_msgs::VectorArray::ConstPtr &);
     void skeletonization(cv::Mat &);
     void iterativeThinning(cv::Mat&, int);
-    void traceandDetectLandingMarker(cv::Mat, const cv::Mat, const cv::Size);
+    cv::Point2f traceandDetectLandingMarker(cv::Mat, const cv::Mat,
+                                            const cv::Size);
     cv::Mat convertImageToMat(const sensor_msgs::Image::ConstPtr &,
                               std::string);
     cv::Size getSlidingWindowSize(const jsk_msgs::VectorArray);
