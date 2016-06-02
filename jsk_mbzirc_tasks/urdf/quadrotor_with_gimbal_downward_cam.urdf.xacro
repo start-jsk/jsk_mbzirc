@@ -13,6 +13,7 @@
 
 
     <xacro:include filename="$(find jsk_mbzirc_common)/urdf/gimbal/gimbal.xacro" />
+    <xacro:include filename="$(find jsk_mbzirc_common)/urdf/drone/additional.xacro" />
 
 
     <xacro:gimbal name="gimbal1" parent="base_link" topside="false" width="0.015" motor_height="0.015" x="0.04" y="0.03" z="0.06" imu_topic_name="/raw_imu">
@@ -29,7 +30,7 @@
 
     <xacro:include filename="$(find hector_sensors_description)/urdf/generic_camera.urdf.xacro" />
 
-    <xacro:generic_camera name="downward_cam" parent="gimbal1_stabilized_link" ros_topic="camera/image" cam_info_topic="camera/camera_info" update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="100">
+    <xacro:generic_camera name="downward_cam" parent="gimbal1_stabilized_link" ros_topic="camera/image" cam_info_topic="camera/camera_info" update_rate="20" res_x="640" res_y="480" image_format="L8" hfov="160">
       <origin xyz="0.0 0.0 -0.03" rpy="0 ${M_PI/2} 0"/>
     </xacro:generic_camera>
 

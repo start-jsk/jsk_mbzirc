@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS gazebo_ros std_msgs geometry_msgs)
 
 # Depend on system install of Gazebo and SDFormat
 find_package(gazebo REQUIRED)
-
 find_package(Boost REQUIRED COMPONENTS thread random)
 
 ###################################
@@ -34,6 +33,8 @@ target_link_libraries(mbzirc_gazebo_treasure_plugin ${GAZEBO_LIBRARIES} ${catkin
 add_library(mbzirc_gazebo_gimbal_plugin src/mbzirc_gazebo_gimbal_plugin.cpp)
 target_link_libraries(mbzirc_gazebo_gimbal_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_library(mbzirc_gazebo_drone_additional_plugin src/mbzirc_gazebo_drone_additional_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_drone_additional_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #############
 ## Install ##
