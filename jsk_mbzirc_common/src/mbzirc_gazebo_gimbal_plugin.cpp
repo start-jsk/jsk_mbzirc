@@ -55,7 +55,7 @@ void GazeboGimbal::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   derivative_controller_gain_ = 1.0;
   integral_controller_gain_ = 0.1;
   maximum_velocity_ = 0.0;
-  maximum_torque_ = 0.0;
+  maximum_torque_ = 5; //test
   count_of_servos_ = 0;
   time_constant_ = 0;
 
@@ -196,7 +196,7 @@ void GazeboGimbal::Update()
     prev_update_time_ = world_->GetSimTime();
   }
 
-#if 0 //velocty
+#if 1 //velocty
   servos_[FIRST].joint->SetVelocity(0, servos_[FIRST].velocity);
   if (count_of_servos_ > 1) {
     servos_[SECOND].joint->SetVelocity(0, servos_[SECOND].velocity);
@@ -204,16 +204,7 @@ void GazeboGimbal::Update()
       servos_[THIRD].joint->SetVelocity(0, servos_[THIRD].velocity);
     }
   }
-#else //pos, cheat
-  servos_[FIRST].joint->SetAngle(0, servos_[FIRST].angle);
-  if (count_of_servos_ > 1) {
-    servos_[SECOND].joint->SetAngle(0, servos_[SECOND].angle);
-    if (count_of_servos_ > 2) {
-      servos_[THIRD].joint->SetAngle(0, servos_[THIRD].angle);
-    }
-  }
 #endif
-
   servos_[FIRST].joint->SetMaxForce(0, maximum_torque_);
   if (count_of_servos_ > 1) {
     servos_[SECOND].joint->SetMaxForce(0, maximum_torque_);
@@ -300,6 +291,10 @@ void GazeboGimbal::calculateVelocities(double dt)
       if (maximum_velocity_ > 0.0 && fabs(servos_[THIRD].velocity) > maximum_velocity_) servos_[THIRD].velocity = (servos_[THIRD].velocity > 0 ? maximum_velocity_ : -maximum_velocity_);
     }
   }
+
+  ROS_INFO("command: 0: %f, 1:%f", servos_[0].filter_command, servos_[1].filter_command);
+  ROS_INFO("actual:  0: %f, 1:%f", actual_angle[FIRST], actual_angle[SECOND]);
+  ROS_INFO("vel:  0: %f, 1:%f", servos_[FIRST].velocity, servos_[SECOND].velocity);
 }
 
 void GazeboGimbal::publish_joint_states()

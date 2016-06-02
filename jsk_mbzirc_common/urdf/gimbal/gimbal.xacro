@@ -176,6 +176,10 @@
         <imuTopic>${imu_topic_name}</imuTopic>
         <firstServoName>${name}_rotor_joint1</firstServoName>
         <secondServoName>${name}_rotor_joint2</secondServoName>
+        <proportionalControllerGain>80.0</proportionalControllerGain>
+        <derivativeControllerGain>0.2</derivativeControllerGain>
+        <IntegralControllerGain>0.1</IntegralControllerGain>
+        <torque>10.0</torque>
       </plugin>
     </gazebo>
 
