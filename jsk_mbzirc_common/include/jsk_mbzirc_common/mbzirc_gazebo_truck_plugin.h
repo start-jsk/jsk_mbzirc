@@ -43,7 +43,7 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <tf/transform_broadcaster.h>
 #include <string>
 
 namespace gazebo
@@ -73,7 +73,8 @@ private:
   std::string namespace_;
 
   ros::NodeHandle* node_handle_;
-  ros::Publisher pub_score_, pub_time_, pub_pos_;
+  ros::Publisher pub_score_, pub_time_;
+  tf::TransformBroadcaster br_;
   ros::Time state_stamp_;
 
   boost::mutex lock;

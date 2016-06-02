@@ -88,7 +88,6 @@ void GazeboTruck::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   node_handle_ = new ros::NodeHandle(namespace_);
   pub_score_ = node_handle_->advertise<std_msgs::String>("score", 1, true);  // set latch true
   pub_time_ = node_handle_->advertise<std_msgs::String>("remaining_time", 1);
-  pub_pos_ = node_handle_->advertise<geometry_msgs::PoseStamped>("heliport/ground_truth/state", 1);
 
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboTruck::Update, this));
 }
@@ -182,18 +181,12 @@ void GazeboTruck::Update()
   rayShape->GetIntersection(distAbove, entityName);
   distAbove -= 0.00001;
 
-  // publish pose of heliport
-  geometry_msgs::PoseStamped pose_msg;
-  pose_msg.header.stamp = ros::Time(world_->GetSimTime().Double());
+  // broadcast the tf of heliport via
+  tf::Transform transform;
   math::Pose heliport_pose = model_->GetLink("heliport")->GetWorldPose();
-  pose_msg.pose.position.x = heliport_pose.pos.x;
-  pose_msg.pose.position.y = heliport_pose.pos.y;
-  pose_msg.pose.position.z = heliport_pose.pos.z;
-  pose_msg.pose.orientation.x = heliport_pose.rot.x;
-  pose_msg.pose.orientation.y = heliport_pose.rot.y;
-  pose_msg.pose.orientation.z = heliport_pose.rot.z;
-  pose_msg.pose.orientation.w = heliport_pose.rot.w;
-  pub_pos_.publish(pose_msg);
+  transform.setOrigin(tf::Vector3(heliport_pose.pos.x, heliport_pose.pos.y, heliport_pose.pos.z));
+  transform.setRotation(tf::Quaternion(heliport_pose.rot.x, heliport_pose.rot.y, heliport_pose.rot.z, heliport_pose.rot.w));
+  br_.sendTransform(tf::StampedTransform(transform,ros::Time(world_->GetSimTime().Double()), "/world", "heliport"));
 
   // publish remain time
   std::stringstream ss;
