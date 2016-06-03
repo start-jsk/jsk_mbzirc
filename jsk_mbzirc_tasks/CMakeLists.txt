@@ -6,8 +6,19 @@ project(jsk_mbzirc_tasks)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
       roscpp cv_bridge image_transport tf message_filters nav_msgs sensor_msgs jsk_mbzirc_msgs)
+
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
+
+add_service_files(
+  FILES
+  NonMaximumSuppression.srv)
+
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+  std_msgs
+  jsk_mbzirc_msgs)
 
 #add gpu support
 set(ENABLE_CUDA OFF)
@@ -63,6 +74,19 @@ if (OpenCV_VERSION VERSION_GREATER "3.0")
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     )
+
+#build for landing site detection
+  add_executable(uav_detect_landing_region_node
+    src/uav_detect_landing_region_node.cpp
+    src/histogram_of_oriented_gradients.cpp
+    src/uav_detect_landing_region_trainer.cpp
+)
+  target_link_libraries(uav_detect_landing_region_node
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    )
+
+
 endif()
 
 #############

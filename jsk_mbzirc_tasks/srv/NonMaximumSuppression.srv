@@ -1,0 +1,6 @@
+jsk_mbzirc_msgs/Rect[] rect
+float32[] probabilities
+float32 threshold
+---
+jsk_mbzirc_msgs/Rect[] bbox
+int64 bbox_count

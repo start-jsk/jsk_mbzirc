@@ -5,6 +5,7 @@ find_package(catkin REQUIRED std_msgs sensor_msgs geometry_msgs message_generati
 add_message_files(
   FILES 
   ProjectionMatrix.msg
+  Rect.msg
   )
 
 generate_messages(
