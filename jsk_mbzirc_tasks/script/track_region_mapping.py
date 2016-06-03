@@ -193,8 +193,7 @@ def detect_and_filter_keypoints(im_gray, corner_type='HARRIS'):
     nearest_neigb = NearestNeighbors(radius = radius_thresh, \
                                      algorithm="kd_tree", \
                                      leaf_size = 30, \
-                                     metric = 'euclidean', \
-                                     n_jobs = 1).fit(np.array(temp_corners))
+                                     metric = 'euclidean').fit(np.array(temp_corners))
     #distances, indices = nearest_neigb.kneighbors(np.array(temp_corners))
     distances, indices = nearest_neigb.radius_neighbors(np.array(temp_corners))    
     
