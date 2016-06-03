@@ -185,8 +185,13 @@ void GazeboTruck::Update()
   tf::Transform transform;
   math::Pose heliport_pose = model_->GetLink("heliport")->GetWorldPose();
   transform.setOrigin(tf::Vector3(heliport_pose.pos.x, heliport_pose.pos.y, heliport_pose.pos.z));
-  transform.setRotation(tf::Quaternion(heliport_pose.rot.x, heliport_pose.rot.y, heliport_pose.rot.z, heliport_pose.rot.w));
-  br_.sendTransform(tf::StampedTransform(transform,ros::Time(world_->GetSimTime().Double()), "/world", "heliport"));
+  transform.setRotation(tf::Quaternion(heliport_pose.rot.x,
+                                       heliport_pose.rot.y,
+                                       heliport_pose.rot.z,
+                                       heliport_pose.rot.w));
+
+  br_.sendTransform(tf::StampedTransform(transform, ros::Time(world_->GetSimTime().Double()),
+                                         "/world", "heliport"));
 
   // publish remain time
   std::stringstream ss;
