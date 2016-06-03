@@ -17,7 +17,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <jsk_recognition_msgs/VectorArray.h>
+#include <jsk_mbzirc_msgs/ProjectionMatrix.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Pose.h>
@@ -59,8 +59,8 @@ public:
         //publish pointcloud msgs:
         std::string topic = nh_.resolveName("imagetoground");
         pointcloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>(topic, 1);
-        std::string topic2 = nh_.resolveName("paramatrix");
-        param_matrix_pub_ = nh_.advertise<jsk_recognition_msgs::VectorArray>(topic2,1);
+        std::string topic2 = nh_.resolveName("projection_matrix");
+        param_matrix_pub_ = nh_.advertise<jsk_mbzirc_msgs::ProjectionMatrix>(topic2,1);
         //for test the image
         cv::namedWindow("view");
         cv::startWindowThread();
@@ -102,7 +102,12 @@ void uav_img2pointcloud::p2p(const sensor_msgs::ImageConstPtr& img,
     tf::Pose tfpose;
     tfScalar extrisic_data[4*4];
     pcl::PointCloud<pcl::PointXYZRGB> Pointcloud;
-    jsk_recognition_msgs::VectorArray param_vector;
+    jsk_mbzirc_msgs::ProjectionMatrix param_vector;
+    std_msgs::MultiArrayDimension dim;
+    dim.size = 3;dim.label = "height";
+    param_vector.layout.dim.push_back(dim);
+    dim.size = 4;dim.label = "width";
+    param_vector.layout.dim.push_back(dim);
     Pointcloud.header.frame_id = "/world";
     Pointcloud.height = img->height; Pointcloud.width = img->width;
     Pointcloud.resize(img->height*img->width);
@@ -186,13 +191,13 @@ void uav_img2pointcloud::p2p(const sensor_msgs::ImageConstPtr& img,
 //     pointcloud_pub_.publish(cloud_msg);
     //publish param matrix 4*3 = 12
     param_vector.header = img->header;
-    param_vector.vector_dim = 12;
     for(int i = 0; i < 4; i++)
-        param_vector.data.push_back((float)a[i]);
+        param_vector.data.push_back(a[i]);
     for(int i = 0; i < 4; i++)
-        param_vector.data.push_back((float)b[i]);
+        param_vector.data.push_back(b[i]);
     for(int i = 0; i < 4; i++)
-        param_vector.data.push_back((float)c[i]);
+        param_vector.data.push_back(c[i]);
+
     param_matrix_pub_.publish(param_vector);
 
 }
