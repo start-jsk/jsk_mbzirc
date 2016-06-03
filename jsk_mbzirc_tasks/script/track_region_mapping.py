@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+## Copyright (C) 2016 by Krishneel Chaudhary @ JSK Lab, The University
+## of Tokyo, Japan
+
+
 import roslib
 roslib.load_manifest("jsk_mbzirc_tasks")
 

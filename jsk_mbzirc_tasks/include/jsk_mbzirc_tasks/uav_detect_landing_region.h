@@ -1,3 +1,5 @@
+// Copyright (C) 2016 by Krishneel Chaudhary @ JSK Lab, The University
+// of Tokyo, Japan
 
 #pragma once
 #ifndef _UAV_DETECT_LANDING_REGION_H_
@@ -17,23 +19,24 @@
 
 #include <geometry_msgs/PolygonStamped.h>
 #include <geometry_msgs/PointStamped.h>
-#include <jsk_recognition_msgs/Rect.h>
-#include <jsk_recognition_msgs/VectorArray.h>
+#include <jsk_mbzirc_msgs/Rect.h>
+#include <jsk_mbzirc_msgs/ProjectionMatrix.h>
 
 #include <jsk_mbzirc_tasks/uav_detect_landing_region_trainer.h>
 #include <jsk_mbzirc_tasks/NonMaximumSuppression.h>
 
-namespace jsk_msgs = jsk_recognition_msgs;
+namespace jsk_msgs = jsk_mbzirc_msgs;
 namespace jsk_tasks = jsk_mbzirc_tasks;
 
 class UAVLandingRegion: public UAVLandingRegionTrainer {
 
  private:
     typedef message_filters::sync_policies::ApproximateTime<
-    sensor_msgs::Image, sensor_msgs::Image, jsk_msgs::VectorArray> SyncPolicy;
+    sensor_msgs::Image, sensor_msgs::Image,
+    jsk_msgs::ProjectionMatrix> SyncPolicy;
     message_filters::Subscriber<sensor_msgs::Image> sub_image_;
     message_filters::Subscriber<sensor_msgs::Image> sub_mask_;
-    message_filters::Subscriber<jsk_msgs::VectorArray> sub_proj_;
+    message_filters::Subscriber<jsk_msgs::ProjectionMatrix> sub_proj_;
     boost::shared_ptr<message_filters::Synchronizer<SyncPolicy> >sync_;
 
     int num_threads_;
@@ -60,15 +63,15 @@ class UAVLandingRegion: public UAVLandingRegionTrainer {
     UAVLandingRegion();
     virtual void imageCB(const sensor_msgs::Image::ConstPtr &,
                          const sensor_msgs::Image::ConstPtr &,
-                         const jsk_msgs::VectorArray::ConstPtr &);
+                         const jsk_msgs::ProjectionMatrix::ConstPtr &);
     cv::Point2f traceandDetectLandingMarker(cv::Mat, const cv::Mat,
                                             const cv::Size);
     cv::Mat convertImageToMat(const sensor_msgs::Image::ConstPtr &,
                               std::string);
-    cv::Size getSlidingWindowSize(const jsk_msgs::VectorArray);
+    cv::Size getSlidingWindowSize(const jsk_msgs::ProjectionMatrix);
     float EuclideanDistance(const cv::Point3_<float> *);
     geometry_msgs::PointStamped pointToWorldCoords(
-       const jsk_msgs::VectorArray, const float, const float);
+       const jsk_msgs::ProjectionMatrix, const float, const float);
 };
 
 

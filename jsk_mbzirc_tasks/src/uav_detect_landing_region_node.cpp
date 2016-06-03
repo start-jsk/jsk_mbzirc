@@ -1,3 +1,5 @@
+// Copyright (C) 2016 by Krishneel Chaudhary @ JSK Lab, The University
+// of Tokyo, Japan
 
 #include <jsk_mbzirc_tasks/uav_detect_landing_region.h>
 
@@ -71,7 +73,7 @@ void UAVLandingRegion::unsubscribe() {
 void UAVLandingRegion::imageCB(
     const sensor_msgs::Image::ConstPtr &image_msg,
     const sensor_msgs::Image::ConstPtr &mask_msg,
-    const jsk_msgs::VectorArray::ConstPtr &proj_mat_msg) {
+    const jsk_msgs::ProjectionMatrix::ConstPtr &proj_mat_msg) {
    
     cv::Mat image = this->convertImageToMat(image_msg, "bgr8");
     cv::Mat im_mask = this->convertImageToMat(mask_msg, "mono8");
@@ -200,7 +202,7 @@ cv::Point2f UAVLandingRegion::traceandDetectLandingMarker(
 }
 
 cv::Size UAVLandingRegion::getSlidingWindowSize(
-    const jsk_msgs::VectorArray projection_matrix) {
+    const jsk_msgs::ProjectionMatrix projection_matrix) {
     float A[2][2];
     float bv[2];
 
@@ -265,7 +267,7 @@ cv::Mat UAVLandingRegion::convertImageToMat(
 }
 
 geometry_msgs::PointStamped UAVLandingRegion::pointToWorldCoords(
-    const jsk_msgs::VectorArray projection_matrix,
+    const jsk_msgs::ProjectionMatrix projection_matrix,
     const float x, const float y) {
     float A[2][2];
     float bv[2];

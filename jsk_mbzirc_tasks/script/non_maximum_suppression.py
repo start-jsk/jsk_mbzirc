@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from jsk_mbzirc_tasks.srv import *
-from jsk_recognition_msgs.msg import Rect
+from jsk_mbzirc_msgs.msg import Rect
 import rospy
 import numpy as np
 
