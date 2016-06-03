@@ -7,7 +7,7 @@ import rospy
 from cv_bridge import CvBridge
 from sklearn.neighbors import NearestNeighbors, KDTree, DistanceMetric
 from sensor_msgs.msg import Image, PointCloud2
-from jsk_recognition_msgs.msg import VectorArray
+from jsk_mbzirc_msgs.msg import ProjectionMatrix
 from std_msgs.msg import Header
 from scipy.spatial import distance
 
@@ -20,7 +20,7 @@ import random
 import time
 
 sub_image_ = '/downward_cam/camera/image'
-sub_matrix_ = '/paramatrix'
+sub_matrix_ = '/projection_matrix'
 
 pub_image_ = None
 pub_topic_ = '/track_region_mapping/output/track_mask'
@@ -312,7 +312,8 @@ def projection_matrix_callback(data):
     is_proj_mat_ = True
         
 def subscribe():
-    rospy.Subscriber(sub_matrix_, VectorArray, projection_matrix_callback)
+    #rospy.Subscriber(sub_matrix_, VectorArray, projection_matrix_callback)
+    rospy.Subscriber(sub_matrix_, ProjectionMatrix, projection_matrix_callback)
     rospy.Subscriber(sub_image_, Image, image_callback)
 
 def onInit():
