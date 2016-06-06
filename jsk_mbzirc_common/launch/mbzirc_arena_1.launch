@@ -4,6 +4,7 @@
   <arg name="gui" default="true"  />
   <arg name="headless" default="false"/>
 
+
   <include file="$(find jsk_mbzirc_common)/launch/mbzirc_arena.launch" >
     <arg name="paused" default="$(arg paused)"/>
     <arg name="debug" default="$(arg debug)"/>
@@ -11,4 +12,31 @@
     <arg name="world_name" default="$(find jsk_mbzirc_common)/gazebo_model/world/mbzirc_arena_task_1.world"/>
     <arg name="headless" default="$(arg headless)"/>
   </include>
+
+
+  <param name="truck/robot_description" command="$(find xacro)/xacro '$(find jsk_mbzirc_common)/urdf/truck.urdf.xacro'" />
+
+  <group ns="truck/ground_truth">
+    <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args=" -urdf -model truck -param /truck/robot_description" />
+
+    <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="truck_ground_truth">
+      <param name="output_frame" value="world"/>
+      <param name="base_footprint_frame" value="truck/ground_truth/base_link"/>
+      <param name="freq" value="50.0"/>
+      <param name="sensor_timeout" value="1.0"/>
+      <param name="odom_used" value="true"/>
+      <param name="imu_used" value="false"/>
+      <param name="vo_used" value="false"/>
+      <param name="debug" value="false"/>
+      <param name="self_diagnose" value="false"/>
+    </node>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="trcuk_state_publisher" output="screen" >
+      <param name="tf_prefix" type="string" value="truck/ground_truth" />
+      <param name="publish_frequency" type="double" value="50.0" />
+    </node>
+
+  </group>
+
 </launch>
