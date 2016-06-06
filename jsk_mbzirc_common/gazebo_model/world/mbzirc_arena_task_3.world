@@ -257,6 +257,12 @@
       </plugin>
     </model>
 
+    <model name="dropping_zone_box">
+      <pose>-65 25 0 0 0 0</pose>
+      <include>
+        <uri>model://dropping_zone_box</uri>
+      </include>
+    </model>
 
     <gui fullscreen='0'>
       <camera name='user_camera'>
