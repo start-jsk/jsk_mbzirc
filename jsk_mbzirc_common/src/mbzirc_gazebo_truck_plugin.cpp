@@ -173,7 +173,11 @@ void GazeboTruck::Update()
   double distAbove;
   std::string entityName;
   math::Box box = model_->GetLink("base_link")->GetCollision("base_link_collision_heliport")->GetBoundingBox();
-  math::Vector3 start = model_->GetLink("base_link")->GetCollision("base_link_collision_heliport")->GetWorldPose().pos;
+  math::Vector3 start = model_->GetWorldPose().pos;
+
+  start.x += (-0.5) * cos(yaw);
+  start.y += (-0.5) * sin(yaw);
+
   math::Vector3 end = start;
   start.z = box.max.z + 0.00001;
   end.z += 1000;
@@ -187,7 +191,7 @@ void GazeboTruck::Update()
   ss << 20*60 - current_time.Double();
   msg_time.data = "remain time:" + ss.str();
   pub_time_.publish(msg_time);
-  if ( entityName != "" && entityName != "truck::base_link::base_link_collision" && distAbove < 1.0 )
+  if ( entityName != ""  && distAbove < 1.0 )
     {
       std_msgs::String msg_score, msg_time;
       msg_score.data = "Mission Completed";

@@ -8,7 +8,7 @@
     <inertial>
       <mass value="700" /> <!-- http://trucktorack.blog.fc2.com/blog-entry-252.html -->
       <origin xyz="0 0 0.595" rpy="0 0 0" />
-      <inertia ixx="250.0" ixy="0.0" ixz="0.0" iyy="300.0" iyz="0.0" izz="300.0" />
+      <inertia ixx="200.0" ixy="0.0" ixz="0.0" iyy="400.0" iyz="0.0" izz="500.0" />
     </inertial>
 
     <visual>
@@ -40,7 +40,7 @@
     <inertial>
       <mass value="20" />
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia ixx="0.18" ixy="0.0" ixz="0.0" iyy="0.18" iyz="0.0" izz="0.3" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
     </inertial>
 
     <visual>
@@ -71,7 +71,7 @@
     <inertial>
       <mass value="20" />
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia ixx="0.18" ixy="0.0" ixz="0.0" iyy="0.18" iyz="0.0" izz="0.3" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
     </inertial>
 
     <visual>
@@ -102,7 +102,7 @@
     <inertial>
       <mass value="20" />
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia ixx="0.18" ixy="0.0" ixz="0.0" iyy="0.18" iyz="0.0" izz="0.3" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
     </inertial>
 
     <visual>
@@ -133,7 +133,7 @@
     <inertial>
       <mass value="20" />
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia ixx="0.18" ixy="0.0" ixz="0.0" iyy="0.18" iyz="0.0" izz="0.3" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
     </inertial>
 
     <visual>
@@ -162,9 +162,9 @@
 
   <link name="heliport">
     <inertial>
-      <mass value="10" />
+      <mass value="5" />
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <inertia ixx="1.5" ixy="0.0" ixz="0.0" iyy="1.5" iyz="0.0" izz="3.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="2.0" />
     </inertial>
 
     <visual>
@@ -190,8 +190,7 @@
       <frameName>world</frameName>
       <bodyName>base_link</bodyName>
       <topicName>odom</topicName>
-      <updateRate>30.0</updateRate>
-<gaussianNoise>0.00001</gaussianNoise>
+      <updateRate>50.0</updateRate>
     </plugin>
     <!-- truck trajectory + task1 rule -->
     <plugin name="mbzirc_gazebo_truck_plugin" filename="libmbzirc_gazebo_truck_plugin.so"> 
@@ -208,13 +207,21 @@
     <gravity>0</gravity>
   </gazebo>
 
-  <gazebo reference="front_left_tire">
+  <gazebo reference="heliport">
     <mu1>100</mu1>
     <mu2>50</mu2>
     <kp>1e+13</kp>
     <kd>1</kd>
     <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo reference="front_left_tire">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
     <material>Gazebo/Black</material>
+    <gravity>0</gravity>
   </gazebo>
 
   <gazebo reference="front_right_tire">
@@ -223,6 +230,7 @@
     <kp>1e+13</kp>
     <kd>1</kd>
     <material>Gazebo/Black</material>
+    <gravity>0</gravity>
   </gazebo>
 
   <gazebo reference="rear_left_tire">
@@ -231,6 +239,7 @@
     <kp>1e+13</kp>
     <kd>1</kd>
     <material>Gazebo/Black</material>
+    <gravity>0</gravity>
   </gazebo>
 
   <gazebo reference="rear_right_tire">
@@ -239,6 +248,7 @@
     <kp>1e+13</kp>
     <kd>1</kd>
     <material>Gazebo/Black</material>
+    <gravity>0</gravity>
   </gazebo>
 
 </robot>

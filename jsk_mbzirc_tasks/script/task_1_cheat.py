@@ -42,7 +42,7 @@ if __name__ == '__main__':
     pub = rospy.Publisher("/cmd_vel", Twist, queue_size=1)
 
     # for for 1 sec
-    while rospy.get_time() < 2:
+    while rospy.get_time() < 2.5:
         rospy.sleep(0.01)
     rospy.loginfo("start program %f" % rospy.get_time())
     msg = Twist()
