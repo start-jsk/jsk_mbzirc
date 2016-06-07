@@ -16,4 +16,8 @@
     local-name: husky_simulator
     uri: https://github.com/k-okada/husky_simulator.git
     version: f8a670d1578254ef6d5c7627ea6f7ac6b8d99a15
-
+# https://github.com/ros-simulation/gazebo_ros_pkgs/pull/460
+- git:
+    local-name: gazebo_ros_pkgs
+    uri: https://github.com/furushchev/gazebo_ros_pkgs.git
+    version: fix-camera-util
