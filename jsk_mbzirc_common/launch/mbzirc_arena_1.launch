@@ -13,7 +13,6 @@
     <arg name="headless" default="$(arg headless)"/>
   </include>
 
-
   <param name="truck/robot_description" command="$(find xacro)/xacro '$(find jsk_mbzirc_common)/urdf/truck.urdf.xacro'" />
 
   <group ns="truck/ground_truth">
@@ -31,7 +30,6 @@
       <param name="tf_prefix" type="string" value="truck/ground_truth" />
       <param name="publish_frequency" type="double" value="50.0" />
     </node>
-
   </group>
 
 </launch>
