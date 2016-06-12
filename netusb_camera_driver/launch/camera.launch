@@ -1,0 +1,25 @@
+<launch>
+  <arg name="camera_index" default="0" />
+  <arg name="launch_manager" default="true" />
+  <arg name="launch_image_proc" default="true" />
+  <arg name="namespace" default="camera" />
+  <arg name="manager" default="$(arg namespace)_nodelet_manager" />
+
+  <node name="$(arg manager)"
+        pkg="nodelet" type="nodelet" args="manager"
+        if="$(arg launch_manager)" />
+
+  <group ns="$(arg namespace)">
+    <node name="driver"
+          pkg="nodelet" type="nodelet"
+          args="load netusb_camera_driver/NETUSBCameraNodelet /$(arg manager)">
+      <param name="frame_id" value="$(arg namespace)" />
+      <param name="camera_index" value="$(arg camera_index)" />
+    </node>
+
+    <include file="$(find image_proc)/launch/image_proc.launch"
+             if="$(arg launch_image_proc)">
+      <arg name="manager" value="/$(arg manager)" />
+    </include>
+  </group>
+</launch>
