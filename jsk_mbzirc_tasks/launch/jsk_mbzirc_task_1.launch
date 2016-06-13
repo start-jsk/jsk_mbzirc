@@ -28,7 +28,7 @@
   <!-- Spawn simulated quadrotor uav -->
   <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
     <arg name="name" value="uav"/> 
-    <arg name="model" value="$(find jsk_mbzirc_tasks)/urdf/uav.urdf.xacro"/> 
+    <arg name="model" value="$(find jsk_mbzirc_tasks)/urdf/hawk.urdf.xacro"/> 
     <arg unless="$(arg cheat)" name="use_ground_truth_for_tf" value="$(arg use_ground_truth)" />
     <arg if="$(arg cheat)" name="use_ground_truth_for_tf" value="true" />
     <arg unless="$(arg cheat)" name="use_ground_truth_for_control" value="$(arg use_ground_truth)" />
