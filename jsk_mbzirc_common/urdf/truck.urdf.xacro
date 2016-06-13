@@ -1,0 +1,254 @@
+<?xml version="1.0"?>
+
+<robot name="truck" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:property name="pi" value="3.1415926535897931" />
+
+  <!-- body -->
+  <link name="base_link">
+    <inertial>
+      <mass value="700" /> <!-- http://trucktorack.blog.fc2.com/blog-entry-252.html -->
+      <origin xyz="0 0 0.595" rpy="0 0 0" />
+      <inertia ixx="200.0" ixy="0.0" ixz="0.0" iyy="400.0" iyz="0.0" izz="500.0" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0.595" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://jsk_mbzirc_common/gazebo_model/models/truck/meshes/truck.dae" scale=".001 .001 .001"/>
+      </geometry>
+      <material name="color"> <!-- blue -->
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.595" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://jsk_mbzirc_common/gazebo_model/models/truck/meshes/truck.dae" scale=".001 .001 .001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- tire -->
+  <joint name="body_to_front_left_tire" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_left_tire"/>
+    <origin rpy="${pi/2} 0 0" xyz="0.8 0.625 0.295"/> 
+  </joint>
+
+  <link name="front_left_tire">
+    <inertial>
+      <mass value="20" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+      <material name="color">
+        <color rgba="0 0 0  1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="body_to_front_right_tire" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_right_tire"/>
+    <origin rpy="${pi/2} 0 0" xyz="0.8 -0.625 0.295"/> 
+  </joint>
+
+  <link name="front_right_tire">
+    <inertial>
+      <mass value="20" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+      <material name="color">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="body_to_rear_left_tire" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_left_tire"/>
+    <origin rpy="${pi/2} 0 0" xyz="-0.8 0.625 0.295"/> 
+  </joint>
+
+  <link name="rear_left_tire">
+    <inertial>
+      <mass value="20" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+      <material name="color">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="body_to_rear_right_tire" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_right_tire"/>
+    <origin rpy="${pi/2} 0 0" xyz="-0.8 -0.625 0.295"/> 
+  </joint>
+
+  <link name="rear_right_tire">
+    <inertial>
+      <mass value="20" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="0.78" ixy="0.0" ixz="0.0" iyy="0.78" iyz="0.0" izz="0.87" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+      <material name="color">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius=".295" length=".23"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="body_to_heliport" type="fixed">
+    <parent link="base_link"/>
+    <child link="heliport"/>
+    <origin rpy="0 0 0" xyz="-0.5 0 0.995"/> 
+  </joint>
+
+  <link name="heliport">
+    <inertial>
+      <mass value="5" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="2.0" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://jsk_mbzirc_common/gazebo_model/models/truck/meshes/heliport.dae"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://jsk_mbzirc_common/gazebo_model/models/truck/meshes/heliport.dae"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- gazebo -->
+  <gazebo>
+    <!-- p3d plugin to publish odom -->
+    <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
+      <tf_prefix>truck/ground_truth</tf_prefix>
+      <frameName>world</frameName>
+      <bodyName>base_link</bodyName>
+      <topicName>odom</topicName>
+      <updateRate>50.0</updateRate>
+    </plugin>
+    <!-- truck trajectory + task1 rule -->
+    <plugin name="mbzirc_gazebo_truck_plugin" filename="libmbzirc_gazebo_truck_plugin.so"> 
+      <bodyName>base_link</bodyName>
+      </plugin>
+  </gazebo>
+
+  <!-- physical property of each link in gazebo -->
+  <gazebo reference="base_link">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo reference="heliport">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo reference="front_left_tire">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <material>Gazebo/Black</material>
+    <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo reference="front_right_tire">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <material>Gazebo/Black</material>
+    <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo reference="rear_left_tire">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <material>Gazebo/Black</material>
+    <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo reference="rear_right_tire">
+    <mu1>100</mu1>
+    <mu2>50</mu2>
+    <kp>1e+13</kp>
+    <kd>1</kd>
+    <material>Gazebo/Black</material>
+    <gravity>0</gravity>
+  </gazebo>
+
+</robot>

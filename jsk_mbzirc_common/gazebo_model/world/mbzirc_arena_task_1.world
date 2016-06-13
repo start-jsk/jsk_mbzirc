@@ -31,21 +31,7 @@
     </include>
 
     <include>
-<!--      <pose>0 0 0 0 -0 0</pose> -->
       <uri>model://arena</uri>
     </include>
-
-    <include>
-      <pose>-12.9517 13.7239 0.0 0 0 -0.81434</pose>
-      <uri>model://truck</uri>
-      <plugin name="mbzirc_gazebo_truck_plugin" filename="libmbzirc_gazebo_truck_plugin.so"/>  
-    </include>
-
-    <gui fullscreen='0'>
-      <camera name='user_camera'>
-        <pose>159.908 -1.39949 83.4967 0 0.559643 -3.11099</pose>
-        <view_controller>orbit</view_controller>
-      </camera>
-    </gui>
   </world>
 </sdf>
