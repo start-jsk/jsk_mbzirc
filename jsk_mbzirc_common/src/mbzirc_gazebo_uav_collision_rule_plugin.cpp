@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <jsk_mbzirc_tasks/mbzirc_gazebo_uav_collision_rule_plugin.h>
+#include <jsk_mbzirc_common/mbzirc_gazebo_uav_collision_rule_plugin.h>
 #include <string>
 
 namespace gazebo
