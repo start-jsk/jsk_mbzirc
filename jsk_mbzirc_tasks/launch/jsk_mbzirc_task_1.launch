@@ -38,19 +38,19 @@
     <arg name="z" value="$(arg z)"/>
   </include>
 
-  <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 
+  <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released -->
   <!-- display time in rviz -->
   <node pkg="jsk_mbzirc_tasks" name="remain_time_text_to_overlay" type="relay_field_728.py"
         args="/remaining_time /remaining_time_overlay jsk_rviz_plugins/OverlayText
-              'text: m.data' --wait-for-start" />
+              'text: m.data' --wait-for-start" /> 
   <!-- display uav state in rviz -->
   <node pkg="jsk_mbzirc_tasks" name="uav_state_text_to_overlay" type="relay_field_728.py"
-        args="/string_state /state_overlay jsk_rviz_plugins/OverlayText
-              'text: m.data' --wait-for-start" />
+        args="/state /state_overlay jsk_rviz_plugins/OverlayText
+              'text: [m.pose.pose.position.z, str]' --wait-for-start" />
   <!-- display  state in rviz -->
-  <node pkg="jsk_mbzirc_tasks" name="uav_ground_truth_text_to_overlay" type="relay_field_728.py"
-        args="/string_ground_truth /ground_truth_overlay jsk_rviz_plugins/OverlayText
-              'text: m.data' --wait-for-start" />
+  <node pkg="jsk_mbzirc_tasks" name="uav_ground_truth_text_to_overlay" type="relay_field_728.py" output="screen"
+        args="/ground_truth/state /ground_truth_overlay jsk_rviz_plugins/OverlayText
+              'text: [m.pose.pose.position.z, str]' --wait-for-start" />
 
   <group unless="$(arg headless)" >
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find jsk_mbzirc_tasks)/config/task1.rviz"/>

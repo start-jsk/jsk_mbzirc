@@ -27,12 +27,12 @@
     </include>
     <!-- display uav state in rviz -->
     <node pkg="jsk_mbzirc_tasks" name="uav_state_text_to_overlay" type="relay_field_728.py"
-          args="/$(arg uav1_name)/string_state /$(arg uav1_name)/state_overlay jsk_rviz_plugins/OverlayText
-                'text: m.data' --wait-for-start" />
+          args="/$(arg uav1_name)/state /$(arg uav1_name)/state_overlay jsk_rviz_plugins/OverlayText
+                'text: [m.pose.pose.position.z, str]' --wait-for-start" />
     <!-- display  state in rviz -->
     <node pkg="jsk_mbzirc_tasks" name="uav_ground_truth_text_to_overlay" type="relay_field_728.py"
-          args="/$(arg uav1_name)/string_ground_truth /$(arg uav1_name)/ground_truth_overlay jsk_rviz_plugins/OverlayText
-                'text: m.data' --wait-for-start" />
+          args="/$(arg uav1_name)/ground_truth/state /$(arg uav1_name)/ground_truth_overlay jsk_rviz_plugins/OverlayText
+                'text: [m.pose.pose.position.z, str]' --wait-for-start" />
   </group>
   <group ns="$(arg uav2_name)">
     <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
@@ -45,12 +45,12 @@
     </include>
     <!-- display uav state in rviz -->
     <node pkg="jsk_mbzirc_tasks" name="uav_state_text_to_overlay" type="relay_field_728.py"
-          args="/$(arg uav2_name)/string_state /$(arg uav2_name)/state_overlay jsk_rviz_plugins/OverlayText
-                'text: m.data' --wait-for-start" />
+          args="/$(arg uav2_name)/state /$(arg uav2_name)/state_overlay jsk_rviz_plugins/OverlayText
+                'text: [m.pose.pose.position.z, str]' --wait-for-start" />
     <!-- display  state in rviz -->
     <node pkg="jsk_mbzirc_tasks" name="uav_ground_truth_text_to_overlay" type="relay_field_728.py"
-          args="/$(arg uav2_name)/string_ground_truth /$(arg uav2_name)/ground_truth_overlay jsk_rviz_plugins/OverlayText
-                'text: m.data' --wait-for-start" />
+          args="/$(arg uav2_name)/ground_truth/state /$(arg uav2_name)/ground_truth_overlay jsk_rviz_plugins/OverlayText
+                'text: [m.pose.pose.position.z, str]' --wait-for-start" />
   </group>
   <group ns="$(arg uav3_name)">
     <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
@@ -63,12 +63,14 @@
     </include>
     <!-- display uav state in rviz -->
     <node pkg="jsk_mbzirc_tasks" name="uav_state_text_to_overlay" type="relay_field_728.py"
-          args="/$(arg uav3_name)/string_state /$(arg uav3_name)/state_overlay jsk_rviz_plugins/OverlayText
-                'text: m.data' --wait-for-start" />
+          args="/$(arg uav3_name)/state /$(arg uav3_name)/state_overlay jsk_rviz_plugins/OverlayText
+                'text: [m.pose.pose.position.z, str]' --wait-for-start" />
+
     <!-- display  state in rviz -->
     <node pkg="jsk_mbzirc_tasks" name="uav_ground_truth_text_to_overlay" type="relay_field_728.py"
-          args="/$(arg uav3_name)/string_ground_truth /$(arg uav3_name)/ground_truth_overlay jsk_rviz_plugins/OverlayText
-                'text: m.data' --wait-for-start" />
+          args="/$(arg uav3_name)/ground_truth/state /$(arg uav3_name)/ground_truth_overlay jsk_rviz_plugins/OverlayText
+                'text: [m.pose.pose.position.z, str]' --wait-for-start" />
+
   </group>
 
   <!-- workaround until https://github.com/ros/ros_comm/pull/728 get released --> 

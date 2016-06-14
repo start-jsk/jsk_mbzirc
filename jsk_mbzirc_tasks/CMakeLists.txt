@@ -4,10 +4,8 @@ project(jsk_mbzirc_tasks)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp gazebo_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp)
 
-# Depend on system install of Gazebo and SDFormat
-find_package(gazebo REQUIRED)
 
 ###################################
 ## catkin specific configuration ##
@@ -16,28 +14,14 @@ catkin_package(
     CATKIN_DEPENDS
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
 
-# build plugins
-add_library(mbzirc_gazebo_uav_state_display_plugin src/mbzirc_gazebo_uav_state_display_plugin.cpp)
-target_link_libraries(mbzirc_gazebo_uav_state_display_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
 #############
 ## Install ##
 #############
-
-#############
-## Install ##
-#############
-install(TARGETS
-  mbzirc_gazebo_uav_state_display_plugin
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  )
-
 install(DIRECTORY launch urdf config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
