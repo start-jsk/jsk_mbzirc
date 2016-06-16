@@ -4,10 +4,13 @@ project(jsk_mbzirc_tasks)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp gazebo_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp)
 
 # Depend on system install of Gazebo and SDFormat
-find_package(gazebo REQUIRED)
+find_package(gazebo_ros QUIET)
+if(gazebo_ros_FOUND)
+  find_package(gazebo REQUIRED)
+endif()
 
 ###################################
 ## catkin specific configuration ##
