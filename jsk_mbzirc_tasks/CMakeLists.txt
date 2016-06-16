@@ -4,8 +4,10 @@ project(jsk_mbzirc_tasks)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS roscpp gazebo_ros)
 
+# Depend on system install of Gazebo and SDFormat
+find_package(gazebo REQUIRED)
 
 ###################################
 ## catkin specific configuration ##
@@ -14,7 +16,7 @@ catkin_package(
     CATKIN_DEPENDS
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
