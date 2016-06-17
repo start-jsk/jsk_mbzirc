@@ -16,7 +16,7 @@ if(gazebo_ros_FOUND)
 
   find_package(catkin REQUIRED COMPONENTS std_msgs geometry_msgs)
   # Depend on system install of Gazebo and SDFormat
-
+  find_package(gazebo REQUIRED)
   find_package(Boost REQUIRED COMPONENTS thread random)
 
   ###################################
