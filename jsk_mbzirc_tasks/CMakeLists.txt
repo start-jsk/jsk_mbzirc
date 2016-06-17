@@ -8,9 +8,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp)
 
 # Depend on system install of Gazebo and SDFormat
 find_package(gazebo_ros QUIET)
-if(gazebo_ros_FOUND)
-  find_package(gazebo REQUIRED)
-endif()
+
 
 ###################################
 ## catkin specific configuration ##
