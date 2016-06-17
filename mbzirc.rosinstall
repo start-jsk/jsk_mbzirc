@@ -19,5 +19,5 @@
 # https://github.com/ros-simulation/gazebo_ros_pkgs/pull/460
 - git:
     local-name: gazebo_ros_pkgs
-    uri: https://github.com/furushchev/gazebo_ros_pkgs.git
-    version: fix-camera-util
+    uri: https://github.com/ros-simulation/gazebo_ros_pkgs.git
+    version: indigo-devel
