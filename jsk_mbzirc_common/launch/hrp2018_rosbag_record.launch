@@ -1,0 +1,23 @@
+<launch>
+  <arg name="save_dir" default="/tmp/hrp2_rosbag" />
+  <arg name="save_multisense" default="true" />
+  <arg name="save_velodyne" default="true" />
+  <arg name="save_cmd_vel" default="true" />
+  <arg name="save_net_usb_cam" default="true" />
+  <arg name="other_topics" default="" />
+
+  <arg name="velodyne_msgs" value="/velodyne_packets" if="$(arg save_velodyne)"/>
+  <arg name="velodyne_msgs" value="" unless="$(arg save_velodyne)"/>
+  <arg name="cmd_vel_msgs" value="/cmd_vel" if="$(arg save_cmd_vel)" />
+  <arg name="cmd_vel_msgs" value="" unless="$(arg save_cmd_vel)" />
+  <arg name="net_usb_cam_msgs" value="/net_usb_cam/camera_info /net_usb_cam/image_raw"
+       if="$(arg save_net_usb_cam)" />
+  <arg name="net_usb_cam_msgs" value="" unless="$(arg save_net_usb_cam)" />
+
+  <include file="$(find jsk_data)/launch/hrp2_record.launch">
+    <arg name="save_openni" value="false" />
+    <arg name="save_all_image" value="false" />
+    <arg name="save_multisense" value="$(arg save_multisense)" />
+    <arg name="other_topics" value="$(arg velodyne_msgs) $(arg cmd_vel_msgs) $(arg net_usb_cam_msgs) $(arg other_topics)" />
+  </include>
+</launch>

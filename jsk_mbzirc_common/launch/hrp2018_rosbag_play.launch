@@ -1,0 +1,37 @@
+<launch>
+  <arg name="bagfile_names" default="tmp.bag" />
+  <arg name="use_gui" default="false" />
+  <arg name="rosbag_option" default="--clock -l" />
+  <arg name="launch_multisense" default="true" />
+  <arg name="launch_velodyne" default="true" />
+  <arg name="launch_net_usb_cam" default="true" />
+  <arg name="use_xterm" default="false" />
+
+  <include file="$(find jsk_data)/launch/hrp2_play.launch">
+    <arg name="bagfile_names" value="$(arg bagfile_names)" />
+    <arg name="use_gui" value="$(arg use_gui)" />
+    <arg name="rosbag_option" value="$(arg rosbag_option)" />
+    <arg name="use_xterm" value="$(arg use_xterm)" />
+    <arg name="launch_openni" value="false" />
+    <arg name="launch_multisense" value="$(arg launch_multisense)" />
+    <arg name="ROBOT" value="HRP2W_MBZIRC" />
+  </include>
+
+  <!-- velodyne -->
+  <group if="$(arg launch_velodyne)">
+    <node name="velodyne_nodelet_manager" pkg="nodelet" type="nodelet"
+          args="manager" />
+    <include file="$(find velodyne_pointcloud)/launch/cloud_nodelet.launch">
+      <arg name="calibration" value="$(find velodyne_pointcloud)/params/32db.yaml" />
+    </include>
+  </group>
+
+  <!-- net_usb_cam -->
+  <group if="$(arg launch_net_usb_cam)" ns="net_usb_cam">
+    <node name="netusbcam_nodelet_manager" pkg="nodelet" type="nodelet"
+          args="manager" />
+    <include file="$(find image_proc)/launch/image_proc.launch">
+      <arg name="manager" value="nteusbcam_nodelet_manager" />
+    </include>
+  </group>
+</launch>
