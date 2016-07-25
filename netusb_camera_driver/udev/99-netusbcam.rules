@@ -1,0 +1,14 @@
+# NETUSBCAM
+
+# 'libusb' device nodes
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0666"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", IMPORT{builtin}="usb_id"
+
+# ICube (usb2.0)
+SYSFS{idVendor}=="152a", SYSFS{idProduct}=="8350", MODE="660", GROUP="users"
+# 3ICube (usb3.0)
+SYSFS{idVendor}=="20f1", SYSFS{idProduct}=="0101", MODE="660", GROUP="users"
+
+
+
+

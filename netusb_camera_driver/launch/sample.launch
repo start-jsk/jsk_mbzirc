@@ -1,0 +1,8 @@
+<launch>
+  <arg name="launch_driver" default="true" />
+  <include file="$(find netusb_camera_driver)/launch/camera.launch"
+           if="$(arg launch_driver)" />
+
+  <node name="camera_gui" pkg="rqt_gui" type="rqt_gui"
+        args="--perspective-file $(find netusb_camera_driver)/config/camera_gui.perspective" />
+</launch>
