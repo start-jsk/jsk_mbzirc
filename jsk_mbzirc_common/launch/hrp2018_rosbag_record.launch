@@ -4,6 +4,7 @@
   <arg name="save_velodyne" default="true" />
   <arg name="save_cmd_vel" default="true" />
   <arg name="save_net_usb_cam" default="true" />
+  <arg name="publish_tf_body_to_velodyne" default="true" />
   <arg name="other_topics" default="" />
 
   <arg name="velodyne_msgs" value="/velodyne_packets" if="$(arg save_velodyne)"/>
@@ -20,4 +21,9 @@
     <arg name="save_multisense" value="$(arg save_multisense)" />
     <arg name="other_topics" value="$(arg velodyne_msgs) $(arg cmd_vel_msgs) $(arg net_usb_cam_msgs) $(arg other_topics)" />
   </include>
+
+  <!-- this is temporally added. we should remove when link is written on robot_description -->
+  <node name="ground_to_velodyne" pkg="tf" type="static_tf_publisher"
+        args="-0.037 0 0.011 0 0 0 /BODY velodyne 10"
+        if="$(arg publish_tf_body_to_velodyne)" />
 </launch>
