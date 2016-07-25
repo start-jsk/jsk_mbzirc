@@ -19,6 +19,7 @@
     <arg name="save_openni" value="false" />
     <arg name="save_all_image" value="false" />
     <arg name="save_multisense" value="$(arg save_multisense)" />
+    <arg name="save_dir" value="$(arg save_dir)" />
     <arg name="other_topics" value="$(arg velodyne_msgs) $(arg cmd_vel_msgs) $(arg net_usb_cam_msgs) $(arg other_topics)" />
   </include>
 
