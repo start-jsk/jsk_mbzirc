@@ -145,7 +145,8 @@ namespace netusb_camera_driver
   {
     NODELET_INFO("connectCallback");
     boost::mutex::scoped_lock slock(conn_mutex_);
-    if (pub_.getNumSubscribers() > 0 && cam_.isStopped()) {
+    bool should_publish = always_publish_ || pub_.getNumSubscribers() > 0;
+    if (should_publish && cam_.isStopped()) {
       while (!cam_.isConnected() && ros::ok()) {
         try {
           NODELET_INFO("Connecting to netusb camera");
@@ -176,6 +177,7 @@ namespace netusb_camera_driver
 
   void NETUSBCameraNodelet::disconnectCallback()
   {
+    if (always_publish_) return;
     boost::mutex::scoped_lock slock(conn_mutex_);
     if (pub_.getNumSubscribers() == 0)
     {
@@ -203,9 +205,10 @@ namespace netusb_camera_driver
     uint32_t img_seq = 0;
     ros::Time prev_time = ros::Time::now();
     uint32_t fps_count = 0;
+    bool should_publish = always_publish_ || pub_.getNumSubscribers() > 0;
     while(!boost::this_thread::interruption_requested())
     {
-      if(pub_.getNumSubscribers() == 0)
+      if(!should_publish)
         continue;
       try
       {
@@ -268,6 +271,11 @@ namespace netusb_camera_driver
     pnh_.param<int>("device_number", cam_index_, 0);
     pnh_.param<double>("conenction_timeout", conn_timeout_, 0.0);
     pnh_.param<std::string>("frame_id", frame_id_, "camera");
+    pnh_.param<bool>("always_publish", always_publish_, false);
+
+    if (always_publish_) {
+      ROS_WARN_STREAM("param ~always_publish is true. This may consume CPU resouce a lot.");
+    }
 
     image_encoding_ = sensor_msgs::image_encodings::BAYER_GRBG8;
 
