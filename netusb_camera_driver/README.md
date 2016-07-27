@@ -38,6 +38,8 @@ $ sudo cp udev/99-netusbcam.rules /etc/udev/rules.d
 
 ``` bash
 $ roslaunch netusb_camera_driver camera.launch
+# if you want to publish image topic even when subscriber is none:
+$ roslaunch netusb_camera_driver camera.launch always_publish:=true
 ```
 
 3. Launch Driver, Viewer and Reconfigure

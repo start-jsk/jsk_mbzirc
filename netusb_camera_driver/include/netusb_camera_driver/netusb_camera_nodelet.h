@@ -52,6 +52,7 @@ namespace netusb_camera_driver
 
     boost::shared_ptr<boost::thread> pub_thread_;
     boost::mutex conn_mutex_, cfg_mutex_;
+    bool always_publish_;
     std::string frame_id_;
     int cam_index_;
     int image_width_, image_height_, image_step_;
