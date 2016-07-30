@@ -21,9 +21,23 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 add_executable(uav_teleop_keyboard src/uav_teleop_keyboard.cpp)
 target_link_libraries(uav_teleop_keyboard ${catkin_LIBRARIES})
 
+# build plugins
+add_library(mbzirc_gazebo_gimbal_plugin src/mbzirc_gazebo_gimbal_plugin.cpp)
+target_link_libraries(mbzirc_gazebo_gimbal_plugin ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 #############
 ## Install ##
 #############
+
+#############
+## Install ##
+#############
+install(TARGETS
+  mbzirc_gazebo_gimbal_plugin
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  )
+
 install(DIRECTORY launch urdf config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS)
