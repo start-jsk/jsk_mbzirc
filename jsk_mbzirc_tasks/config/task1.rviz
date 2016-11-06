@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /OverlayText1
+        - /OverlayText2
+        - /OverlayText3
       Splitter Ratio: 0.5
     Tree Height: 428
   - Class: rviz/Selection
@@ -151,6 +153,42 @@ Visualization Manager:
       text size: 32
       top: 10
       width: 500
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 25; 255; 240
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /state_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 40
+      left: 10
+      line width: 2
+      text size: 24
+      top: 70
+      width: 250
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 255; 0; 0
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /ground_truth_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 30
+      left: 10
+      line width: 2
+      text size: 18
+      top: 110
+      width: 200
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

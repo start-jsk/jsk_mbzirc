@@ -28,6 +28,7 @@ import rospy
 import rostopic
 import genpy
 import std_msgs
+import __builtin__
 
 __author__ = 'www.kentaro.wada@gmail.com (Kentaro Wada)'
 
@@ -38,6 +39,9 @@ def _eval_in_dict_impl(dict_, globals_, locals_):
         type_ = type(v)
         if type_ is dict:
             res[k] = _eval_in_dict_impl(v, globals_, locals_)
+        elif (type_ is list):
+            val = eval(v[0], globals_, locals_)
+            res[k] = getattr(__builtin__, v[1])(val)
         elif (type_ is str) or (type_ is unicode):
             try:
                 res[k] = eval(v, globals_, locals_)

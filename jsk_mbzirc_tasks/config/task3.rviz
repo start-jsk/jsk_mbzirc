@@ -1,13 +1,16 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 78
+    Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /Global Options1
         - /Status1
+        - /OverlayText1
+        - /OverlayText2
+        - /OverlayText3
       Splitter Ratio: 0.5
-    Tree Height: 124
+    Tree Height: 202
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -113,7 +116,6 @@ Visualization Manager:
       Size (m): 0.01
       Style: Flat Squares
       Topic: /UAV1/scan
-      Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -125,10 +127,10 @@ Visualization Manager:
       Overlay Alpha: 0.5
       Queue Size: 2
       Transport Hint: raw
-      Unreliable: false
       Value: true
       Visibility:
         Grid: true
+        OverlayText: true
         Remaining Time: true
         UAV1 LaserScan: true
         UAV1 RobotModel: true
@@ -196,7 +198,7 @@ Visualization Manager:
       Max Color: 255; 255; 255
       Max Intensity: 999999
       Min Color: 0; 0; 0
-      Min Intensity: 0
+      Min Intensity: -6.80389e-27
       Name: UAV2 LaserScan
       Position Transformer: XYZ
       Queue Size: 10
@@ -205,7 +207,6 @@ Visualization Manager:
       Size (m): 0.01
       Style: Flat Squares
       Topic: /UAV2/scan
-      Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -217,10 +218,10 @@ Visualization Manager:
       Overlay Alpha: 0.5
       Queue Size: 2
       Transport Hint: raw
-      Unreliable: false
       Value: true
       Visibility:
         Grid: true
+        OverlayText: true
         Remaining Time: true
         UAV1 Camera: true
         UAV1 LaserScan: true
@@ -297,7 +298,6 @@ Visualization Manager:
       Size (m): 0.01
       Style: Flat Squares
       Topic: /UAV3/scan
-      Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -309,10 +309,10 @@ Visualization Manager:
       Overlay Alpha: 0.5
       Queue Size: 2
       Transport Hint: raw
-      Unreliable: false
       Value: true
       Visibility:
         Grid: true
+        OverlayText: true
         Remaining Time: true
         UAV1 Camera: true
         UAV1 LaserScan: true
@@ -342,6 +342,60 @@ Visualization Manager:
       text size: 64
       top: 10
       width: 370
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 25; 255; 240
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /UAV1/ground_truth_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 30
+      left: 10
+      line width: 2
+      text size: 20
+      top: 10
+      width: 250
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 25; 255; 240
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /UAV2/ground_truth_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 30
+      left: 10
+      line width: 2
+      text size: 20
+      top: 80
+      width: 250
+    - Background Alpha: 0.8
+      Background Color: 0; 0; 0
+      Class: jsk_rviz_plugin/OverlayText
+      Enabled: true
+      Foreground Alpha: 0.8
+      Foreground Color: 25; 255; 240
+      Name: OverlayText
+      Overtake Color Properties: true
+      Overtake Position Properties: true
+      Topic: /UAV3/ground_truth_overlay
+      Value: true
+      font: DejaVu Sans Mono
+      height: 30
+      left: 10
+      line width: 2
+      text size: 20
+      top: 150
+      width: 250
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
